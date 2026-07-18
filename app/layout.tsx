@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_KR } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const notoSansKr = Noto_Sans_KR({
@@ -11,6 +12,18 @@ const notoSansKr = Noto_Sans_KR({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const jalnan = localFont({
+  src: "../public/fonts/Jalnan2.woff2",
+  variable: "--jalnan-font",
+  display: "swap",
+});
+
+const jalnanGothic = localFont({
+  src: "../public/fonts/JalnanGothic.woff2",
+  variable: "--jalnan-gothic-font",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${notoSansKr.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${notoSansKr.variable} ${geistMono.variable} ${jalnan.variable} ${jalnanGothic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

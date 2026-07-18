@@ -1,6 +1,42 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
+@theme {
+  /* ===== Brand - Green ===== */
+  --color-primary-focus: #358c1c;
+  --color-primary: #a8d89a;
+  --color-primary-light: #f6fbf5;
+
+  /* ===== Brand - Pink =====*/
+  --color-pink: #ffb3b3;
+  --color-pink-light: #fff7f7;
+
+  /* ===== Brand - Caramel / Brown ===== */
+  --color-secondary: #d9b58c;
+  --color-secondary-light: #fff7e6;
+  --color-brown-dark: #4b3f36;
+  --color-brown-medium: #6f655e;
+
+  /* ===== Text & Border ===== */
+  /* text- 접두사를 중복 유발하는 이름 대신 직관적인 컬러명으로 변경 */
+  --color-main: #525252; /* 활용: text-main */
+  --color-sub: #6f6f6f; /* 활용: text-sub */
+  --color-muted: #aaaaaa; /* 활용: text-muted */
+  --color-gray-light: #dddddd; /* 활용: text-gray-light 또는 bg-gray-light */
+  --color-border: #f0f0f0; /* 활용: border-border */
+
+  /* ===== Status ===== */
+  --color-success: #16a34a;
+  --color-info: #2563eb;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
+}
+
+@theme inline {
+  /* 기본 서체는 Noto Sans KR 유지, Jalnan은 선택 적용용 (font-jalnan / font-jalnan-gothic) */
+  --font-jalnan: var(--jalnan-font);
+  --font-jalnan-gothic: var(--jalnan-gothic-font);
+}
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -23,4 +59,4 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-}
+} */
