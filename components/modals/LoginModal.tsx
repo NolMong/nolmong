@@ -1,5 +1,5 @@
 'use client';
-
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useLoginModalStore } from '@/store/useLoginModalStore';
 
@@ -52,7 +52,9 @@ export default function LoginModal() {
 
         <button>카카오 로그인</button>
 
-        <button>회원가입</button>
+        <Link href='/travel-test' className='text-center'>
+          회원가입
+        </Link>
       </div>
     </div>
   );
