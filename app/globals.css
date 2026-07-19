@@ -11,10 +11,10 @@
   --color-pink-light: #fff7f7;
 
   /* ===== Brand - Caramel / Brown ===== */
-  --color-secondary: #d9b58c;
-  --color-secondary-light: #fff7e6;
-  --color-brown-dark: #4b3f36;
-  --color-brown-medium: #6f655e;
+  --color-caramel: #d9b58c;
+  --color-caramel-light: #fff7e6;
+  --color-brown: #4b3f36;
+  --color-brown-light: #6f655e;
 
   /* ===== Text & Border ===== */
   /* text- 접두사를 중복 유발하는 이름 대신 직관적인 컬러명으로 변경 */

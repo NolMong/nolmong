@@ -37,12 +37,12 @@ export default function LoginModal() {
       }}
     >
       <div
-        className='bg-white p-4 rounded-lg flex flex-col gap-4 w-92 '
+        className='bg-white p-4 rounded-lg flex flex-col gap-4 w-92 shadow-[0px_4px_10px_0px_#525252]'
         onClick={(e) => e.stopPropagation()}
       >
         <div className='font-jalnan text-[32px] flex items-center justify-center'>
           <span className='text-primary'>Nol</span>
-          <span className='text-secondary'>Mong</span>
+          <span className='text-caramel'>Mong</span>
         </div>
         <div className='flex gap-2.5 align-center items-center'>
           <div className='w-full min-w-0 h-px bg-muted'></div>

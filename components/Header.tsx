@@ -16,12 +16,12 @@ export default function Header() {
         {pathname === '/landing' ? (
           <div className='font-jalnan text-2xl'>
             <span className='text-primary'>Nol</span>
-            <span className='text-secondary'>Mong</span>
+            <span className='text-caramel'>Mong</span>
           </div>
         ) : (
           <Link href='/' className='font-jalnan text-2xl'>
             <span className='text-primary'>Nol</span>
-            <span className='text-secondary'>Mong</span>
+            <span className='text-caramel'>Mong</span>
           </Link>
         )}
 
