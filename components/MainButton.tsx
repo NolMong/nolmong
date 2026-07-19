@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center text-sm font-medium transition-colors focus:outline-none cursor-pointer select-none w-fit',
+  'inline-flex items-center justify-center text-sm font-medium transition-colors focus:outline-none cursor-pointer select-none w-fit py-[10px] px-4',
   {
     variants: {
       variant: {
@@ -37,7 +37,6 @@ interface MainButtonProps
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   width?: string;
-  padding?: string;
 }
 
 export default function MainButton({
@@ -45,7 +44,6 @@ export default function MainButton({
   variant,
   className,
   width,
-  padding,
   style,
   ...props
 }: MainButtonProps) {
@@ -57,8 +55,6 @@ export default function MainButton({
       className={cn(buttonVariants({ variant }), className)}
       style={{
         width: width || 'auto',
-        padding: padding || '10px 16px',
-        // isDisabled가 true일 때 커서를 강제로 not-allowed로 지정
         cursor: isDisabled ? 'not-allowed' : style?.cursor || 'pointer',
         ...style,
       }}
