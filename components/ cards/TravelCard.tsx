@@ -103,7 +103,7 @@ export default function TravelCard() {
         <div className='text-[12px] text-muted whitespace-nowrap'>
           최근 편집 : 방금 전
         </div>
-        <Link href='/main/edit' className='flex gap-1 items-center'>
+        <Link href='/plan/1' className='flex gap-1 items-center'>
           <Tag color='primary'>수정</Tag>
         </Link>
       </div>
