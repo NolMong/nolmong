@@ -6,9 +6,15 @@ import {
   FilterGroup,
   ProfileAvatar,
   ProfileEditModal,
+  DayCard,
+  PlaceListContainer,
 } from '@/components';
+import { type PlaceItem } from '@/components/ cards/PlaceCard';
+import { type CandidatePlaceItem } from '@/components/ cards/CandidatePlaceCard';
 import { useState } from 'react';
 import { useUserStore } from '@/store/useUserStore';
+import type { PlanCardData } from '@/types/plans';
+import PlanEditorCard from '@/components/ cards/PlanEditorCard';
 
 export default function NotFound() {
   // 필터 버튼용 상태값
@@ -23,8 +29,135 @@ export default function NotFound() {
   const userType = useUserStore((state) => state.userType);
   const setUserType = useUserStore((state) => state.setUserType);
 
+  // 가고 싶은 장소 더미 데이터
+  const candidatePlaces: CandidatePlaceItem[] = [
+    {
+      id: '1',
+      name: '해운대블루라인파크',
+      category: '테마/체험',
+      location: '부산 해운대구',
+    },
+    {
+      id: '2',
+      name: '미피스토어 해운대점',
+      category: '관광',
+      location: '나만의 장소',
+    },
+    {
+      id: '3',
+      name: '국이네 낙지볶음',
+      category: '식당',
+      location: '부산 수영구',
+    },
+    {
+      id: '4',
+      name: '우리돼지국밥',
+      category: '관광',
+      location: '부산 동구',
+    },
+    {
+      id: '5',
+      name: '흰여울 문화 마을',
+      category: '관광',
+      location: '부산 동구',
+    },
+  ];
+
+  // 장소 카드용 더미 데이터
+  const samplePlaces: PlaceItem[] = [
+    {
+      id: '1',
+      orderNumber: 1,
+      name: '부산역',
+      category: '관광',
+      location: '부산 동구',
+    },
+    {
+      id: '2',
+      orderNumber: 2,
+      name: '톤쇼우 남포점',
+      category: '식당',
+      location: '부산 남포동',
+    },
+    {
+      id: '3',
+      orderNumber: 3,
+      name: '롯데 현대백화점 부산 본점',
+      category: '쇼핑',
+      location: '부산 서면동',
+    },
+    {
+      id: '4',
+      orderNumber: 4,
+      name: '신라스테이 부산 해운대',
+      category: '호텔',
+      location: '부산 해운대구',
+    },
+  ];
+
+  // 타임라인 장소 더미 데이터
+  const [cards, setCards] = useState<PlanCardData[]>([
+    {
+      id: '1',
+      type: 'CHECKLIST',
+      checklistItems: [
+        { id: 'c1', text: '기차 티켓 확인', checked: true },
+        {
+          id: 'c2',
+          text: '렌터카 인수 확인 및 운전면허증 지참',
+          checked: false,
+        },
+      ],
+    },
+    {
+      id: '2',
+      type: 'PLACE',
+      placeOrderNumber: 1,
+      title: '부산역',
+      category: '관광',
+      location: '부산 동구',
+      visitTime: '12:29 ~ 12:50',
+      cost: '150,900원 (1인 50,300원)',
+      memo: '가지전에 탑승권 뽑고 가서 역무원에게 문의해야함.',
+    },
+    {
+      id: '3',
+      type: 'PLACE',
+      placeOrderNumber: 2,
+      title: '톤쇼우 남포점',
+      category: '관광',
+      location: '부산 동구',
+      visitTime: '11:00 ~ 13:00',
+      cost: '',
+      memo: '캐치테이블 11시에 열림\n성공하면 먹고, 못하면 옆집ㄱㄱ',
+    },
+    {
+      id: '4',
+      type: 'MEMO',
+      memo: '이따 해운대 구경하자\n여기 플리마켓 있다는데 구경하고 가자',
+    },
+  ]);
+
+  const handleUpdate = (updated: PlanCardData) => {
+    setCards((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+  };
+
+  const handleDelete = (id: string) => {
+    setCards((prev) => prev.filter((c) => c.id !== id));
+  };
+
   return (
     <div className="flex flex-col gap-10 p-4">
+      <div className="p-6 bg-gray-50 min-h-screen flex flex-col items-center">
+        <PlanEditorCard
+          dayNumber={1}
+          dateText="8.8 / 토"
+          cards={cards}
+          onUpdateCard={handleUpdate}
+          onDeleteCard={handleDelete}
+        />
+      </div>
+
       {/* 메인 버튼 */}
       <div className="p-3 border rounded-2xl">
         <h1 className="text-2xl font-bold">main 버튼</h1>
@@ -167,6 +300,25 @@ export default function NotFound() {
       <div className="p-3 border rounded-2xl flex flex-col gap-6 items-start">
         <h1 className="text-2xl font-bold">마이페이지 프로필 변경 UI</h1>
         <ProfileEditModal />
+      </div>
+
+      <div className="w-full max-w-md flex flex-col gap-4">
+        <h1 className="text-2xl font-bold text-main">
+          여행 일정 Day 카드 테스트
+        </h1>
+
+        {/* Day 1 카드 출력 */}
+        <DayCard dayNumber={1} dateText="8.8 (토)" places={samplePlaces} />
+      </div>
+
+      <div className="p-6 bg-gray-100 flex flex-col gap-6">
+        <h1 className="text-xl font-bold">후보 장소 리스트 테스트</h1>
+
+        {/* 장소 리스트 컴포넌트 */}
+        <PlaceListContainer
+          places={candidatePlaces}
+          onAddClick={() => alert('장소 추가 모달을 엽니다!')}
+        />
       </div>
     </div>
   );
