@@ -21,7 +21,7 @@ export default function DayCard({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 px-3 py-4 bg-white border border-border rounded-xl w-full max-w-[300px] shadow-card',
+        'flex flex-col gap-4 px-3 py-4 bg-white border border-border rounded-xl w-full max-w-75 shadow-card',
         className,
       )}
     >
