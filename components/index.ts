@@ -10,3 +10,5 @@ export { default as TravelTestResultCard } from './ cards/TravelTestResultCard';
 export { default as Header } from './templates/Header';
 // modal
 export { default as LoginModal } from './modals/LoginModal';
+// calendar
+export { default as CalendarComponent } from './calendar/CalendarComponent';

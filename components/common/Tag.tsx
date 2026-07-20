@@ -3,10 +3,10 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
-const tagVariants = cva('rounded-full w-fit font-jalnan-gothic', {
+const tagVariants = cva('rounded-full w-fit font-jalnan-gothic text-center', {
   variants: {
     size: {
-      small: 'text-xs px-3 pt-[5px] pb-[3px] leading-none',
+      small: 'text-xs px-3 pt-[6px] pb-[5px] leading-none',
       medium: 'text-base px-4 py-2',
       large: 'text-lg px-5 py-3',
     },

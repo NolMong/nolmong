@@ -8,6 +8,8 @@ import { useLoginModalStore } from '@/store/useLoginModalStore';
 export default function Header() {
   const pathname = usePathname();
   const openLoginModal = useLoginModalStore((state) => state.open);
+  const isLogin = true;
+  const isMain = pathname === '/main';
 
   return (
     <div className='w-full h-17.5 border-b border-border'>
