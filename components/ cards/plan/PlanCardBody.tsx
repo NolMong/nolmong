@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import ActionButton from '../../common/ActionButton';
 import PlaceCard from './content/PlaceCard';
 import ChecklistCard from './content/ChecklistCard';
 import MemoCard from './content/MemoCard';
+import Tag from '@/components/common/Tag';
 import type { PlanCardData } from '@/types/plans';
 
 interface PlanCardBodyProps {
@@ -96,14 +96,15 @@ export default function PlanCardBody({
     <div className="flex flex-col gap-3 text-xs font-regular text-main">
       {renderContent()}
 
+      {/* 수정 중일 때만 하단에 공통 취소/확인 버튼 표시 */}
       {isEditing && (
-        <div className="flex items-center justify-end gap-2 mt-2">
-          <ActionButton variant="cancel" onClick={onCancel}>
+        <div className="mt-2 flex items-center justify-end gap-2">
+          <Tag color="gray" onClick={onCancel}>
             취소
-          </ActionButton>
-          <ActionButton variant="confirm" onClick={onSave}>
+          </Tag>
+          <Tag color="primary" onClick={onSave}>
             확인
-          </ActionButton>
+          </Tag>
         </div>
       )}
     </div>

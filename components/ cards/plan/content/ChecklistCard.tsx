@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Plus, X } from 'lucide-react';
 import type { PlanCardData } from '@/types/plans';
 import Checkbox from '../../../common/Checkbox';
 
@@ -51,7 +50,7 @@ export default function ChecklistCard({
                 <button
                   type="button"
                   onClick={() => onRemoveChecklistItem(item.id)}
-                  className="text-[11px] text-gray-400"
+                  className="cursor-pointer text-[11px] text-gray-400 hover:text-red-500"
                 >
                   삭제
                 </button>
@@ -61,7 +60,7 @@ export default function ChecklistCard({
             <button
               type="button"
               onClick={onAddChecklistItem}
-              className="self-start rounded-full border border-dashed border-gray-300 px-3 py-1 text-[11px] text-gray-500"
+              className="cursor-pointer self-start rounded-full border border-dashed border-gray-300 px-3 py-1 text-[11px] text-gray-500 hover:bg-gray-50"
             >
               + 항목 추가
             </button>
@@ -69,7 +68,10 @@ export default function ChecklistCard({
         ) : (
           <div className="flex flex-col gap-2">
             {checklists.map((item) => (
-              <label key={item.id} className="flex items-center gap-2">
+              <label
+                key={item.id}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <Checkbox
                   checked={item.checked}
                   onChange={() => onToggleCheck(item.id)}

@@ -3,7 +3,6 @@
 import React from 'react';
 import { Edit3 } from 'lucide-react';
 import Tag from '../../common/Tag';
-import ActionButton from '../../common/ActionButton';
 import type { PlanCardData } from '@/types/plans';
 
 interface PlanCardHeaderProps {
@@ -38,17 +37,14 @@ export default function PlanCardHeader({
         <button
           type="button"
           onClick={onEditStart}
-          className="text-muted hover:text-main transition-colors cursor-pointer"
+          className="cursor-pointer text-muted transition-colors hover:text-main"
         >
           <Edit3 size={12} />
         </button>
       ) : (
-        <ActionButton
-          variant="delete"
-          onClick={() => onDelete && onDelete(data.id)}
-        >
+        <Tag color="pink" onClick={() => onDelete && onDelete(data.id)}>
           삭제
-        </ActionButton>
+        </Tag>
       )}
     </div>
   );
