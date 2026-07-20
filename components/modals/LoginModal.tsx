@@ -1,13 +1,21 @@
 'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useLoginModalStore } from '@/store/useLoginModalStore';
+import { MainButton } from '@/components';
 
 export default function LoginModal() {
   const isOpen = useLoginModalStore((state) => state.isOpen);
   const close = useLoginModalStore((state) => state.close);
   const [rendered, setRendered] = useState(false);
   const [visible, setVisible] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    close();
+  }, [pathname, close]);
 
   useEffect(() => {
     if (isOpen) {
@@ -52,8 +60,10 @@ export default function LoginModal() {
 
         <button>카카오 로그인</button>
 
-        <Link href='/travel-test' className='text-center'>
-          회원가입
+        <Link href='/travel-test' className='text-center w-full'>
+          <MainButton variant='fill' className='font-jalnan' width='100%'>
+            회원가입
+          </MainButton>
         </Link>
       </div>
     </div>

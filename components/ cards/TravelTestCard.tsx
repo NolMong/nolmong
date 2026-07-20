@@ -1,7 +1,8 @@
 'use client';
 import TravelTestResultCard from './TravelTestResultCard';
-import Image from 'next/image';
+import { MainButton } from '@/components';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { test } from '@/data/test';
 
@@ -10,7 +11,11 @@ type Answer = (typeof test)[number]['answers'][number];
 const DRUMROLL_DURATION = 3000;
 const FADE_DURATION = 200;
 
-export default function TravelTestCard() {
+export default function TravelTestCard({
+  onShowResult,
+}: {
+  onShowResult?: () => void;
+}) {
   const [currentNumber, setCurrentNumber] = useState(1);
   const [answers, setAnswers] = useState<(Answer | null)[]>(
     Array(test.length).fill(null),
@@ -40,6 +45,10 @@ export default function TravelTestCard() {
     }, FADE_DURATION);
     return () => clearTimeout(timeoutId);
   }, [isFinished, showResult, visible]);
+
+  useEffect(() => {
+    if (showResult) onShowResult?.();
+  }, [showResult, onShowResult]);
 
   const handleSelect = (answer: Answer) => {
     const nextAnswers = [...answers];
@@ -93,7 +102,8 @@ export default function TravelTestCard() {
               />
             </div>
             <div className='font-jalnan text-2xl text-center text-brown'>
-              <span className='text-brown-light'>이주현</span>님의 결과는
+              <span className='text-caramel'>이주현</span>님의 결과는
+              <br />
               두구두구두구두구~
             </div>
           </div>
@@ -145,22 +155,28 @@ export default function TravelTestCard() {
           </div>
         ))}
       </div>
-      <div className='flex gap-72'>
+      <div className='flex w-fill justify-between'>
         {currentNumber > 1 && (
-          <button
+          <MainButton
             onClick={handlePrev}
-            className='bg-white text-primary border border-primary rounded-full px-8 py-3 w-full'
+            variant='default'
+            className='font-jalnan'
+            width='80px'
           >
             이전
-          </button>
+          </MainButton>
         )}
-        <button
+        <MainButton
+          variant={!currentAnswer ? 'disabled' : 'fill'}
           onClick={handleNext}
           disabled={!currentAnswer}
-          className='bg-primary text-white rounded-full px-8 py-3 disabled:opacity-40 w-full'
+          width={
+            currentNumber > 1 ? (isLastQuestion ? '100px' : '80px') : '100%'
+          }
+          className={`font-jalnan ${currentAnswer ? '' : 'bg-[#c0d6b9]'}`}
         >
           {isLastQuestion ? '결과 보기' : '다음'}
-        </button>
+        </MainButton>
       </div>
     </div>
   );

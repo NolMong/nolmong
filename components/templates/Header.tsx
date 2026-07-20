@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LoginModal } from '@/components';
+import { MainButton, LoginModal } from '@/components';
 import { useLoginModalStore } from '@/store/useLoginModalStore';
 
 export default function Header() {
   const pathname = usePathname();
   const openLoginModal = useLoginModalStore((state) => state.open);
+  const isLogin = true;
+  const isMain = pathname === '/main';
 
   return (
     <div className='w-full h-17.5 border-b border-border'>
@@ -26,10 +28,12 @@ export default function Header() {
         )}
 
         <div>
-          <button onClick={openLoginModal}>로그인</button>
-          <button className='ml-2' onClick={openLoginModal}>
+          <MainButton variant='default' onClick={openLoginModal}>
+            로그인
+          </MainButton>
+          <MainButton variant='fill' className='ml-2' onClick={openLoginModal}>
             회원가입
-          </button>
+          </MainButton>
         </div>
       </div>
     </div>
