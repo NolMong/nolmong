@@ -38,7 +38,7 @@ export default function PlaceCard({ place, className }: PlaceCardProps) {
           <span className="flex items-center justify-center w-4 h-4 rounded-full bg-primary text-white text-[8px] font-jalnan pt-1 shrink-0 mb-1">
             {place.orderNumber}
           </span>
-          <h3 className="font-regular text-main text-sm font-jalnan-gothic">
+          <h3 className="font-regular text-main text-sm font-jalnan-gothic truncate">
             {place.name}
           </h3>
         </div>
