@@ -14,7 +14,8 @@ const tagVariants = cva('rounded-full w-fit font-jalnan-gothic', {
       primary: 'bg-primary text-primary-light',
       'primary-light': 'bg-primary-light text-primary',
       gray: 'bg-border text-muted',
-      pink: 'bg-pink-light text-pink',
+      pink: 'bg-pink text-pink-light',
+      'pink-light': 'bg-pink-light text-pink',
     },
   },
   defaultVariants: {

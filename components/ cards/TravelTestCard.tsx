@@ -102,7 +102,8 @@ export default function TravelTestCard({
               />
             </div>
             <div className='font-jalnan text-2xl text-center text-brown'>
-              <span className='text-brown-light'>이주현</span>님의 결과는
+              <span className='text-caramel'>이주현</span>님의 결과는
+              <br />
               두구두구두구두구~
             </div>
           </div>
