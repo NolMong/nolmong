@@ -1,19 +1,45 @@
 'use client';
 
-import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
-interface TagProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+const tagVariants = cva('rounded-full w-fit font-jalnan-gothic', {
+  variants: {
+    size: {
+      small: 'text-xs px-3 pt-[5px] pb-[3px] leading-none',
+      medium: 'text-base px-4 py-2',
+      large: 'text-lg px-5 py-3',
+    },
+    color: {
+      primary: 'bg-primary text-primary-light',
+      'primary-light': 'bg-primary-light text-primary',
+      gray: 'bg-border text-muted',
+      pink: 'bg-pink-light text-pink',
+    },
+  },
+  defaultVariants: {
+    size: 'small',
+    color: 'primary-light',
+  },
+});
+
+interface TagProps extends VariantProps<typeof tagVariants> {
+  onClick?: () => void;
+  children?: React.ReactNode;
+  props?: React.HTMLAttributes<HTMLDivElement>;
 }
 
-export default function Tag({ children, className, ...props }: TagProps) {
+export default function Tag({
+  onClick,
+  children,
+  size,
+  color,
+  ...props
+}: TagProps) {
   return (
     <div
-      className={cn(
-        'inline-flex items-center justify-center bg-color-primary-light text-primary font-jalnan text-xs rounded-full px-3 py-1 w-fit select-none',
-        className,
-      )}
+      onClick={onClick}
+      className={cn(tagVariants({ size, color }), onClick && 'cursor-pointer')}
       {...props}
     >
       {children}

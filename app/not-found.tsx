@@ -63,27 +63,6 @@ export default function NotFound() {
         </section>
       </div>
 
-      {/* 태그 */}
-      <div className="p-3 border rounded-2xl">
-        <h1 className="text-2xl font-bold">Tag</h1>
-        <section className="flex flex-col gap-3 items-start">
-          <h2 className="font-semibold text-main">
-            [1] 기본 태그 (피그마 D-Day 매핑)
-          </h2>
-          <Tag>D-12</Tag>
-        </section>
-
-        <section className="flex flex-col gap-3 items-start">
-          <h2 className="font-semibold text-main">
-            [2] 텍스트가 길어질 때 자율 확장 테스트
-          </h2>
-          <Tag>D-Day</Tag>
-          <Tag>모집중</Tag>
-          {/* 외부에서 폰트 크기나 패딩을 더 넓히고 싶을 때 className 주입 가능 */}
-          <Tag className="text-base px-4 py-1.5">크기를 키운 커스텀 태그</Tag>
-        </section>
-      </div>
-
       {/* 필터 버튼 */}
       <div className="p-3 border rounded-2xl flex flex-col gap-6">
         <h1 className="text-2xl font-bold">FILTER 버튼</h1>
