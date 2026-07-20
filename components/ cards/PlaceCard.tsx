@@ -21,7 +21,7 @@ export default function PlaceCard({ place, className }: PlaceCardProps) {
   return (
     <div
       className={cn(
-        'flex items-center gap-3 px-1 py-3 bg-white border border-border rounded-2xl select-none',
+        'flex items-center gap-3 px-1 py-3 bg-white border border-border rounded-lg select-none',
         className,
       )}
     >
