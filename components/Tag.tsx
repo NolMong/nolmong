@@ -26,13 +26,21 @@ const tagVariants = cva('rounded-full w-fit font-jalnan-gothic', {
 interface TagProps extends VariantProps<typeof tagVariants> {
   onClick?: () => void;
   children?: React.ReactNode;
+  props?: React.HTMLAttributes<HTMLDivElement>;
 }
 
-export default function Tag({ onClick, children, size, color }: TagProps) {
+export default function Tag({
+  onClick,
+  children,
+  size,
+  color,
+  ...props
+}: TagProps) {
   return (
     <div
       onClick={onClick}
       className={cn(tagVariants({ size, color }), onClick && 'cursor-pointer')}
+      {...props}
     >
       {children}
     </div>

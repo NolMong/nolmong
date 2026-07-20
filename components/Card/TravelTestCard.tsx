@@ -1,5 +1,5 @@
 'use client';
-import TravelTextResultCard from './TravelTextResultCard';
+import TravelTestResultCard from './TravelTestResultCard';
 import Image from 'next/image';
 
 import { useEffect, useState } from 'react';
@@ -69,7 +69,7 @@ export default function TravelTestCard() {
         }`}
       >
         {showResult ? (
-          <TravelTextResultCard
+          <TravelTestResultCard
             result={result}
             totalCapi={totalCapi}
             totalBara={totalBara}

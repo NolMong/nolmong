@@ -2,7 +2,7 @@ import { Tag } from '@/components';
 import { SquareCheck } from 'lucide-react';
 import Image from 'next/image';
 
-export default function TravelTextResultCard({
+export default function TravelTestResultCard({
   result,
   totalCapi,
   totalBara,
@@ -132,9 +132,7 @@ export default function TravelTextResultCard({
       </div>
       <div className='flex gap-2.5'>
         <button className='bg-white'>다시하기</button>
-        <button className={resultData.buttonClassName}>
-          여행가기!
-        </button>
+        <button className={resultData.buttonClassName}>여행가기!</button>
       </div>
     </div>
   );
