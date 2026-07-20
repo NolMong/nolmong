@@ -1,4 +1,4 @@
-import { CalendarComponent, Tag } from '@/components';
+import { CalendarComponent, Tag, TravelCard } from '@/components';
 import Image from 'next/image';
 
 export default function MainPage() {
@@ -6,7 +6,7 @@ export default function MainPage() {
     <div className='bg-[#FDFDFD] min-h-screen'>
       <div className='min-w-300 w-300 mx-auto px-5 py-8'>
         {/* 위에 달력 & 새 일정 만드는 버튼 */}
-        <div className='flex gap-5 h-fit mb-10'>
+        <div className='flex gap-5 h-fit mb-15'>
           <div className='shrink-0 box w-[384px] px-9 pt-1 rounded-2xl shadow-[0px_4px_10px_0px_#b5b5b540]'>
             <CalendarComponent size='medium' />
             <div className='w-full h-px bg-border mt-2'></div>
@@ -52,10 +52,22 @@ export default function MainPage() {
             </div>
           </button>
         </div>
-        <div className='px-5'>
+        <div className='px-4'>
           <div className='flex items-center gap-1'>
             <div className='text-2xl font-jalnan text-main'>나의 여행</div>
             <Tag>12개</Tag>
+          </div>
+
+          <div className='grid grid-cols-3 gap-y-6 py-6'>
+            <TravelCard />
+            <TravelCard />
+            <TravelCard />
+            <TravelCard />
+            <TravelCard />
+            <TravelCard />
+            <TravelCard />
+            <TravelCard />
+            <TravelCard />
           </div>
         </div>
       </div>
