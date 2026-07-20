@@ -1,6 +1,7 @@
-import { Tag } from '@/components';
+import { Tag, MainButton } from '@/components';
 import { SquareCheck } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function TravelTestResultCard({
   result,
@@ -35,9 +36,9 @@ export default function TravelTestResultCard({
     bara: {
       title: '바라',
       color: 'pink',
-      textColor: 'text-pink',
-      borderColor: 'border-pink',
-      buttonClassName: 'bg-pink text-pink-light',
+      // textColor: 'text-pink',
+      // borderColor: 'border-pink',
+      // buttonClassName: 'bg-pink text-pink-light',
       description: (
         <>
           꼼꼼한 계획을 세우는 걸 좋아하는 당신,
@@ -61,9 +62,6 @@ export default function TravelTestResultCard({
 
   return (
     <div className='flex flex-col items-center gap-8 w-150 h-fit'>
-      <Tag color={resultData.color as 'primary' | 'pink'}>
-        당신의 여행 유형은
-      </Tag>
       <Image
         src={`/images/${result}1.webp`}
         width={120}
@@ -71,8 +69,13 @@ export default function TravelTestResultCard({
         alt={result}
         className={`${result === 'capi' ? '' : '-scale-x-100'}`}
       />
+      <Tag
+        color={`${resultData.color}-light` as 'primary-light' | 'pink-light'}
+      >
+        당신의 여행 유형은
+      </Tag>
       <div className='text-center font-jalnan text-[32px] text-brown-light'>
-        <span className={resultData.textColor}>
+        <span className={resultData.color}>
           &ldquo;{resultData.title}&rdquo;
         </span>
         타입 여행자
@@ -94,7 +97,7 @@ export default function TravelTestResultCard({
           <div className='relative w-full h-3 rounded-full bg-linear-to-r from-primary to-pink'>
             <div className='absolute left-1/2 top-1/2 h-2 w-px -translate-x-1/2 -translate-y-1/2 bg-white/70'></div>
             <div
-              className={`absolute top-0 h-3 w-3 -translate-x-1/2 rounded-full border ${resultData.borderColor} bg-white`}
+              className={`absolute top-0 h-3 w-3 -translate-x-1/2 rounded-full border border-${resultData.color} bg-white`}
               style={{ left: `${baraPercent}%` }}
             ></div>
           </div>
@@ -131,8 +134,18 @@ export default function TravelTestResultCard({
         </div>
       </div>
       <div className='flex gap-2.5'>
-        <button className='bg-white'>다시하기</button>
-        <button className={resultData.buttonClassName}>여행가기!</button>
+        <MainButton variant='default' className='font-jalnan' width='140px'>
+          다시하기
+        </MainButton>
+        <Link href='/main'>
+          <MainButton
+            variant={result === 'capi' ? 'fill' : 'pinkFill'}
+            className='font-jalnan'
+            width='140px'
+          >
+            여행가기!
+          </MainButton>
+        </Link>
       </div>
     </div>
   );

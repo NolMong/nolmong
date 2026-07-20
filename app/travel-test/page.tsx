@@ -1,7 +1,8 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+
 import { TravelTestCard } from '@/components';
 
 const text = [
@@ -29,6 +30,7 @@ export default function TravelTestPage() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
   const [showTestCard, setShowTestCard] = useState(false);
+  const [resultShown, setResultShown] = useState(false);
 
   useEffect(() => {
     if (showTestCard) return;
@@ -53,13 +55,13 @@ export default function TravelTestPage() {
 
   return (
     <div className='w-full min-h-screen bg-caramel-light flex flex-col items-center pb-15'>
-      <div className='mt-30'>
-        <div className='bg-[#ffd17b68] w-45 h-13 rotate-4 mx-auto'></div>
+      <div className='mt-20'>
+        <div className='bg-[#ffd17b68] w-45 h-13 rotate-4 mx-auto z-20'></div>
         <div
           className={`min-w-150 bg-white rounded-[20px] shadow-[0px_4px_10px_0px_#b5b5b540] flex flex-col items-center justify-center -mt-6.5 ${showTestCard ? 'px-7.5 pt-15 pb-7.5 gap-10' : 'px-15 pt-15 pb-10'}`}
         >
           {showTestCard ? (
-            <TravelTestCard />
+            <TravelTestCard onShowResult={() => setResultShown(true)} />
           ) : (
             <>
               <div className='flex gap-4 items-center'>

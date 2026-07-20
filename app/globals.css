@@ -43,8 +43,21 @@
 
 @theme inline {
   /* 기본 서체는 Noto Sans KR 유지, Jalnan은 선택 적용용 (font-jalnan / font-jalnan-gothic) */
+  --font-sans: var(--font-noto-sans-kr);
   --font-jalnan: var(--jalnan-font);
   --font-jalnan-gothic: var(--jalnan-gothic-font);
+
+  /* 가만히 있어도 옆으로 흐르는 마퀴(marquee) 애니메이션 */
+  --animate-marquee: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* :root {
