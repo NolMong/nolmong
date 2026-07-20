@@ -11,18 +11,23 @@
   --color-pink-light: #fff7f7;
 
   /* ===== Brand - Caramel / Brown ===== */
-  --color-secondary: #d9b58c;
-  --color-secondary-light: #fff7e6;
-  --color-brown-dark: #4b3f36;
-  --color-brown-medium: #6f655e;
+  --color-caramel: #d9b58c;
+  --color-caramel-light: #fff7e6;
+  --color-brown: #4b3f36;
+  --color-brown-light: #6f655e;
 
   /* ===== Text & Border ===== */
   /* text- 접두사를 중복 유발하는 이름 대신 직관적인 컬러명으로 변경 */
-  --color-main: #525252; /* 활용: text-main */
-  --color-sub: #6f6f6f; /* 활용: text-sub */
-  --color-muted: #aaaaaa; /* 활용: text-muted */
-  --color-gray-light: #dddddd; /* 활용: text-gray-light 또는 bg-gray-light */
-  --color-border: #f0f0f0; /* 활용: border-border */
+  --color-main: #525252;
+  /* 활용: text-main */
+  --color-sub: #6f6f6f;
+  /* 활용: text-sub */
+  --color-muted: #aaaaaa;
+  /* 활용: text-muted */
+  --color-gray-light: #dddddd;
+  /* 활용: text-gray-light 또는 bg-gray-light */
+  --color-border: #f0f0f0;
+  /* 활용: border-border */
 
   /* ===== Status ===== */
   --color-success: #16a34a;
@@ -36,6 +41,7 @@
   --font-jalnan: var(--jalnan-font);
   --font-jalnan-gothic: var(--jalnan-gothic-font);
 }
+
 /* :root {
   --background: #ffffff;
   --foreground: #171717;
