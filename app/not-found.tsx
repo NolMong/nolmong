@@ -1,10 +1,14 @@
 'use client';
 
-import { MainButton, Tag, FilterGroup } from '@/components';
+import {
+  MainButton,
+  Tag,
+  FilterGroup,
+  ProfileAvatar,
+  ProfileEditModal,
+} from '@/components';
 import { useState } from 'react';
 import { useUserStore } from '@/store/useUserStore';
-import ProfileAvatar from '@/components/common/ProfileAvatar';
-import ProfileEditModal from '@/components/modals/ProfileEditModal';
 
 export default function NotFound() {
   // 필터 버튼용 상태값
