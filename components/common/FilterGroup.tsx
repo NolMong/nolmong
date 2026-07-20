@@ -15,7 +15,7 @@ export default function FilterGroup({
   onChange,
 }: FilterGroupProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className='flex flex-wrap items-center gap-2'>
       {options.map((option) => (
         <FilterButton
           key={option}

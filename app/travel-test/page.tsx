@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { TravelTestCard } from '../../components';
+import { TravelTestCard } from '@/components';
 
 const text = [
   <div key={0}>
