@@ -5,6 +5,7 @@ export { default as MainButton } from './common/MainButton';
 export { default as Tag } from './common/Tag';
 // cards
 export { default as TravelTestCard } from './ cards/TravelTestCard';
+export { default as TravelTestResultCard } from './ cards/TravelTestResultCard';
 // template
 export { default as Header } from './templates/Header';
 // modal

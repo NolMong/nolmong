@@ -1,6 +1,7 @@
-import { Tag } from '@/components';
+import { Tag, MainButton } from '@/components';
 import { SquareCheck } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function TravelTestResultCard({
   result,
@@ -131,8 +132,18 @@ export default function TravelTestResultCard({
         </div>
       </div>
       <div className='flex gap-2.5'>
-        <button className='bg-white'>다시하기</button>
-        <button className={resultData.buttonClassName}>여행가기!</button>
+        <MainButton variant='default' className='font-jalnan' width='140px'>
+          다시하기
+        </MainButton>
+        <Link href='/main'>
+          <MainButton
+            variant={result === 'capi' ? 'fill' : 'pinkFill'}
+            className='font-jalnan'
+            width='140px'
+          >
+            여행가기!
+          </MainButton>
+        </Link>
       </div>
     </div>
   );

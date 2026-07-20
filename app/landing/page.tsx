@@ -229,7 +229,7 @@ export default function LandingPage() {
           </div>
           <button
             onClick={openLoginModal}
-            className='text-white text-xl bg-caramel px-14 py-4 rounded-full mt-10 block w-fit mx-auto'
+            className='cursor-pointer text-white text-xl hover:bg-[#bc9d79] px-14 py-4 rounded-full mt-10 block w-fit mx-auto bg-caramel transition duration-200'
           >
             나는 카피? 바라? 테스트 해보기
           </button>
