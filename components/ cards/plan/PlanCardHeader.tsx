@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Pencil } from 'lucide-react';
+import { Edit3 } from 'lucide-react';
 import Tag from '../../common/Tag';
 import ActionButton from '../../common/ActionButton';
 import type { PlanCardData } from '@/types/plans';
@@ -40,7 +40,7 @@ export default function PlanCardHeader({
           onClick={onEditStart}
           className="text-muted hover:text-main transition-colors cursor-pointer"
         >
-          <Pencil size={12} />
+          <Edit3 size={12} />
         </button>
       ) : (
         <ActionButton
