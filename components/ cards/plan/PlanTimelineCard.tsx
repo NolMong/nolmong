@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import TimelineLeft from './TimelineLeft';
 import PlanCardHeader from './PlanCardHeader';
-import PlanCardContent from './PlanCardContent';
+import PlanCardBody from './PlanCardBody';
 import type { PlanCardData } from '@/types/plans';
 
 interface PlanTimelineCardProps {
@@ -96,7 +96,7 @@ export default function PlanTimelineCard({
             onDelete={onDelete}
           />
 
-          <PlanCardContent
+          <PlanCardBody
             data={data}
             isEditing={isEditing}
             editStartTime={editStartTime}
