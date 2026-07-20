@@ -21,7 +21,7 @@ export default function PlanTimelineCard({
 }: PlanTimelineCardProps) {
   const [isEditing, setIsEditing] = useState(false);
 
-  // 수정 모드 Form 상태 (공통/장소/메모용)
+  // 수정 모드 Form 상태
   const [editStartTime, setEditStartTime] = useState(
     data.visitTime?.split(' ~ ')[0] || '',
   );
@@ -31,10 +31,10 @@ export default function PlanTimelineCard({
   const [editCost, setEditCost] = useState(data.cost || '');
   const [editMemo, setEditMemo] = useState(data.memo || '');
 
-  // 체크리스트 상태 (조회 및 수정 공유)
+  // 체크리스트 상태
   const [checklists, setChecklists] = useState(data.checklistItems || []);
 
-  // [조회 모드] 체크박스 토글
+  // 조회 모드-체크박스 토글
   const toggleCheck = (id: string) => {
     setChecklists((prev) =>
       prev.map((item) =>
@@ -43,14 +43,14 @@ export default function PlanTimelineCard({
     );
   };
 
-  // [수정 모드] 체크리스트 항목 텍스트 변경
+  // 수정 모드-체크리스트 항목 텍스트 변경
   const handleChecklistTextChange = (id: string, text: string) => {
     setChecklists((prev) =>
       prev.map((item) => (item.id === id ? { ...item, text } : item)),
     );
   };
 
-  // [수정 모드] 체크리스트 항목 추가
+  // 수정 모드-체크리스트 항목 추가
   const handleAddChecklistItem = () => {
     setChecklists((prev) => [
       ...prev,
@@ -58,7 +58,7 @@ export default function PlanTimelineCard({
     ]);
   };
 
-  // [수정 모드] 체크리스트 항목 삭제
+  // 수정 모드-체크리스트 항목 삭제
   const handleRemoveChecklistItem = (id: string) => {
     setChecklists((prev) => prev.filter((item) => item.id !== id));
   };

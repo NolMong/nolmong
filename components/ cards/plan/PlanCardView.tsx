@@ -1,15 +1,10 @@
 'use client';
 
 import React from 'react';
-import {
-  CheckSquare,
-  Square,
-  Clock,
-  CircleDollarSign,
-  SquareMenu,
-} from 'lucide-react';
+import { Clock, CircleDollarSign, SquareMenu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PlanCardData } from '@/types/plans';
+import Checkbox from '../../common/Checkbox';
 
 interface PlanCardViewProps {
   data: PlanCardData;
@@ -27,16 +22,12 @@ export default function PlanCardView({
       {data.type === 'CHECKLIST' && (
         <div className="flex flex-col gap-1.5">
           {checklists.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => onToggleCheck(item.id)}
-              className="flex items-center gap-2 cursor-pointer text-sub hover:text-main"
-            >
-              {item.checked ? (
-                <CheckSquare size={16} className="text-primary shrink-0" />
-              ) : (
-                <Square size={16} className="text-muted shrink-0" />
-              )}
+            <div key={item.id} className="flex items-center gap-2">
+              <Checkbox
+                checked={!!item.checked}
+                onChange={() => onToggleCheck(item.id)}
+                size={16}
+              />
               <span className={cn(item.checked && 'line-through text-muted')}>
                 {item.text}
               </span>

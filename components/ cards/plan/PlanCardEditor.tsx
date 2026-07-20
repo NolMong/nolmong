@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Clock, SquareMenu, CircleDollarSign, Plus, X } from 'lucide-react';
+import Checkbox from '../../common/Checkbox';
 import type { PlanCardData } from '@/types/plans';
 
 interface PlanCardEditorProps {
@@ -76,11 +77,10 @@ export default function PlanCardEditor({
         <div className="flex flex-col gap-2">
           {checklists.map((item) => (
             <div key={item.id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={item.checked}
+              <Checkbox
+                checked={!!item.checked}
                 onChange={() => onToggleCheck(item.id)}
-                className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
+                size={16}
               />
               <input
                 type="text"
