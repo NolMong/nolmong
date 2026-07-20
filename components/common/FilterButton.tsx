@@ -22,7 +22,7 @@ export default function FilterButton({
           ? // Active
             'bg-primary border-primary text-white'
           : // Inactive
-            'bg-white border-border text-sub hover:bg-border/30',
+            'bg-white border-border text-muted hover:bg-border/30',
         className,
       )}
       {...props}
