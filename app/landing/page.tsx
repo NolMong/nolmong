@@ -109,7 +109,7 @@ export default function LandingPage() {
 
   return (
     <div>
-      <Header />
+      {/* <Header /> */}
       {/* 랜딩 이미지 */}
       <div className='relative'>
         <Image
