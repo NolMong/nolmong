@@ -36,6 +36,9 @@
   --color-info: #2563eb;
   --color-warning: #f59e0b;
   --color-error: #dc2626;
+
+  /* 카드용 그림자 */
+  --shadow-card: 0 4px 10px rgba(181, 181, 181, 0.25);
 }
 
 @theme inline {

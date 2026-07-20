@@ -17,12 +17,12 @@ export default function FilterButton({
     <button
       type="button"
       className={cn(
-        'inline-flex items-center justify-center text-sm font-medium rounded-full w-fit py-2 px-[14px] cursor-pointer select-none transition-colors border-1 border-border',
+        'inline-flex items-center justify-center text-sm font-medium rounded-full w-fit py-2 px-3.5 cursor-pointer select-none transition-colors border border-border',
         isActive
           ? // Active
             'bg-primary border-primary text-white'
           : // Inactive
-            'bg-white border-border text-sub hover:bg-border/30',
+            'bg-white border-border text-muted hover:bg-border/30',
         className,
       )}
       {...props}
