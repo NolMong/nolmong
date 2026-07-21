@@ -9,12 +9,12 @@ import {
   DayCard,
   PlaceListContainer,
 } from '@/components';
-import { type PlaceItem } from '@/components/ cards/PlaceCard';
-import { type CandidatePlaceItem } from '@/components/ cards/CandidatePlaceCard';
+import { type PlaceItem } from '@/components/cards/PlaceCard';
+import { type CandidatePlaceItem } from '@/components/cards/CandidatePlaceCard';
 import { useState } from 'react';
 import { useUserStore } from '@/store/useUserStore';
 import type { PlanCardData } from '@/types/plans';
-import PlanEditorCard from '@/components/ cards/PlanEditorCard';
+import PlanEditorCard from '@/components/cards/PlanEditorCard';
 
 export default function NotFound() {
   // 필터 버튼용 상태값

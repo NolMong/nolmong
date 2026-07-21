@@ -4,7 +4,7 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import CandidatePlaceCard, {
   type CandidatePlaceItem,
-} from '../ cards/CandidatePlaceCard';
+} from '../cards/CandidatePlaceCard';
 import { cn } from '@/lib/utils';
 
 interface PlaceListContainerProps {
