@@ -47,6 +47,7 @@ export default function Header() {
 
   return (
     <div className="w-full h-17.5 border-b border-border">
+    <div className='w-full h-17.5 border-b border-border bg-white'>
       <LoginModal />
       <div className="w-full min-w-75 max-w-300 h-full mx-auto px-5 flex items-center justify-between">
         {pathname === '/landing' ? (

@@ -6,12 +6,6 @@ import type { Value } from 'react-calendar/dist/shared/types.js';
 import 'react-calendar/dist/Calendar.css';
 import './custom_calendar.css';
 
-const sizeClassMap = {
-  small: 'w-100 h-100',
-  medium: 'w-125 h-125',
-  large: 'w-150 h-150',
-};
-
 type TravelEntry = string | { startDay: string; endDay: string };
 
 function formatDateKey(date: Date) {
@@ -68,7 +62,7 @@ export default function CalendarComponent({
       value={value}
       onChange={setValue}
       calendarType='gregory'
-      className='font-jalnan'
+      className={['font-jalnan', 'main-calendar']}
       formatDay={(_locale, date) => String(date.getDate())}
       tileClassName={({ date, view }) =>
         view === 'month' ? getTravelTileClassName(date, travels) : null
