@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist_Mono, Noto_Sans_KR } from 'next/font/google';
 import localFont from 'next/font/local';
-import { Header } from '@/components';
+import { Header, CreatePlanModal } from '@/components';
 import './globals.css';
 
 const notoSansKr = Noto_Sans_KR({
@@ -39,11 +39,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang='en'
       className={`${notoSansKr.variable} ${geistMono.variable} ${jalnan.variable} ${jalnanGothic.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className='relative min-h-full flex flex-col'>
         <Header />
+
         {children}
       </body>
     </html>

@@ -1,9 +1,20 @@
-import { CalendarComponent, Tag, TravelCard } from '@/components';
+'use client';
+
+import {
+  CalendarComponent,
+  CreatePlanModal,
+  Tag,
+  TravelCard,
+} from '@/components';
+import { useCreatePlanModalStore } from '@/store/useModalStore';
 import Image from 'next/image';
 
 export default function MainPage() {
+  const openCreatePlanModal = useCreatePlanModalStore((state) => state.open);
+
   return (
-    <div className='bg-[#FDFDFD] min-h-screen'>
+    <div className=' bg-[#FDFDFD] min-h-screen'>
+      <CreatePlanModal />
       <div className='min-w-300 w-300 mx-auto px-5 py-8'>
         {/* 위에 달력 & 새 일정 만드는 버튼 */}
         <div className='flex gap-5 h-fit mb-15'>
@@ -17,7 +28,10 @@ export default function MainPage() {
             </div>
           </div>
 
-          <button className='cursor-pointer relative flex-1 self-stretch rounded-2xl shadow-[0px_4px_10px_0px_#b5b5b540] overflow-hidden'>
+          <button
+            onClick={openCreatePlanModal}
+            className='cursor-pointer relative flex-1 self-stretch rounded-2xl shadow-[0px_4px_10px_0px_#b5b5b540] overflow-hidden'
+          >
             <Image
               src='/images/landing_bg.webp'
               alt='Main Image'

@@ -1,49 +1,25 @@
-/* 캘린더 전체 wrapper (main-calendar 클래스로 스코핑: TravelDateCalendar와 클래스명이 겹쳐서 서로 스타일이 새는 것을 방지) */
-.main-calendar {
+/* 캘린더 전체 wrapper (travel-date-calendar 클래스로 스코핑: CalendarComponent와 클래스명이 겹쳐서 서로 스타일이 새는 것을 방지) */
+.travel-date-calendar .react-calendar {
   width: 100%;
   border: none;
-  font-family: inherit;
 }
 
-.main-calendar .react-calendar__navigation {
+.travel-date-calendar .react-calendar__navigation {
   margin: 0;
-  font-family: var(--font-jalnan-gothic);
   color: var(--color-sub);
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* 네비게이션 버튼 hover / focus */
-.main-calendar .react-calendar__navigation button:enabled:hover,
-.main-calendar .react-calendar__navigation button:enabled:focus {
+.travel-date-calendar .react-calendar__navigation button:enabled:hover,
+.travel-date-calendar .react-calendar__navigation button:enabled:focus {
   background-color: transparent;
 }
 
 /* 요일 행(월화수목금토일) 각 셀 */
-.main-calendar .react-calendar__month-view__weekdays__weekday {
-  font-size: 0.75rem;
+.travel-date-calendar .react-calendar__month-view__weekdays__weekday {
+  font-size: 14px;
   color: var(--color-muted);
-  font-family: var(--font-jalnan);
-}
-
-/* 요일 행 첫번째 칸(일) */
-.main-calendar
-  .react-calendar__month-view__weekdays__weekday:nth-child(7n + 1) {
-  color: #f48f8f;
-}
-
-/* 요일 행 마지막 칸(토) */
-.main-calendar .react-calendar__month-view__weekdays__weekday:nth-child(7n) {
-  color: #8fc1f4;
-}
-
-/* 날짜 칸 첫번째 열(일요일, calendarType='gregory'라 일요일이 첫 칸) */
-.main-calendar .react-calendar__month-view__days__day:nth-child(7n + 1) {
-  color: #f48f8f;
-}
-
-/* 날짜 칸 마지막 열(토요일) */
-.main-calendar .react-calendar__month-view__days__day:nth-child(7n) {
-  color: #8fc1f4;
 }
 
 /* 요일 이름이 abbr 태그라 브라우저 기본 점선 밑줄이 붙는 것 제거 */
@@ -51,30 +27,52 @@
   text-decoration: none;
 }
 
+/* 요일 행 첫번째 칸(일) */
+.travel-date-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(7n + 1) {
+  color: #f48f8f;
+}
+
+/* 요일 행 마지막 칸(토) */
+.travel-date-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(7n) {
+  color: #8fc1f4;
+}
+
+/* 날짜 칸 첫번째 열(일요일, calendarType='gregory'라 일요일이 첫 칸) */
+.travel-date-calendar .react-calendar__month-view__days__day:nth-child(7n + 1) {
+  color: #f48f8f;
+}
+
+/* 날짜 칸 마지막 열(토요일) */
+.travel-date-calendar .react-calendar__month-view__days__day:nth-child(7n) {
+  color: #8fc1f4;
+}
+
 /* 지난달 / 다음달로 넘어가는 날짜(흐리게 표시되는 칸) */
 /* .react-calendar__tile까지 체이닝해서 특이도를 올림 (아래 .react-calendar__tile 규칙에 안 밀리도록) */
-.main-calendar
+.travel-date-calendar
   .react-calendar__tile.react-calendar__month-view__days__day--neighboringMonth {
   color: var(--color-gray-light);
 }
 
 /* 날짜 칸 하나(공통 기본 스타일) */
-.main-calendar .react-calendar__tile {
+.travel-date-calendar .react-calendar__tile {
   border-radius: 999px;
   padding: 0;
   line-height: 28px;
+  font-size: 16px;
   color: var(--color-sub);
-  font-family: var(--font-jalnan);
 }
 
 /* 날짜 칸 hover / focus (마우스 올렸을 때) */
-.main-calendar .react-calendar__tile:enabled:hover,
-.main-calendar .react-calendar__tile:enabled:focus {
+.travel-date-calendar .react-calendar__tile:enabled:hover,
+.travel-date-calendar .react-calendar__tile:enabled:focus {
   background-color: var(--color-border);
 }
 
 /* 오늘 날짜 */
-.main-calendar .react-calendar__tile--now {
+.travel-date-calendar .react-calendar__tile--now {
   background: none;
   color: var(--color-primary);
   font-weight: 600;
@@ -83,7 +81,7 @@
 }
 
 /* 사용자가 클릭해서 선택한 날짜(value로 지정된 것) */
-.main-calendar .react-calendar__tile--active {
+.travel-date-calendar .react-calendar__tile--active {
   background: var(--color-primary) !important;
   color: #fff !important;
 }
@@ -91,14 +89,14 @@
 /* CalendarComponent의 tileClassName이 붙여주는 커스텀 클래스 (react-calendar 기본 클래스 아님) */
 
 /* 여행 일정 하이라이트: 단일 날짜, 또는 범위(startDay~endDay)의 시작·끝 날짜 */
-.main-calendar .travel-edge {
+.travel-date-calendar .travel-edge {
   background-color: var(--color-primary) !important;
   color: var(--color-primary-light) !important;
   border-radius: 999px !important;
 }
 
 /* 여행 일정 하이라이트: 범위(startDay~endDay) 사이에 낀 날짜들 */
-.main-calendar .travel-between {
+.travel-date-calendar .travel-between {
   background-color: var(--color-primary-light) !important;
   color: var(--color-primary) !important;
   border-radius: 0 !important;
