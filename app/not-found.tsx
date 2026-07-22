@@ -250,14 +250,14 @@ export default function NotFound() {
 
           <div className="flex gap-2 mt-2">
             <MainButton
-              variant={userType === 'KAPI' ? 'fill' : 'default'}
-              onClick={() => setUserType('KAPI')}
+              variant={userType === 'capi' ? 'fill' : 'default'}
+              onClick={() => setUserType('capi')}
             >
               카피 선택
             </MainButton>
             <MainButton
-              variant={userType === 'BALA' ? 'fill' : 'default'}
-              onClick={() => setUserType('BALA')}
+              variant={userType === 'bara' ? 'fill' : 'default'}
+              onClick={() => setUserType('bara')}
             >
               바라 선택
             </MainButton>
@@ -273,7 +273,7 @@ export default function NotFound() {
             {/* 상태에 따른 원형 프로필 */}
             <ProfileAvatar />
             <div>
-              <Tag>{userType === 'KAPI' ? '카피' : '바라'}</Tag>
+              <Tag>{userType === 'capi' ? '카피' : '바라'}</Tag>
             </div>
           </div>
         </section>
