@@ -2,24 +2,32 @@
 
 import React from 'react';
 import { Plus } from 'lucide-react';
-import CandidatePlaceCard, {
-  type CandidatePlaceItem,
-} from '../cards/CandidatePlaceCard';
+import PlaceCard, { type PlaceItem } from '../cards/PlaceCard';
 import { cn } from '@/lib/utils';
+import { useDroppable } from '@dnd-kit/core';
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 interface PlaceListContainerProps {
-  places: CandidatePlaceItem[];
-  onAddClick?: () => void; // 장소 추가 (+) 버튼 클릭 이벤트
+  containerId?: string;
+  places: PlaceItem[];
+  onAddClick?: () => void;
   className?: string;
 }
 
 export default function PlaceListContainer({
+  containerId = 'candidate-list',
   places,
   onAddClick,
   className,
 }: PlaceListContainerProps) {
+  const { setNodeRef } = useDroppable({ id: containerId });
+
   return (
     <div
+      ref={setNodeRef}
       className={cn(
         'flex flex-col gap-3 p-4 bg-white rounded-xl w-full shadow-card',
         className,
@@ -40,11 +48,18 @@ export default function PlaceListContainer({
         </button>
       </div>
 
-      <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        {places.map((place) => (
-          <CandidatePlaceCard key={place.id} place={place} />
-        ))}
-      </div>
+      <SortableContext
+        items={places.map((p) => p.id)}
+        strategy={horizontalListSortingStrategy}
+      >
+        <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none min-h-20">
+          {places.map((place) => (
+            <div key={place.id} className="w-55 shrink-0">
+              <PlaceCard place={place} />
+            </div>
+          ))}
+        </div>
+      </SortableContext>
     </div>
   );
 }

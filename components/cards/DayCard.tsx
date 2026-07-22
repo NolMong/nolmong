@@ -1,11 +1,17 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Cloud } from "lucide-react";
-import PlaceCard, { type PlaceItem } from "./PlaceCard";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Cloud } from 'lucide-react';
+import PlaceCard, { type PlaceItem } from './PlaceCard';
+import { cn } from '@/lib/utils';
+import { useDroppable } from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 interface DayCardProps {
+  dayId: string; // ex: day-1
   dayNumber: number;
   dateText: string;
   places: PlaceItem[];
@@ -13,15 +19,19 @@ interface DayCardProps {
 }
 
 export default function DayCard({
+  dayId,
   dayNumber,
   dateText,
   places,
   className,
 }: DayCardProps) {
+  const { setNodeRef } = useDroppable({ id: dayId });
+
   return (
     <div
+      ref={setNodeRef}
       className={cn(
-        "flex flex-col gap-4 px-3 py-4 bg-white border border-border rounded-xl w-75 shrink-0 shadow-card",
+        'flex flex-col gap-4 px-3 py-4 bg-white border border-border rounded-xl w-75 shrink-0 shadow-card',
         className,
       )}
     >
@@ -37,11 +47,16 @@ export default function DayCard({
       </div>
 
       {/* 목록 */}
-      <div className="flex flex-col gap-2 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden">
-        {places.map((place) => (
-          <PlaceCard key={place.id} place={place} />
-        ))}
-      </div>
+      <SortableContext
+        items={places.map((p) => p.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="flex flex-col gap-2 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden">
+          {places.map((place) => (
+            <PlaceCard key={place.id} place={place} />
+          ))}
+        </div>
+      </SortableContext>
     </div>
   );
 }

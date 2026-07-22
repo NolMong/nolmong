@@ -10,7 +10,6 @@ import {
   PlaceListContainer,
 } from '@/components';
 import { type PlaceItem } from '@/components/cards/PlaceCard';
-import { type CandidatePlaceItem } from '@/components/cards/CandidatePlaceCard';
 import { useState } from 'react';
 import { useUserStore } from '@/store/useUserStore';
 import type { PlanCardData } from '@/types/plans';
@@ -28,40 +27,6 @@ export default function NotFound() {
   // 프로필용 스토어와 변경 함수
   const userType = useUserStore((state) => state.userType);
   const setUserType = useUserStore((state) => state.setUserType);
-
-  // 가고 싶은 장소 더미 데이터
-  const candidatePlaces: CandidatePlaceItem[] = [
-    {
-      id: '1',
-      name: '해운대블루라인파크',
-      category: '테마/체험',
-      location: '부산 해운대구',
-    },
-    {
-      id: '2',
-      name: '미피스토어 해운대점',
-      category: '관광',
-      location: '나만의 장소',
-    },
-    {
-      id: '3',
-      name: '국이네 낙지볶음',
-      category: '식당',
-      location: '부산 수영구',
-    },
-    {
-      id: '4',
-      name: '우리돼지국밥',
-      category: '관광',
-      location: '부산 동구',
-    },
-    {
-      id: '5',
-      name: '흰여울 문화 마을',
-      category: '관광',
-      location: '부산 동구',
-    },
-  ];
 
   // 장소 카드용 더미 데이터
   const samplePlaces: PlaceItem[] = [
@@ -308,17 +273,17 @@ export default function NotFound() {
         </h1>
 
         {/* Day 1 카드 출력 */}
-        <DayCard dayNumber={1} dateText="8.8 (토)" places={samplePlaces} />
+        {/* <DayCard dayNumber={1} dateText="8.8 (토)" places={samplePlaces} /> */}
       </div>
 
       <div className="p-6 bg-gray-100 flex flex-col gap-6">
         <h1 className="text-xl font-bold">후보 장소 리스트 테스트</h1>
 
         {/* 장소 리스트 컴포넌트 */}
-        <PlaceListContainer
-          places={candidatePlaces}
-          onAddClick={() => alert('장소 추가 모달을 엽니다!')}
-        />
+        {/* <PlaceListContainer */}
+        {/* places={candidatePlaces} */}
+        {/* onAddClick={() => alert('장소 추가 모달을 엽니다!')} */}
+        {/* /> */}
       </div>
     </div>
   );
