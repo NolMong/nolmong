@@ -10,7 +10,6 @@ import {
   PlaceListContainer,
 } from '@/components';
 import { type PlaceItem } from '@/components/cards/PlaceCard';
-import { type CandidatePlaceItem } from '@/components/cards/CandidatePlaceCard';
 import { useState } from 'react';
 import { useUserStore } from '@/store/useUserStore';
 import type { PlanCardData } from '@/types/plans';
@@ -28,40 +27,6 @@ export default function NotFound() {
   // 프로필용 스토어와 변경 함수
   const userType = useUserStore((state) => state.userType);
   const setUserType = useUserStore((state) => state.setUserType);
-
-  // 가고 싶은 장소 더미 데이터
-  const candidatePlaces: CandidatePlaceItem[] = [
-    {
-      id: '1',
-      name: '해운대블루라인파크',
-      category: '테마/체험',
-      location: '부산 해운대구',
-    },
-    {
-      id: '2',
-      name: '미피스토어 해운대점',
-      category: '관광',
-      location: '나만의 장소',
-    },
-    {
-      id: '3',
-      name: '국이네 낙지볶음',
-      category: '식당',
-      location: '부산 수영구',
-    },
-    {
-      id: '4',
-      name: '우리돼지국밥',
-      category: '관광',
-      location: '부산 동구',
-    },
-    {
-      id: '5',
-      name: '흰여울 문화 마을',
-      category: '관광',
-      location: '부산 동구',
-    },
-  ];
 
   // 장소 카드용 더미 데이터
   const samplePlaces: PlaceItem[] = [
