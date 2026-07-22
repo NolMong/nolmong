@@ -3,6 +3,7 @@
 import {
   DayCard,
   FilterGroup,
+  KakaoMap,
   MainButton,
   PlaceListContainer,
   PlanEditorCard,
@@ -195,7 +196,7 @@ export default function PlanPage() {
               onDeleteCard={handleDelete}
             />
           </div>
-          <div className="flex-1 h-full border"></div>
+          <KakaoMap className="flex-1 h-full rounded-xl overflow-hidden border" />
         </div>
       ) : (
         <>
