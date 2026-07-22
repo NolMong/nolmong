@@ -1,7 +1,10 @@
+'use client';
+
 import { Tag, MainButton } from '@/components';
 import { SquareCheck } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export default function TravelTestResultCard({
   result,
@@ -12,6 +15,9 @@ export default function TravelTestResultCard({
   totalCapi: number;
   totalBara: number;
 }) {
+  const router = useRouter();
+  const supabase = createClient();
+
   const resultDataMap = {
     capi: {
       title: '카피',
@@ -60,8 +66,56 @@ export default function TravelTestResultCard({
   const total = totalCapi + totalBara;
   const baraPercent = total === 0 ? 50 : (totalBara / total) * 100;
 
+  const handleSaveAndGoMain = async () => {
+    try {
+      // 현재 세션 및 유저 확인
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
+
+      if (!user) {
+        alert('로그인 세션이 만료되었습니다. 랜딩 페이지로 이동합니다.');
+        router.push('/landing');
+        return;
+      }
+
+      // 카카오 프로필 닉네임 가져오기
+      const kakaoName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        '이름없는유저';
+
+      const userFeatures = [
+        result === 'capi' ? 'capi' : 'bara',
+        result === 'capi' ? 'green' : 'pink',
+      ];
+
+      // upsert 이용해서 저장
+      const { error } = await supabase.from('profiles').upsert(
+        {
+          id: user.id,
+          name: kakaoName,
+          features: userFeatures,
+        },
+        { onConflict: 'id' },
+      );
+
+      if (error) {
+        console.error('프로필 저장 실패:', error.message);
+        alert('프로필 저장 중 오류가 발생했습니다: ' + error.message);
+        return;
+      }
+
+      // 메인 페이지로 이동
+      router.push('/main');
+    } catch (err) {
+      console.error('저장 예외 발생:', err);
+    }
+  };
+
   return (
-    <div className='flex flex-col items-center gap-8 w-150 h-fit'>
+    <div className="flex flex-col items-center gap-8 w-150 h-fit">
       <Image
         src={`/images/${result}1.webp`}
         width={120}
@@ -74,28 +128,28 @@ export default function TravelTestResultCard({
       >
         당신의 여행 유형은
       </Tag>
-      <div className='text-center font-jalnan text-[32px] text-brown-light'>
+      <div className="text-center font-jalnan text-[32px] text-brown-light">
         <span className={resultData.color}>
           &ldquo;{resultData.title}&rdquo;
         </span>
         타입 여행자
       </div>
-      <div className='leading-[1.7] text-center text-brown'>
+      <div className="leading-[1.7] text-center text-brown">
         {resultData.description}
       </div>
-      <div className='w-full h-px bg-border'></div>
+      <div className="w-full h-px bg-border"></div>
 
-      <div className='w-full'>
-        <div className='font-jalnan text-[20px] text-brown-light w-full'>
+      <div className="w-full">
+        <div className="font-jalnan text-[20px] text-brown-light w-full">
           성향 그래프
         </div>
-        <div className='w-full'>
-          <div className='w-full mt-5 mb-2 flex justify-between items-center text-sm text-sub'>
+        <div className="w-full">
+          <div className="w-full mt-5 mb-2 flex justify-between items-center text-sm text-sub">
             <div>느긋형</div>
             <div>꼼꼼형</div>
           </div>
-          <div className='relative w-full h-3 rounded-full bg-linear-to-r from-primary to-pink'>
-            <div className='absolute left-1/2 top-1/2 h-2 w-px -translate-x-1/2 -translate-y-1/2 bg-white/70'></div>
+          <div className="relative w-full h-3 rounded-full bg-linear-to-r from-primary to-pink">
+            <div className="absolute left-1/2 top-1/2 h-2 w-px -translate-x-1/2 -translate-y-1/2 bg-white/70"></div>
             <div
               className={`absolute top-0 h-3 w-3 -translate-x-1/2 rounded-full border border-${resultData.color} bg-white`}
               style={{ left: `${baraPercent}%` }}
@@ -103,20 +157,20 @@ export default function TravelTestResultCard({
           </div>
         </div>
       </div>
-      <div className='w-full'>
-        <div className='font-jalnan text-[20px] text-brown-light mb-5'>
+      <div className="w-full">
+        <div className="font-jalnan text-[20px] text-brown-light mb-5">
           여행 스타일
         </div>
-        <div className='flex flex-col gap-2 w-full'>
+        <div className="flex flex-col gap-2 w-full">
           {resultData.style.map((s) => (
-            <div key={s} className='flex items-center gap-2'>
-              <SquareCheck className='w-3.5 h-3.5 text-brown' />
-              <span className='text-brown text-[14px]'>{s}</span>
+            <div key={s} className="flex items-center gap-2">
+              <SquareCheck className="w-3.5 h-3.5 text-brown" />
+              <span className="text-brown text-[14px]">{s}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className='w-full rounded-[10px] border border-caramel px-7.5 py-5 bg-caramel-light flex gap-6 items-center'>
+      <div className="w-full rounded-[10px] border border-caramel px-7.5 py-5 bg-caramel-light flex gap-6 items-center">
         <Image
           src={`/images/${result === 'capi' ? 'bara' : 'capi'}1.webp`}
           width={60}
@@ -124,8 +178,8 @@ export default function TravelTestResultCard({
           alt={result}
           className={`w-15 h-13 object-cover object-top ${result === 'capi' ? '-scale-x-100' : ''}`}
         />
-        <div className='font-sans text-brown-light text-[14px] leading-normal pt-1'>
-          <span className='font-bold'>
+        <div className="font-sans text-brown-light text-[14px] leading-normal pt-1">
+          <span className="font-bold">
             &ldquo;{result === 'capi' ? '바라' : '카피'}&rdquo;형과 함께
             여행하면 서로의 빈틈을 잘 채워줘요
           </span>
@@ -133,19 +187,18 @@ export default function TravelTestResultCard({
           계획은 카피가, 재미는 바라가!
         </div>
       </div>
-      <div className='flex gap-2.5'>
-        <MainButton variant='default' className='font-jalnan' width='140px'>
+      <div className="flex gap-2.5">
+        <MainButton variant="default" className="font-jalnan" width="140px">
           다시하기
         </MainButton>
-        <Link href='/main'>
-          <MainButton
-            variant={result === 'capi' ? 'fill' : 'pinkFill'}
-            className='font-jalnan'
-            width='140px'
-          >
-            여행가기!
-          </MainButton>
-        </Link>
+        <MainButton
+          variant={result === 'capi' ? 'fill' : 'pinkFill'}
+          className="font-jalnan"
+          width="140px"
+          onClick={handleSaveAndGoMain}
+        >
+          여행가기!
+        </MainButton>
       </div>
     </div>
   );

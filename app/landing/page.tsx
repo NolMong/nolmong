@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Header, Tag } from '@/components';
 import { CalendarDays, Map, Sheet, type LucideIcon } from 'lucide-react';
 import { useLoginModalStore } from '@/store/useLoginModalStore';
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const features: {
   icon: LucideIcon;
@@ -105,45 +107,57 @@ const characters: {
 ];
 
 export default function LandingPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const openLoginModal = useLoginModalStore((state) => state.open);
+
+  useEffect(() => {
+    // 미들웨어에서 비접근 제안으로 왔을 때
+    if (searchParams.get('unauthorized') === 'true') {
+      alert('로그인이 필요한 서비스입니다. 로그인을 해주세요!');
+
+      // Alert 확인 후 URL에서 ?unauthorized=true 파라미터 제거
+      router.replace('/landing');
+    }
+  }, [searchParams, router]);
 
   return (
     <div>
       {/* <Header /> */}
       {/* 랜딩 이미지 */}
-      <div className='relative'>
+      <div className="relative">
         <Image
-          src='/images/landing_bg.webp'
-          alt='Landing Image'
+          src="/images/landing_bg.webp"
+          alt="Landing Image"
           width={1512}
           height={856}
-          className='h-auto w-full'
-          loading='eager'
+          className="h-auto w-full"
+          loading="eager"
         />
         <Image
-          src='/images/capi1.webp'
-          alt='Capi Image'
+          src="/images/capi1.webp"
+          alt="Capi Image"
           width={222}
           height={295}
-          loading='eager'
-          className='absolute bottom-[-10%] left-[10%] w-[14.68%] h-auto -translate-y-1/2'
+          loading="eager"
+          className="absolute bottom-[-10%] left-[10%] w-[14.68%] h-auto -translate-y-1/2"
         />
         <Image
-          src='/images/bara1.webp'
-          alt='Bara Image'
+          src="/images/bara1.webp"
+          alt="Bara Image"
           width={222}
           height={295}
-          loading='eager'
-          className='absolute bottom-[-10%] left-[27%] w-[14.68%] h-auto -translate-y-1/2'
+          loading="eager"
+          className="absolute bottom-[-10%] left-[27%] w-[14.68%] h-auto -translate-y-1/2"
         />
       </div>
 
       {/* 첫번째 카드 */}
-      <div className='box bg-primary-light w-full py-15 font-jalnan'>
-        <div className='mb-4 text-2xl text-center text-primary-focus'>
+      <div className="box bg-primary-light w-full py-15 font-jalnan">
+        <div className="mb-4 text-2xl text-center text-primary-focus">
           공동 여행 계획 서비스
         </div>
-        <div className='text-center text-4xl text-primary leading-[1.4]'>
+        <div className="text-center text-4xl text-primary leading-[1.4]">
           친구들과 함께 여행 계획을
           <br />
           세워보세요!
@@ -151,20 +165,20 @@ export default function LandingPage() {
         {/* 나중에 화면 캡쳐해서 쓸거임 */}
       </div>
       {/* 두번째 카드 */}
-      <div className='box bg-white w-full py-15 font-jalnan'>
-        <div className='text-center text-4xl text-sub'>이런걸 도와드려요</div>
+      <div className="box bg-white w-full py-15 font-jalnan">
+        <div className="text-center text-4xl text-sub">이런걸 도와드려요</div>
 
-        <div className='w-fit flex gap-7.5 mx-auto mt-15'>
+        <div className="w-fit flex gap-7.5 mx-auto mt-15">
           {features.map(({ icon: Icon, bg, iconColor, title, description }) => (
             <div
               key={title}
               className={`box w-80 h-72 rounded-[20px] px-10 py-7.5 ${bg} flex flex-col items-center gap-5`}
             >
-              <div className='w-14 h-14 bg-white rounded-full flex items-center justify-center'>
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
                 <Icon className={`w-8 h-8 ${iconColor}`} />
               </div>
-              <div className='text-[20px] text-center text-sub'>{title}</div>
-              <div className='font-sans font-normal text-center text-sub'>
+              <div className="text-[20px] text-center text-sub">{title}</div>
+              <div className="font-sans font-normal text-center text-sub">
                 {description}
               </div>
             </div>
@@ -173,54 +187,54 @@ export default function LandingPage() {
       </div>
 
       {/* 세번째 카드 */}
-      <div className='box bg-caramel-light w-full py-15 font-jalnan'>
-        <div className='mb-4 text-2xl text-center text-brown'>
+      <div className="box bg-caramel-light w-full py-15 font-jalnan">
+        <div className="mb-4 text-2xl text-center text-brown">
           공동 여행 계획 서비스
         </div>
-        <div className='mb-4 text-center text-4xl text-caramel'>
+        <div className="mb-4 text-center text-4xl text-caramel">
           카피 & 바라를 소개합니다
         </div>
-        <div className='font-sans font-normal text-center text-brown'>
+        <div className="font-sans font-normal text-center text-brown">
           서로 다른 여행 스타일을 가진 두 친구, 당신은 누구와 더 닮았나요?
         </div>
-        <div className='flex gap-4 justify-center mt-15'>
+        <div className="flex gap-4 justify-center mt-15">
           <Image
-            src='/images/capi2.webp'
-            alt='Capi Image'
+            src="/images/capi2.webp"
+            alt="Capi Image"
             width={222}
             height={295}
-            loading='eager'
+            loading="eager"
           />
           <Image
-            src='/images/bara2.webp'
-            alt='Bara Image'
+            src="/images/bara2.webp"
+            alt="Bara Image"
             width={222}
             height={295}
-            loading='eager'
+            loading="eager"
           />
         </div>
         <div>
-          <div className='flex gap-15 mt-15 mx-auto w-fit'>
+          <div className="flex gap-15 mt-15 mx-auto w-fit">
             {characters.map((c) => (
               <div
                 key={c.name}
                 className={`box rounded-[20px] border ${c.borderColor} w-fit bg-white p-7.5`}
               >
-                <div className='flex gap-2 items-center'>
-                  <div className='text-brown-light text-xl my-2'>{c.name}</div>
+                <div className="flex gap-2 items-center">
+                  <div className="text-brown-light text-xl my-2">{c.name}</div>
                   <Tag color={c.tagColor}>{c.tagLabel}</Tag>
                 </div>
 
-                <div className='font-normal text-brown-light leading-[1.4] font-sans text-sm mb-5'>
+                <div className="font-normal text-brown-light leading-[1.4] font-sans text-sm mb-5">
                   {c.description}
                 </div>
-                <div className='flex flex-col gap-1 font-sans'>
+                <div className="flex flex-col gap-1 font-sans">
                   {c.traits.map((trait) => (
-                    <div key={trait} className='flex gap-2 items-center'>
+                    <div key={trait} className="flex gap-2 items-center">
                       <div
                         className={`w-1.5 h-1.5 rounded-full ${c.dotColor}`}
                       ></div>
-                      <div className='text-muted text-sm'>{trait}</div>
+                      <div className="text-muted text-sm">{trait}</div>
                     </div>
                   ))}
                 </div>
@@ -229,7 +243,7 @@ export default function LandingPage() {
           </div>
           <button
             onClick={openLoginModal}
-            className='cursor-pointer text-white text-xl hover:bg-[#bc9d79] px-14 py-4 rounded-full mt-10 block w-fit mx-auto bg-caramel transition duration-200'
+            className="cursor-pointer text-white text-xl hover:bg-[#bc9d79] px-14 py-4 rounded-full mt-10 block w-fit mx-auto bg-caramel transition duration-200"
           >
             나는 카피? 바라? 테스트 해보기
           </button>
