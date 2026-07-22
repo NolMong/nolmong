@@ -45,9 +45,7 @@ export const locations = [
     title: '충청도',
     options: [
       { city: '단양', eng: 'Danyang' },
-      { city: '속초', eng: 'Sokcho' },
       { city: '정선', eng: 'Jeongseon' },
-      { city: '춘천', eng: 'Chuncheon' },
       { city: '평창', eng: 'Pyeongchang' },
       { city: '청주', eng: 'Cheongju' },
       { city: '천안', eng: 'Cheonan' },
