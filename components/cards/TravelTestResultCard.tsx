@@ -86,7 +86,10 @@ export default function TravelTestResultCard({
         user.user_metadata?.name ||
         '이름없는유저';
 
-      const userFeatures = [resultData.title, resultData.color];
+      const userFeatures = [
+        result === 'capi' ? 'capi' : 'bara',
+        result === 'capi' ? 'green' : 'pink',
+      ];
 
       // upsert 이용해서 저장
       const { error } = await supabase.from('profiles').upsert(
