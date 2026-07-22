@@ -21,3 +21,4 @@ export { default as CreatePlanModal } from './modals/CreatePlanModal';
 export { default as ProfileEditModal } from './modals/ProfileEditModal';
 // calendar
 export { default as CalendarComponent } from './calendar/CalendarComponent';
+export { default as TravelDateCalendar } from './calendar/TravelDateCalendar';

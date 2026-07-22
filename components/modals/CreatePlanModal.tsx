@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   CalendarDays,
@@ -10,23 +10,34 @@ import {
   PersonStanding,
   Check,
 } from 'lucide-react';
-import { MainButton, CalendarComponent, LocationTag } from '@/components';
+import { MainButton, TravelDateCalendar, LocationTag } from '@/components';
 import { useModal } from '@/hooks/useModal';
 import { useCreatePlanModalStore } from '@/store/useModalStore';
-import ChooseStartLocation from './ChooseStartLocation';
+import ChooseLocation from './ChooseLocation';
 
 type LocationEntry = { text: string; editable: boolean };
 
+function formatDisplayDate(dateKey: string) {
+  const [year, month, day] = dateKey.split('-');
+  return `${year}.${month}.${day}`;
+}
+
+const initialPlan = {
+  startDate: '',
+  endDate: '',
+  startLocation: [] as LocationEntry[],
+  endLocation: [
+    // 예시임
+    // { text: '서울', editable: false },
+    // { text: '인천', editable: false },
+  ] as LocationEntry[],
+  budget: '',
+  headcount: '',
+};
+
 export default function CreatePlanModal() {
   const isOpen = useCreatePlanModalStore((state) => state.isOpen);
-  const close = useCreatePlanModalStore((state) => state.close);
-  const { rendered, visible, handleTransitionEnd } = useModal(isOpen, close);
-
-  const calendarRef = useRef(null);
-  const startLocationRef = useRef(null);
-  const endLocationRef = useRef(null);
-  const budgetRef = useRef(null);
-  const headcountRef = useRef(null);
+  const closeStore = useCreatePlanModalStore((state) => state.close);
 
   const [oneDayTrip, setOneDayTrip] = useState(false);
   const [writeStartLocation, setWriteStartLocation] = useState(false);
@@ -34,17 +45,21 @@ export default function CreatePlanModal() {
   const [state, setState] = useState(
     'date' as 'date' | 'startLocation' | 'endLocation',
   );
-  const [plan, setPlan] = useState({
-    startDate: '',
-    endDate: '',
-    startLocation: [] as LocationEntry[],
-    endLocation: [
-      { text: '서울', editable: false },
-      { text: '인천', editable: false },
-    ] as LocationEntry[],
-    budget: '',
-    headcount: '',
-  });
+  const [plan, setPlan] = useState(initialPlan);
+
+  // 정상적으로 닫힐 때(배경 클릭, 라우트 이동, 완료 버튼 등) plan을 처음 상태로 초기화
+  const close = useCallback(() => {
+    setPlan(initialPlan);
+    closeStore();
+  }, [closeStore]);
+
+  const { rendered, visible, handleTransitionEnd } = useModal(isOpen, close);
+
+  const calendarRef = useRef(null);
+  const startLocationRef = useRef(null);
+  const endLocationRef = useRef(null);
+  const budgetRef = useRef(null);
+  const headcountRef = useRef(null);
 
   if (!rendered) return null;
 
@@ -66,6 +81,14 @@ export default function CreatePlanModal() {
       }
       return { ...prev, endLocation: [...picked, ...editableEntries] };
     });
+  };
+
+  const handleChangeDate = (range: { startDay: string; endDay: string }) => {
+    setPlan((prev) => ({
+      ...prev,
+      startDate: range.startDay,
+      endDate: range.endDay,
+    }));
   };
 
   const handleAddStartLocation = () => {
@@ -129,8 +152,13 @@ export default function CreatePlanModal() {
           <div className='font-jalnan text-2xl text-brown-light mb-6'>
             여행 날짜
           </div>
-          <div className='h-140 overflow-y-auto scrollbar-thin pr-2'>
-            <CalendarComponent size='medium' />
+          <div className='h-140'>
+            <TravelDateCalendar
+              startDay={plan.startDate}
+              endDay={plan.endDate}
+              oneDayTrip={oneDayTrip}
+              onChange={handleChangeDate}
+            />
           </div>
         </div>
       );
@@ -142,7 +170,7 @@ export default function CreatePlanModal() {
             출발지
           </div>
           <div className='h-140 overflow-y-auto scrollbar-thin pr-2'>
-            <ChooseStartLocation
+            <ChooseLocation
               selectedCity={
                 plan.startLocation.find((l) => !l.editable)?.text ?? ''
               }
@@ -159,7 +187,7 @@ export default function CreatePlanModal() {
             여행지
           </div>
           <div className='h-140 overflow-y-auto scrollbar-thin pr-2'>
-            <ChooseStartLocation
+            <ChooseLocation
               multiple
               selectedCities={plan.endLocation
                 .filter((l) => !l.editable)
@@ -187,7 +215,7 @@ export default function CreatePlanModal() {
         <div className='font-jalnan text-[32px] text-brown mb-8'>여행 일정</div>
         <div className='flex gap-4'>
           {renderContent()}
-          <div className='w-[384px]'>
+          <div className='w-[384px] flex flex-col'>
             <div className='w-full shrink-0 font-jalnan text-2xl text-brown-light mb-6'>
               여행 정보
             </div>
@@ -204,15 +232,31 @@ export default function CreatePlanModal() {
                 }`}
               >
                 <CalendarDays width={20} height={20} />
-                <div className='flex-1 h-12 flex items-center text-main text-sm'>
-                  여행 날짜를 선택해 주세요
+                <div
+                  className={`flex-1 h-12 flex items-center ${plan.startDate ? 'text-main' : 'text-muted'}`}
+                >
+                  {!plan.startDate
+                    ? '여행 날짜를 선택해 주세요'
+                    : !plan.endDate || plan.startDate === plan.endDate
+                      ? formatDisplayDate(plan.startDate)
+                      : `${formatDisplayDate(plan.startDate)} ~ ${formatDisplayDate(plan.endDate)}`}
                 </div>
                 <label className='flex gap-1.5 items-center cursor-pointer'>
                   <div className='relative flex items-center justify-center'>
                     <input
                       type='checkbox'
                       checked={oneDayTrip}
-                      onChange={() => setOneDayTrip(!oneDayTrip)}
+                      onChange={() => {
+                        const turningOn = !oneDayTrip;
+                        setOneDayTrip(turningOn);
+                        if (turningOn) {
+                          setPlan((prev) => ({
+                            ...prev,
+                            startDate: '',
+                            endDate: '',
+                          }));
+                        }
+                      }}
                       className='peer appearance-none w-4 h-4 rounded-sm border border-border checked:bg-primary checked:border-primary transition-colors cursor-pointer'
                     />
                     <Check
@@ -398,7 +442,7 @@ export default function CreatePlanModal() {
                   />
                   <input
                     className='border border-none focus:outline-none h-12 text-main min-w-0'
-                    placeholder='예산'
+                    placeholder='예산 (선택)'
                   />
                   <div className='shrink-0 text-main'>원</div>
                 </div>
@@ -410,13 +454,60 @@ export default function CreatePlanModal() {
                   <PersonStanding width={20} height={20} className='shrink-0' />
                   <input
                     className='border border-none focus:outline-none h-12 text-main min-w-0'
-                    placeholder='인원'
+                    placeholder='인원 (선택)'
                   />
                   <div className='shrink-0 text-main'>명</div>
                 </div>
               </div>
             </div>
-            <MainButton onClick={() => console.log(plan)}>여행 시작</MainButton>
+            <MainButton
+              onClick={() => {
+                console.log(plan);
+                if (plan.startDate === '' || plan.endDate === '') {
+                  alert('여행 날짜를 선택해주세요.');
+                  return;
+                }
+                if (plan.startLocation.length === 0) {
+                  alert('출발지를 선택해주세요.');
+                  return;
+                }
+                if (plan.endLocation.length === 0) {
+                  alert('도착지를 선택해주세요.');
+                  return;
+                } else {
+                  if (
+                    confirm(
+                      '여행 계획을 생성하시겠습니까?\n여행일 : ' +
+                        plan.startDate +
+                        ' ~ ' +
+                        plan.endDate +
+                        '\n출발지: ' +
+                        plan.startLocation.map((l) => l.text).join(', ') +
+                        '\n도착지: ' +
+                        plan.endLocation.map((l) => l.text).join(', ') +
+                        '\n예산: ' +
+                        (plan.budget ? plan.budget + '원' : '미정') +
+                        '\n인원: ' +
+                        (plan.headcount ? plan.headcount + '명' : '미정'),
+                    )
+                  ) {
+                    alert('여행 계획이 생성되었습니다.');
+                  } else {
+                    return;
+                  }
+                }
+                close();
+              }}
+              variant='fill'
+              style={{
+                fontWeight: 700,
+                marginTop: 'auto',
+                marginLeft: 'auto',
+                width: 'fit-content',
+              }}
+            >
+              여행 시작
+            </MainButton>
           </div>
         </div>
       </div>
