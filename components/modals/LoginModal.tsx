@@ -33,7 +33,24 @@ export default function LoginModal() {
     return () => cancelAnimationFrame(id);
   }, [isOpen]);
 
-  // 카카오 로그인 처리
+  // 카카오 회원가입
+  const handleKakaoSignup = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/main`,
+        queryParams: {
+          scope: 'profile_nickname',
+          prompt: 'login',
+        },
+      },
+    });
+    if (error) {
+      console.error('카카오 회원가입 실패:', error.message);
+    }
+  };
+
+  // 카카오 로그인
   const handleKakaoLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
@@ -41,13 +58,11 @@ export default function LoginModal() {
         redirectTo: `${window.location.origin}/auth/callback?next=/main`,
         queryParams: {
           scope: 'profile_nickname',
+          prompt: 'login',
         },
       },
     });
-
-    if (error) {
-      console.error('카카오 로그인 실패:', error.message);
-    }
+    if (error) console.error('카카오 로그인 실패:', error.message);
   };
 
   if (!rendered) return null;
@@ -92,11 +107,14 @@ export default function LoginModal() {
           />
         </button>
 
-        <Link href="/travel-test" className="text-center w-full">
-          <MainButton variant="fill" className="font-jalnan" width="100%">
-            회원가입
-          </MainButton>
-        </Link>
+        <MainButton
+          variant="fill"
+          className="font-jalnan"
+          width="100%"
+          onClick={handleKakaoSignup}
+        >
+          회원가입
+        </MainButton>
       </div>
     </div>
   );

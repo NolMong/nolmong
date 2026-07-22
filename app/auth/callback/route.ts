@@ -5,13 +5,14 @@ import { cookies } from 'next/headers';
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/main';
+
+  // console.log('Callback 진입 URL params code:', code ? '있음' : '없음');
 
   if (code) {
     const cookieStore = await cookies();
 
-    // NextResponse 객체를 미리 만들어 쿠키 변경 사항을 응답 헤더에 세팅
-    const response = NextResponse.redirect(`${origin}${next}`);
+    // 기본 이동은 /main 으로 설정
+    let response = NextResponse.redirect(`${origin}/main`);
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,14 +23,15 @@ export async function GET(request: Request) {
             return cookieStore.getAll();
           },
           setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) => {
-                cookieStore.set(name, value, options);
-                response.cookies.set(name, value, options);
-              });
-            } catch {
-              // Server Component 예외 처리
-            }
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+            response = NextResponse.redirect(`${origin}/main`, {
+              headers: request.headers,
+            });
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
           },
         },
       },
@@ -37,21 +39,46 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-    // 에러가 발생한 경우
     if (error) {
-      console.error(
-        'Supabase DB 유저 생성 및 세션 교환 실패:',
-        error.message,
-        error,
-      );
-      return NextResponse.redirect(`${origin}/`);
+      console.error('세션 교환 실패 에러:', error.message);
+      return NextResponse.redirect(`${origin}/landing?error=auth_failed`);
     }
 
-    // 성공한 경우
-    console.log('DB 유저 생성 성공 유저 정보:', data.user);
-    return response;
+    if (data.user) {
+      const user = data.user;
+
+      // profiles 테이블 조회
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('profiles 조회 실패 에러:', profileError.message);
+      }
+
+      // console.log('DB 조회 결과 profile:', profile);
+
+      // profiles 테이블에 없는 유저는 신규 저장 및 travel-test로 이동
+      if (!profile) {
+        // console.log('profile 없음 -> /travel-test 이동');
+        const testRedirect = NextResponse.redirect(`${origin}/travel-test`);
+        response.cookies.getAll().forEach((cookie) => {
+          testRedirect.cookies.set(cookie.name, cookie.value, cookie);
+        });
+        return testRedirect;
+      }
+
+      // profiles 테이블에 기존 유저는 /main 으로 이동!
+      // console.log('profile 있음 -> /main 이동');
+      const mainRedirect = NextResponse.redirect(`${origin}/main`);
+      response.cookies.getAll().forEach((cookie) => {
+        mainRedirect.cookies.set(cookie.name, cookie.value, cookie);
+      });
+      return mainRedirect;
+    }
   }
 
-  // 에러 발생 시 메인 페이지로 리다이렉트
-  return NextResponse.redirect(`${origin}/`);
+  return NextResponse.redirect(`${origin}/landing`);
 }
