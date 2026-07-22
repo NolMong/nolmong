@@ -52,7 +52,7 @@ export default function PlaceCard({ place, className }: PlaceCardProps) {
         {...listeners}
         className="cursor-grab text-muted hover:text-sub transition-colors"
       >
-        <GripVertical size={12} />
+        <GripVertical size={16} />
       </div>
 
       {/* 장소 정보 구역 */}
