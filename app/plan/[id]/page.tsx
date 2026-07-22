@@ -1,6 +1,12 @@
 "use client";
 
-import { DayCard, MainButton, PlaceListContainer } from "@/components";
+import {
+  DayCard,
+  FilterGroup,
+  MainButton,
+  PlaceListContainer,
+  PlanEditorCard,
+} from "@/components";
 import { CandidatePlaceItem } from "@/components/cards/CandidatePlaceCard";
 import { PlaceItem } from "@/components/cards/PlaceCard";
 import { usePlanTabStore } from "@/store/usePlanTabStore";
@@ -86,8 +92,11 @@ const samplePlaces: PlaceItem[] = [
   },
 ];
 
+const dayOptions = ["Day 1", "Day 2", "Day 3"];
+
 export default function PlanPage() {
   const { activePlanTab, setPlanTab } = usePlanTabStore();
+  const [currentDay, setCurrentDay] = useState("Day 1");
 
   const [cards, setCards] = useState<PlanCardData[]>([
     {
@@ -171,7 +180,23 @@ export default function PlanPage() {
       </div>
 
       {activePlanTab === "PLAN_DETAILS" ? (
-        <></>
+        <div className="flex gap-5 h-161">
+          <div className="flex flex-col gap-5 h-full min-h-0 w-107.5">
+            <FilterGroup
+              options={dayOptions}
+              value={currentDay}
+              onChange={setCurrentDay}
+            />
+            <PlanEditorCard
+              dayNumber={1}
+              dateText="8.8 / 토"
+              cards={cards}
+              onUpdateCard={handleUpdate}
+              onDeleteCard={handleDelete}
+            />
+          </div>
+          <div className="flex-1 h-full border"></div>
+        </div>
       ) : (
         <>
           <div className="flex gap-5 h-117 overflow-x-scroll scrollbar-none [&::-webkit-scrollbar]:hidden">
