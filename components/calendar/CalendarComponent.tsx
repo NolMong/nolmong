@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar } from 'react-calendar';
 import type { Value } from 'react-calendar/dist/shared/types.js';
 import 'react-calendar/dist/Calendar.css';
@@ -48,7 +48,15 @@ export default function CalendarComponent({
 }: {
   size: 'small' | 'medium' | 'large';
 }) {
-  const [value, setValue] = useState<Value>(new Date());
+  // new Date()를 useState 초기값으로 바로 넣으면 서버 렌더와 클라이언트 첫 렌더의
+  // 시각이 미세하게 달라 hydration mismatch가 나서, null로 시작해 클라이언트에서만 채운다
+  const [value, setValue] = useState<Value>(null);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setValue(new Date()));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   const travels: (TravelEntry | undefined)[] = [
     '2027-07-01',
     { startDay: '2027-07-05', endDay: '2027-07-07' },

@@ -13,6 +13,7 @@ import { MainButton, TravelDateCalendar, LocationTag } from '@/components';
 import { useModal } from '@/hooks/useModal';
 import { useCreatePlanModalStore } from '@/store/useModalStore';
 import ChooseLocation from './ChooseLocation';
+import { postNewPlan } from '@/api/postNewPlan';
 
 type LocationEntry = { text: string; editable: boolean };
 
@@ -141,9 +142,7 @@ function PanelSection({
 }) {
   return (
     <div>
-      <div className='font-jalnan text-2xl text-brown-light mb-6'>
-        {title}
-      </div>
+      <div className='font-jalnan text-2xl text-brown-light mb-6'>{title}</div>
       <div className='h-140 overflow-y-auto scrollbar-thin pr-2'>
         {children}
       </div>
@@ -320,7 +319,7 @@ export default function CreatePlanModal() {
     setPlan((prev) => ({ ...prev, headcount: e.target.value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (plan.startDate === '' || plan.endDate === '') {
       alert('여행 날짜를 선택해주세요.');
       return;
@@ -349,6 +348,18 @@ export default function CreatePlanModal() {
         (plan.headcount ? plan.headcount + '명' : '미정'),
     );
     if (!confirmed) return;
+
+    const { error } = await postNewPlan({
+      startLocation: plan.startLocation[0]?.text ?? '',
+      endLocations: plan.endLocation.map((l) => l.text),
+      budget: plan.budget,
+      headcount: plan.headcount,
+    });
+
+    if (error) {
+      alert('여행 계획 생성에 실패했습니다.');
+      return;
+    }
 
     alert('여행 계획이 생성되었습니다.');
     close();
