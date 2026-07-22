@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Header, Tag } from '@/components';
 import { CalendarDays, Map, Sheet, type LucideIcon } from 'lucide-react';
-import { useLoginModalStore } from '@/store/useLoginModalStore';
+import { useLoginModalStore } from '@/store/useModalStore';
 
 const features: {
   icon: LucideIcon;

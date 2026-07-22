@@ -11,3 +11,15 @@ export const useLoginModalStore = create<LoginModalStore>((set) => ({
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),
 }));
+
+interface CreatePlanModalStore {
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+}
+
+export const useCreatePlanModalStore = create<CreatePlanModalStore>((set) => ({
+  isOpen: true,
+  open: () => set({ isOpen: true }),
+  close: () => set({ isOpen: false }),
+}));

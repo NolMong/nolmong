@@ -1,34 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useLoginModalStore } from '@/store/useLoginModalStore';
+import { useLoginModalStore } from '@/store/useModalStore';
 import { MainButton } from '@/components';
+import { useModal } from '@/hooks/useModal';
 
 export default function LoginModal() {
   const isOpen = useLoginModalStore((state) => state.isOpen);
   const close = useLoginModalStore((state) => state.close);
-  const [rendered, setRendered] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    close();
-  }, [pathname, close]);
-
-  useEffect(() => {
-    if (isOpen) {
-      const id = requestAnimationFrame(() => {
-        setRendered(true);
-        requestAnimationFrame(() => setVisible(true));
-      });
-      return () => cancelAnimationFrame(id);
-    }
-
-    const id = requestAnimationFrame(() => setVisible(false));
-    return () => cancelAnimationFrame(id);
-  }, [isOpen]);
+  const { rendered, visible, handleTransitionEnd } = useModal(isOpen, close);
 
   if (!rendered) return null;
 
@@ -38,11 +18,7 @@ export default function LoginModal() {
         visible ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={close}
-      onTransitionEnd={(e) => {
-        if (e.target === e.currentTarget && !isOpen) {
-          setRendered(false);
-        }
-      }}
+      onTransitionEnd={handleTransitionEnd}
     >
       <div
         className='bg-white p-4 rounded-lg flex flex-col gap-4 w-92 shadow-[0px_4px_10px_0px_#525252]'
