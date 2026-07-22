@@ -10,8 +10,11 @@ import { LucideEdit3 } from 'lucide-react';
 import WishlistTab from './_components/WishlistTab';
 import PlanDetailsTab from './_components/PlanDetailsTab';
 
+const dayOptions = ['Day 1', 'Day 2', 'Day 3'];
+
 export default function PlanPage() {
   const { activePlanTab, setPlanTab } = usePlanTabStore();
+  const [currentDay, setCurrentDay] = useState('Day 1');
 
   // 후보 장소 데이터
   const [candidatePlaces, setCandidatePlaces] = useState<PlaceItem[]>([
