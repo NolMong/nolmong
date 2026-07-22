@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Cloud } from 'lucide-react';
-import PlaceCard, { type PlaceItem } from './PlaceCard';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Cloud } from "lucide-react";
+import PlaceCard, { type PlaceItem } from "./PlaceCard";
+import { cn } from "@/lib/utils";
 
 interface DayCardProps {
   dayNumber: number;
@@ -21,7 +21,7 @@ export default function DayCard({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 px-3 py-4 bg-white border border-border rounded-xl w-full max-w-75 shadow-card',
+        "flex flex-col gap-4 px-3 py-4 bg-white border border-border rounded-xl w-75 shrink-0 shadow-card",
         className,
       )}
     >
@@ -37,7 +37,7 @@ export default function DayCard({
       </div>
 
       {/* 목록 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden">
         {places.map((place) => (
           <PlaceCard key={place.id} place={place} />
         ))}
