@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FilterGroup, PlanEditorCard } from '@/components';
+import { FilterGroup, PlanEditorCard, KakaoMap } from '@/components';
 import { PlanCardData } from '@/types/plans';
 
 interface PlanDetailsTabProps {
@@ -35,7 +35,8 @@ export default function PlanDetailsTab({
           onDeleteCard={onDeleteCard}
         />
       </div>
-      {/* <KakaoMap className="flex-1 h-full rounded-xl overflow-hidden border" /> */}
+
+      <KakaoMap className="flex-1 h-full rounded-xl overflow-hidden border" />
     </div>
   );
 }
