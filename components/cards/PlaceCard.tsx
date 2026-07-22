@@ -61,7 +61,7 @@ export default function PlaceCard({ place, className }: PlaceCardProps) {
         <div className="flex items-center gap-2">
           {/* 순번 배지-orderNumber가 있을 때만 */}
           {place.orderNumber !== undefined && (
-            <span className="flex items-center justify-center w-4 h-4 rounded-full bg-primary text-white text-[8px] font-jalnan pt-1 shrink-0 mb-1">
+            <span className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-primary text-white text-[10px] font-jalnan pt-1 shrink-0 mb-1">
               {place.orderNumber}
             </span>
           )}
