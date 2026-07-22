@@ -308,17 +308,17 @@ export default function NotFound() {
         </h1>
 
         {/* Day 1 카드 출력 */}
-        <DayCard dayNumber={1} dateText="8.8 (토)" places={samplePlaces} />
+        {/* <DayCard dayNumber={1} dateText="8.8 (토)" places={samplePlaces} /> */}
       </div>
 
       <div className="p-6 bg-gray-100 flex flex-col gap-6">
         <h1 className="text-xl font-bold">후보 장소 리스트 테스트</h1>
 
         {/* 장소 리스트 컴포넌트 */}
-        <PlaceListContainer
-          places={candidatePlaces}
-          onAddClick={() => alert('장소 추가 모달을 엽니다!')}
-        />
+        {/* <PlaceListContainer */}
+        {/* places={candidatePlaces} */}
+        {/* onAddClick={() => alert('장소 추가 모달을 엽니다!')} */}
+        {/* /> */}
       </div>
     </div>
   );
