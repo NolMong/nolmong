@@ -297,10 +297,10 @@ export default function NotFound() {
       </div>
 
       {/* 마이페이지 프로필 수정 */}
-      <div className="p-3 border rounded-2xl flex flex-col gap-6 items-start">
-        <h1 className="text-2xl font-bold">마이페이지 프로필 변경 UI</h1>
-        <ProfileEditModal />
-      </div>
+      {/* <div className="p-3 border rounded-2xl flex flex-col gap-6 items-start"> */}
+      {/* <h1 className="text-2xl font-bold">마이페이지 프로필 변경 UI</h1> */}
+      {/* <ProfileEditModal /> */}
+      {/* </div> */}
 
       <div className="w-full max-w-md flex flex-col gap-4">
         <h1 className="text-2xl font-bold text-main">
