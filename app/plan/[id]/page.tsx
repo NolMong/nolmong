@@ -1,27 +1,19 @@
 'use client';
 
-import { DayCard, MainButton, PlaceListContainer } from '@/components';
-import PlaceCard, { PlaceItem } from '@/components/cards/PlaceCard';
+import { useState } from 'react';
+import { MainButton } from '@/components';
+import { PlaceItem } from '@/components/cards/PlaceCard';
 import { usePlanTabStore } from '@/store/usePlanTabStore';
 import { PlanCardData } from '@/types/plans';
 import { LucideEdit3 } from 'lucide-react';
-import { useState } from 'react';
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  DragStartEvent,
-  closestCenter,
-} from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
+
+import WishlistTab from './_components/WishlistTab';
+import PlanDetailsTab from './_components/PlanDetailsTab';
 
 export default function PlanPage() {
   const { activePlanTab, setPlanTab } = usePlanTabStore();
 
-  // 후보 장소 리스트
+  // 후보 장소 데이터
   const [candidatePlaces, setCandidatePlaces] = useState<PlaceItem[]>([
     {
       id: 'cand-1',
@@ -43,7 +35,7 @@ export default function PlanPage() {
     },
   ]);
 
-  // Day별 장소 리스트
+  // Day별 장소 데이터
   const [dayPlaces, setDayPlaces] = useState<Record<string, PlaceItem[]>>({
     'day-1': [
       {
@@ -65,154 +57,44 @@ export default function PlanPage() {
     'day-3': [],
   });
 
-  // 드래그 중인 카드
-  const [activePlace, setActivePlace] = useState<PlaceItem | null>(null);
+  // 상세 계획 카드 데이터
+  const [cards, setCards] = useState<PlanCardData[]>([
+    {
+      id: '1',
+      type: 'CHECKLIST',
+      checklistItems: [
+        { id: 'c1', text: '기차 티켓 확인', checked: true },
+        {
+          id: 'c2',
+          text: '렌터카 인수 확인 및 운전면허증 지참',
+          checked: false,
+        },
+      ],
+    },
+    {
+      id: '2',
+      type: 'PLACE',
+      placeOrderNumber: 1,
+      title: '부산역',
+      category: '관광',
+      location: '부산 동구',
+      visitTime: '12:29 ~ 12:50',
+      cost: '150,900원 (1인 50,300원)',
+      memo: '가지전에 탑승권 뽑고 가서 역무원에게 문의해야함.',
+    },
+  ]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 }, // 5px 이동 시 드래그 시작
-    }),
-  );
-
-  // 어떤 컨테이너(Day 또는 후보)에 속해있는지 찾아주는 함수
-  const findContainer = (id: string) => {
-    if (
-      id === 'candidate-list' ||
-      candidatePlaces.some((item) => item.id === id)
-    ) {
-      return 'candidate-list';
-    }
-    if (id in dayPlaces) return id;
-
-    return Object.keys(dayPlaces).find((key) =>
-      dayPlaces[key].some((item) => item.id === id),
-    );
+  const handleUpdate = (updated: PlanCardData) => {
+    setCards((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
   };
 
-  // Day 카드 내 순번(orderNumber) 재계산 함수
-  const recalculateOrder = (places: PlaceItem[]) => {
-    return places.map((item, index) => ({
-      ...item,
-      orderNumber: index + 1,
-    }));
-  };
-
-  // Drag Start
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const activeId = active.id as string;
-
-    const allPlaces = [...candidatePlaces, ...Object.values(dayPlaces).flat()];
-    const found = allPlaces.find((p) => p.id === activeId);
-    if (found) setActivePlace(found);
-  };
-
-  // Drag End (모든 양방향 이동 및 순서 변경 처리)
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActivePlace(null);
-
-    if (!over) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-
-    const activeContainer = findContainer(activeId);
-    const overContainer = findContainer(overId);
-
-    if (!activeContainer || !overContainer) return;
-
-    // CASE 1: 후보 리스트 -> Day 카드로 이동
-    if (
-      activeContainer === 'candidate-list' &&
-      overContainer.startsWith('day-')
-    ) {
-      const itemToMove = candidatePlaces.find((p) => p.id === activeId);
-      if (!itemToMove) return;
-
-      // Candidate에서 제거
-      setCandidatePlaces((prev) => prev.filter((p) => p.id !== activeId));
-
-      // Day로 추가 및 순번 계산
-      setDayPlaces((prev) => {
-        const targetList = [...prev[overContainer], itemToMove];
-        return {
-          ...prev,
-          [overContainer]: recalculateOrder(targetList),
-        };
-      });
-      return;
-    }
-
-    // CASE 2: Day 카드 -> 후보 리스트로 이동
-    if (
-      activeContainer.startsWith('day-') &&
-      overContainer === 'candidate-list'
-    ) {
-      const itemToMove = dayPlaces[activeContainer].find(
-        (p) => p.id === activeId,
-      );
-      if (!itemToMove) return;
-
-      // Day에서 제거
-      setDayPlaces((prev) => ({
-        ...prev,
-        [activeContainer]: recalculateOrder(
-          prev[activeContainer].filter((p) => p.id !== activeId),
-        ),
-      }));
-
-      // Candidate로 추가 (orderNumber 제거)
-      setCandidatePlaces((prev) => [
-        ...prev,
-        { ...itemToMove, orderNumber: undefined },
-      ]);
-      return;
-    }
-
-    // CASE 3: Day 카드 -> 다른 Day 카드로 이동
-    if (
-      activeContainer.startsWith('day-') &&
-      overContainer.startsWith('day-') &&
-      activeContainer !== overContainer
-    ) {
-      const itemToMove = dayPlaces[activeContainer].find(
-        (p) => p.id === activeId,
-      );
-      if (!itemToMove) return;
-
-      setDayPlaces((prev) => ({
-        ...prev,
-        [activeContainer]: recalculateOrder(
-          prev[activeContainer].filter((p) => p.id !== activeId),
-        ),
-        [overContainer]: recalculateOrder([...prev[overContainer], itemToMove]),
-      }));
-      return;
-    }
-
-    // CASE 4: 같은 Day 카드 내에서 순서 변경
-    if (
-      activeContainer === overContainer &&
-      activeContainer.startsWith('day-')
-    ) {
-      const list = dayPlaces[activeContainer];
-      const oldIndex = list.findIndex((p) => p.id === activeId);
-      const newIndex = list.findIndex((p) => p.id === overId);
-
-      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        const reordered = arrayMove(list, oldIndex, newIndex);
-        setDayPlaces((prev) => ({
-          ...prev,
-          [activeContainer]: recalculateOrder(reordered),
-        }));
-      }
-    }
+  const handleDelete = (id: string) => {
+    setCards((prev) => prev.filter((c) => c.id !== id));
   };
 
   return (
     <main className="flex flex-col gap-7.5 min-w-300 w-300 mx-auto px-5 py-8">
-      {/* 타이틀 + 메뉴 탭 */}
+      {/* 헤더 타이틀 및 탭 버튼 */}
       <div className="flex flex-col gap-5">
         <div className="flex gap-2">
           <div className="text-xl font-jalnan-gothic text-sub">
@@ -241,45 +123,21 @@ export default function PlanPage() {
         </div>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex gap-5 h-117 overflow-x-auto scrollbar-none">
-          <DayCard
-            dayId="day-1"
-            dayNumber={1}
-            dateText="8.8 (토)"
-            places={dayPlaces['day-1']}
-          />
-          <DayCard
-            dayId="day-2"
-            dayNumber={2}
-            dateText="8.9 (일)"
-            places={dayPlaces['day-2']}
-          />
-          <DayCard
-            dayId="day-3"
-            dayNumber={3}
-            dateText="8.10 (월)"
-            places={dayPlaces['day-3']}
-          />
-        </div>
-
-        <div className="mt-5">
-          <PlaceListContainer
-            containerId="candidate-list"
-            places={candidatePlaces}
-          />
-        </div>
-
-        {/* Drag Overlay */}
-        <DragOverlay>
-          {activePlace ? <PlaceCard place={activePlace} isOverlay /> : null}
-        </DragOverlay>
-      </DndContext>
+      {/* 탭별 뷰 컴포넌트 렌더링 */}
+      {activePlanTab === 'PLAN_DETAILS' ? (
+        <PlanDetailsTab
+          cards={cards}
+          onUpdateCard={handleUpdate}
+          onDeleteCard={handleDelete}
+        />
+      ) : (
+        <WishlistTab
+          candidatePlaces={candidatePlaces}
+          setCandidatePlaces={setCandidatePlaces}
+          dayPlaces={dayPlaces}
+          setDayPlaces={setDayPlaces}
+        />
+      )}
     </main>
   );
 }
