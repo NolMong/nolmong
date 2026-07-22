@@ -164,7 +164,7 @@ export default function WishlistTab({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-5 h-117 overflow-x-auto scrollbar-none">
+      <div className="flex gap-5 h-120 p-2 overflow-x-auto scrollbar-none">
         <DayCard
           dayId="day-1"
           dayNumber={1}
@@ -185,7 +185,7 @@ export default function WishlistTab({
         />
       </div>
 
-      <div className="mt-5">
+      <div className="mt-5 p-2">
         <PlaceListContainer
           containerId="candidate-list"
           places={candidatePlaces}
