@@ -11,14 +11,14 @@ import {
 
 const THEME_OPTIONS: { id: ProfileTheme; name: string }[] = [
   { id: 'green', name: '초록' },
-  { id: 'red', name: '빨강' },
-  { id: 'yellow', name: '노랑' },
-  { id: 'gray', name: '회색' },
+  { id: 'pink', name: '핑크' },
+  { id: 'caramel', name: '카라멜' },
+  { id: 'brown', name: '갈색' },
 ];
 
 const CHARACTER_OPTIONS: { id: UserType; name: string }[] = [
-  { id: 'KAPI', name: '카피' },
-  { id: 'BALA', name: '바라' },
+  { id: 'capi', name: '카피' },
+  { id: 'bara', name: '바라' },
 ];
 
 export default function ProfileEditModal() {
@@ -43,7 +43,7 @@ export default function ProfileEditModal() {
       <div className="flex flex-col items-center gap-2 py-4 bg-gray-light/20 rounded-xl">
         <ProfileAvatar size={100} type={selectedType} theme={selectedTheme} />
         <span className="text-xs font-semibold text-sub mt-2">
-          선택된 프로필: {selectedType === 'KAPI' ? '카피' : '바라'} (
+          선택된 프로필: {selectedType === 'capi' ? '카피' : '바라'} (
           {selectedTheme})
         </span>
       </div>

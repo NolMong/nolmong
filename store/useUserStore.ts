@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
-export type UserType = 'KAPI' | 'BALA';
-export type ProfileTheme = 'green' | 'red' | 'yellow' | 'gray';
+export type UserType = 'capi' | 'bara';
+export type ProfileTheme = 'green' | 'pink' | 'caramel' | 'brown';
 
 interface UserState {
   userType: UserType;
@@ -13,7 +13,7 @@ interface UserState {
 }
 
 export const useUserStore = create<UserState>((set) => ({
-  userType: 'KAPI', // 기본 캐릭터
+  userType: 'capi', // 기본 캐릭터
   profileTheme: 'green', // 기본 테마 (초록)
   setUserType: (type) => set({ userType: type }),
   setProfileTheme: (theme) => set({ profileTheme: theme }),

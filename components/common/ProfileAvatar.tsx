@@ -12,9 +12,9 @@ import {
 // 배경색 & 테두리 색깔 매핑
 const themeStyles: Record<ProfileTheme, string> = {
   green: 'bg-primary-light border-primary',
-  red: 'bg-pink-light border-pink',
-  yellow: 'bg-caramel-light border-caramel',
-  gray: 'bg-border border-muted',
+  pink: 'bg-pink-light border-pink',
+  caramel: 'bg-caramel-light border-caramel',
+  brown: 'bg-border border-muted',
 };
 
 interface ProfileAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -38,7 +38,7 @@ export default function ProfileAvatar({
   const currentTheme = theme || globalProfileTheme;
 
   const imageSrc =
-    currentType === 'KAPI' ? '/images/capi2.webp' : '/images/bara2.webp';
+    currentType === 'capi' ? '/images/capi2.webp' : '/images/bara2.webp';
 
   return (
     <div
