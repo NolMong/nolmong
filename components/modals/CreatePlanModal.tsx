@@ -50,6 +50,10 @@ export default function CreatePlanModal() {
   // 정상적으로 닫힐 때(배경 클릭, 라우트 이동, 완료 버튼 등) plan을 처음 상태로 초기화
   const close = useCallback(() => {
     setPlan(initialPlan);
+    setOneDayTrip(false);
+    setWriteStartLocation(false);
+    setWriteEndLocation(false);
+    setState('date');
     closeStore();
   }, [closeStore]);
 
@@ -443,6 +447,16 @@ export default function CreatePlanModal() {
                   <input
                     className='border border-none focus:outline-none h-12 text-main min-w-0'
                     placeholder='예산 (선택)'
+                    value={plan.budget}
+                    onChange={(e) => {
+                      const digitsOnly = e.target.value.replace(/[^0-9]/g, '');
+                      setPlan((prev) => ({
+                        ...prev,
+                        budget: digitsOnly
+                          ? Number(digitsOnly).toLocaleString()
+                          : '',
+                      }));
+                    }}
                   />
                   <div className='shrink-0 text-main'>원</div>
                 </div>
@@ -455,6 +469,12 @@ export default function CreatePlanModal() {
                   <input
                     className='border border-none focus:outline-none h-12 text-main min-w-0'
                     placeholder='인원 (선택)'
+                    onChange={(e) =>
+                      setPlan((prev) => ({
+                        ...prev,
+                        headcount: e.target.value,
+                      }))
+                    }
                   />
                   <div className='shrink-0 text-main'>명</div>
                 </div>
