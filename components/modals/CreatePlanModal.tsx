@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   CalendarDays,
   Flag,
@@ -153,6 +154,7 @@ function PanelSection({
 export default function CreatePlanModal() {
   const isOpen = useCreatePlanModalStore((state) => state.isOpen);
   const closeStore = useCreatePlanModalStore((state) => state.close);
+  const router = useRouter();
 
   const [oneDayTrip, setOneDayTrip] = useState(false);
   const [writeStartLocation, setWriteStartLocation] = useState(false);
@@ -349,7 +351,7 @@ export default function CreatePlanModal() {
     );
     if (!confirmed) return;
 
-    const { error } = await postNewPlan({
+    const { data, error, channel } = await postNewPlan({
       startLocation: plan.startLocation[0]?.text ?? '',
       endLocations: plan.endLocation.map((l) => l.text),
       budget: plan.budget,
@@ -363,6 +365,9 @@ export default function CreatePlanModal() {
 
     alert('여행 계획이 생성되었습니다.');
     close();
+    if (channel) {
+      router.push(`/plan/${channel}`);
+    }
   };
 
   const renderContent = () => {
