@@ -46,7 +46,11 @@ export default function PlanDetailsTab() {
         />
       </div>
 
-      <KakaoMap className="flex-1 h-full rounded-xl overflow-hidden border" />
+      <KakaoMap
+        cards={cards}
+        currentDay={currentDay}
+        className="flex-1 h-full rounded-xl overflow-hidden border"
+      />
     </div>
   );
 }
