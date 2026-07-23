@@ -24,11 +24,16 @@ export default function ChecklistCard({
   onAddChecklistItem,
   onRemoveChecklistItem,
 }: ChecklistCardProps) {
+  // checklist가 비어있으면 data.checklistItems를 사용
+  const itemsToRender = checklists?.length
+    ? checklists
+    : data.checklistItems || [];
+
   return (
     <div className="flex flex-col gap-1.5">
       {isEditing ? (
         <div className="flex flex-col gap-2">
-          {checklists.map((item) => (
+          {itemsToRender.map((item) => (
             <div key={item.id} className="flex items-center gap-2">
               <Checkbox
                 checked={item.checked}
@@ -63,7 +68,7 @@ export default function ChecklistCard({
         </div>
       ) : (
         <div className="flex flex-col gap-1.5 ">
-          {checklists.map((item) => (
+          {itemsToRender.map((item) => (
             <label
               key={item.id}
               className="flex items-center gap-1.5 cursor-pointer"

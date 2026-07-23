@@ -2,22 +2,32 @@
 
 import { useState } from 'react';
 import { FilterGroup, PlanEditorCard, KakaoMap } from '@/components';
+import { usePlanStore } from '@/store/usePlanStore';
 import { PlanCardData } from '@/types/plans';
 
-interface PlanDetailsTabProps {
-  cards: PlanCardData[];
-  onUpdateCard: (updated: PlanCardData) => void;
-  onDeleteCard: (id: string) => void;
-}
+const dayOptions = ['Day-1', 'Day-2', 'Day-3'];
 
-const dayOptions = ['Day 1', 'Day 2', 'Day 3'];
+export default function PlanDetailsTab() {
+  const [currentDay, setCurrentDay] = useState('Day-1');
+  const { cards, updateCard, deleteCard } = usePlanStore();
 
-export default function PlanDetailsTab({
-  cards,
-  onUpdateCard,
-  onDeleteCard,
-}: PlanDetailsTabProps) {
-  const [currentDay, setCurrentDay] = useState('Day 1');
+  const dayId = currentDay;
+
+  // 현재 선택된 Day의 카드만 추출 및 정렬
+  const rawDayCards = cards
+    .filter((card) => card.day === dayId)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  // PLACE 카드에 순차적 순번 부여
+  let placeCounter = 1;
+  const filteredCards: PlanCardData[] = rawDayCards.map((card) => {
+    if (card.type === 'PLACE') {
+      return { ...card, placeOrderNumber: placeCounter++ };
+    }
+    return card;
+  });
+
+  const dayNumber = parseInt(currentDay.replace('Day-', ''), 10) || 1;
 
   return (
     <div className="flex gap-5 h-161">
@@ -28,11 +38,11 @@ export default function PlanDetailsTab({
           onChange={setCurrentDay}
         />
         <PlanEditorCard
-          dayNumber={parseInt(currentDay.replace('Day ', ''), 10) || 1}
+          dayNumber={dayNumber}
           dateText="8.8 / 토"
-          cards={cards}
-          onUpdateCard={onUpdateCard}
-          onDeleteCard={onDeleteCard}
+          cards={filteredCards}
+          onUpdateCard={updateCard}
+          onDeleteCard={deleteCard}
         />
       </div>
 

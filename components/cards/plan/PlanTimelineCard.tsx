@@ -21,15 +21,19 @@ export default function PlanTimelineCard({
 }: PlanTimelineCardProps) {
   const [isEditing, setIsEditing] = useState(false);
 
-  // 수정 모드 Form 상태
-  const [editStartTime, setEditStartTime] = useState(
-    data.visitTime?.split(' ~ ')[0] || '',
-  );
-  const [editEndTime, setEditEndTime] = useState(
-    data.visitTime?.split(' ~ ')[1] || '',
-  );
-  const [editCost, setEditCost] = useState(data.cost || '');
-  const [editMemo, setEditMemo] = useState(data.memo || '');
+  // times 배열 형태(['12:29', '12:50'])와 visitTime 문자열 형태 둘 다 대응
+  const initialStartTime = data.times?.[0] || '';
+  const initialEndTime = data.times?.[1] || '';
+
+  // cost, memo
+  const initialCost = data.expense !== undefined ? String(data.expense) : '';
+  const initialMemo = data.desc || '';
+
+  // State 초기화
+  const [editStartTime, setEditStartTime] = useState(initialStartTime);
+  const [editEndTime, setEditEndTime] = useState(initialEndTime);
+  const [editCost, setEditCost] = useState(initialCost);
+  const [editMemo, setEditMemo] = useState(initialMemo);
 
   // 체크리스트 상태
   const [checklists, setChecklists] = useState(data.checklistItems || []);
@@ -65,14 +69,16 @@ export default function PlanTimelineCard({
 
   const handleSave = () => {
     if (onUpdate) {
+      const updatedTimes =
+        editStartTime && editEndTime
+          ? [editStartTime, editEndTime]
+          : data.times;
+
       onUpdate({
         ...data,
-        visitTime:
-          editStartTime && editEndTime
-            ? `${editStartTime} ~ ${editEndTime}`
-            : data.visitTime,
-        cost: editCost,
-        memo: editMemo,
+        times: updatedTimes,
+        expense: editCost ? Number(editCost) : undefined,
+        desc: editMemo,
         checklistItems: checklists,
       });
     }

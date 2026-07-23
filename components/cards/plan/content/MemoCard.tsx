@@ -25,6 +25,13 @@ export default function MemoCard({
   setEditEndTime,
   setEditMemo,
 }: MemoCardProps) {
+  // times, desc
+  const displayTime =
+    data.times && data.times.length === 2
+      ? `${data.times[0]} ~ ${data.times[1]}`
+      : null;
+  const displayMemo = data.desc;
+
   if (isEditing) {
     return (
       <div className="flex flex-col gap-3 text-xs font-regular text-main">
@@ -62,15 +69,15 @@ export default function MemoCard({
 
   return (
     <div className="flex flex-col gap-1.5 text-sub">
-      {data.visitTime && (
+      {displayTime && (
         <div className="flex items-center gap-1.5">
           <Clock size={13} className="shrink-0 text-muted" />
-          <span>{data.visitTime}</span>
+          <span>{displayTime}</span>
         </div>
       )}
-      {data.memo && (
+      {displayMemo && (
         <p className="whitespace-pre-line font-medium leading-relaxed">
-          {data.memo}
+          {displayMemo}
         </p>
       )}
     </div>

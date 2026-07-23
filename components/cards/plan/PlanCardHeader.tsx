@@ -25,10 +25,10 @@ export default function PlanCardHeader({
       {data.type === 'PLACE' && (
         <div className="flex flex-col gap-2">
           <h3 className="text-sm font-regular text-main font-jalnan-gothic">
-            {data.title}
+            {data.name}
           </h3>
           <p className="text-xs text-muted font-regular">
-            {data.category} · {data.location}
+            {data.category} · {data.address}
           </p>
         </div>
       )}
