@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { getPlans, PlanType } from '@/api/getPlans';
 import {
   CalendarComponent,
   CreatePlanModal,
@@ -10,7 +12,18 @@ import { useCreatePlanModalStore } from '@/store/useModalStore';
 import Image from 'next/image';
 
 export default function MainPage() {
+  const [plans, setPlans] = useState<PlanType[]>([]);
   const openCreatePlanModal = useCreatePlanModalStore((state) => state.open);
+  useEffect(() => {
+    getPlans().then((res) => {
+      if (res.error) {
+        console.error('Error fetching plans:', res.error);
+      } else {
+        console.log('Fetched plans:', res.data);
+        setPlans(res.data);
+      }
+    });
+  }, []);
 
   return (
     <div className=' bg-[#FDFDFD] min-h-screen'>
@@ -68,20 +81,14 @@ export default function MainPage() {
         </div>
         <div className='px-4'>
           <div className='flex items-center gap-1'>
-            <div className='text-2xl font-jalnan text-main'>나의 여행</div>
-            <Tag>12개</Tag>
+            <div className='text-2xl font-jalnan text-main mr-2'>나의 여행</div>
+            <Tag>{plans.length}개</Tag>
           </div>
 
-          <div className='grid grid-cols-3 gap-y-6 py-6'>
-            <TravelCard />
-            <TravelCard />
-            <TravelCard />
-            <TravelCard />
-            <TravelCard />
-            <TravelCard />
-            <TravelCard />
-            <TravelCard />
-            <TravelCard />
+          <div className='grid grid-cols-3 gap-y-6 py-6 '>
+            {plans.map((plan) => (
+              <TravelCard key={plan.id} data={plan} />
+            ))}
           </div>
         </div>
       </div>
