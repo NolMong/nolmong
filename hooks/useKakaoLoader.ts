@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const SDK_URL = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false`;
+const SDK_URL = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false&libraries=services`;
 
 // 스크립트 로드는 앱 전체에서 한 번만. 진행 중인 Promise를 모듈 스코프에 캐싱해 중복 로드를 막는다.
 let loaderPromise: Promise<void> | null = null;
@@ -14,7 +14,7 @@ function loadKakaoSdk(): Promise<void> {
 
   loaderPromise = new Promise<void>((resolve, reject) => {
     const existing = document.querySelector<HTMLScriptElement>(
-      'script[data-kakao-sdk]'
+      'script[data-kakao-sdk]',
     );
 
     const handleLoad = () => window.kakao.maps.load(() => resolve());
@@ -42,7 +42,7 @@ function loadKakaoSdk(): Promise<void> {
 /** 카카오맵 SDK 로드 완료 여부를 반환. 여러 지도 컴포넌트에서 호출해도 SDK는 한 번만 로드된다. */
 export function useKakaoLoader() {
   const [loaded, setLoaded] = useState(
-    () => typeof window !== 'undefined' && !!window.kakao?.maps
+    () => typeof window !== 'undefined' && !!window.kakao?.maps,
   );
   const [error, setError] = useState<Error | null>(null);
 
