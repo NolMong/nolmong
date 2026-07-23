@@ -29,6 +29,14 @@ export default function PlaceCard({
   setEditCost,
   setEditMemo,
 }: PlaceCardProps) {
+  // times, expense, desc
+  const displayTime =
+    data.times && data.times.length === 2
+      ? `${data.times[0]} ~ ${data.times[1]}`
+      : null;
+  const displayCost = data.expense !== undefined ? data.expense : null;
+  const displayMemo = data.desc;
+
   if (isEditing) {
     return (
       <div className="flex flex-col gap-3 text-xs font-regular text-main">
@@ -77,22 +85,22 @@ export default function PlaceCard({
 
   return (
     <div className="flex flex-col gap-1.5 pt-1 text-sub">
-      {data.visitTime && (
+      {displayTime && (
         <div className="flex items-center gap-1.5">
           <Clock size={13} className="shrink-0 text-main" />
-          <span>{data.visitTime}</span>
+          <span>{displayTime}</span>
         </div>
       )}
-      {data.cost && (
+      {displayCost && (
         <div className="flex items-center gap-1.5">
           <CircleDollarSign size={13} className="shrink-0 text-main" />
-          <span>{data.cost}</span>
+          <span>{displayCost}</span>
         </div>
       )}
-      {data.memo && (
+      {displayMemo && (
         <div className="flex items-start gap-1.5">
           <SquareMenu size={13} className="shrink-0 text-main" />
-          <span className="whitespace-pre-line">{data.memo}</span>
+          <span className="whitespace-pre-line">{displayMemo}</span>
         </div>
       )}
     </div>
