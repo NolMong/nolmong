@@ -39,10 +39,10 @@ const initialCards: PlanCardData[] = [
     y: 35.17,
   },
 
-  // --- Day 1 데이터 (day: 'Day-1') ---
+  // --- day 1 데이터 (day: 'day-1') ---
   {
     id: 'card-1',
-    day: 'Day-1',
+    day: 'day-1',
     order: 1,
     type: 'CHECKLIST',
     checklistItems: [
@@ -52,7 +52,7 @@ const initialCards: PlanCardData[] = [
   },
   {
     id: 'card-2',
-    day: 'Day-1',
+    day: 'day-1',
     order: 2,
     type: 'PLACE',
     name: '부산역',
@@ -66,7 +66,7 @@ const initialCards: PlanCardData[] = [
   },
   {
     id: 'card-3',
-    day: 'Day-1',
+    day: 'day-1',
     order: 3,
     type: 'MEMO',
     times: ['13:00', '13:30'],
@@ -74,7 +74,7 @@ const initialCards: PlanCardData[] = [
   },
   {
     id: 'card-4',
-    day: 'Day-1',
+    day: 'day-1',
     order: 4,
     type: 'PLACE',
     name: '톤쇼우 남포점',

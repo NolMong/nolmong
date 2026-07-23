@@ -11,7 +11,7 @@ import {
 } from '@dnd-kit/sortable';
 
 interface DayCardProps {
-  dayId: string; // ex: Day-1
+  dayId: string; // ex: day-1
   dayNumber: number;
   dateText: string;
   places: PlaceItem[];

@@ -5,10 +5,10 @@ import { FilterGroup, PlanEditorCard, KakaoMap } from '@/components';
 import { usePlanStore } from '@/store/usePlanStore';
 import { PlanCardData } from '@/types/plans';
 
-const dayOptions = ['Day-1', 'Day-2', 'Day-3'];
+const dayOptions = ['day-1', 'day-2', 'day-3'];
 
 export default function PlanDetailsTab() {
-  const [currentDay, setCurrentDay] = useState('Day-1');
+  const [currentDay, setCurrentDay] = useState('day-1');
   const { cards, updateCard, deleteCard } = usePlanStore();
 
   const dayId = currentDay;
@@ -27,7 +27,7 @@ export default function PlanDetailsTab() {
     return card;
   });
 
-  const dayNumber = parseInt(currentDay.replace('Day-', ''), 10) || 1;
+  const dayNumber = parseInt(currentDay.replace('day-', ''), 10) || 1;
 
   return (
     <div className="flex gap-5 h-161">

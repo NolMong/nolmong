@@ -2,7 +2,7 @@ export type PlanCardType = 'CHECKLIST' | 'PLACE' | 'MEMO';
 
 export interface PlanCardData {
   id: string;
-  day: string | null; // 'Day-1', 'Day-2', 'Day-3' 또는 후보 리스트일 때 null
+  day: string | null; // 'day-1', 'day-2', 'day-3' 또는 후보 리스트일 때 null
   order: number | null; // 전체 카드 내 순서
   type: PlanCardType;
 

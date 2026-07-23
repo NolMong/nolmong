@@ -49,7 +49,7 @@ export default function WishlistTab() {
 
   const findContainerDay = (id: string): string | null => {
     if (id === 'candidate-list') return null;
-    if (id.startsWith('Day-')) return id;
+    if (id.startsWith('day-')) return id;
 
     const card = cards.find((c) => c.id === id);
     return card ? card.day : null;
@@ -94,22 +94,22 @@ export default function WishlistTab() {
     >
       <div className="flex gap-5 h-120 p-2 overflow-x-auto scrollbar-none">
         <DayCard
-          dayId="Day-1"
+          dayId="day-1"
           dayNumber={1}
           dateText="8.8 (토)"
-          places={getPlaceItemsByDay('Day-1')}
+          places={getPlaceItemsByDay('day-1')}
         />
         <DayCard
-          dayId="Day-2"
+          dayId="day-2"
           dayNumber={2}
           dateText="8.9 (일)"
-          places={getPlaceItemsByDay('Day-2')}
+          places={getPlaceItemsByDay('day-2')}
         />
         <DayCard
-          dayId="Day-3"
+          dayId="day-3"
           dayNumber={3}
           dateText="8.10 (월)"
-          places={getPlaceItemsByDay('Day-3')}
+          places={getPlaceItemsByDay('day-3')}
         />
       </div>
 
