@@ -54,7 +54,7 @@ const initialCards: PlanCardData[] = [
     id: 'card-2',
     day: 'day-1',
     order: 2,
-    type: 'PLACE',
+    type: 'PLACE', // 📌 1번 핀
     name: '부산역',
     category: '관광',
     address: '부산 동구 중앙대로 206',
@@ -76,7 +76,7 @@ const initialCards: PlanCardData[] = [
     id: 'card-4',
     day: 'day-1',
     order: 4,
-    type: 'PLACE',
+    type: 'PLACE', // 📌 2번 핀
     name: '톤쇼우 남포점',
     category: '식당',
     address: '부산 남포동',
@@ -85,6 +85,34 @@ const initialCards: PlanCardData[] = [
     times: ['13:30', '15:00'],
     expense: 35000,
     desc: '캐치테이블 현장 대기 등록 필수!',
+  },
+  {
+    id: 'card-5',
+    day: 'day-1',
+    order: 5,
+    type: 'PLACE', // 📌 3번 핀 (추가됨)
+    name: '감천문화마을',
+    category: '관광',
+    address: '부산 사하구 감내2로 203',
+    x: 129.01,
+    y: 35.097,
+    times: ['15:30', '17:00'],
+    expense: 0,
+    desc: '어린왕자 동상 앞에서 사진 찍기',
+  },
+  {
+    id: 'card-6',
+    day: 'day-1',
+    order: 6,
+    type: 'PLACE', // 📌 4번 핀 (추가됨)
+    name: '광안리해수욕장',
+    category: '관광',
+    address: '부산 수영구 광안해변로 219',
+    x: 129.118,
+    y: 35.153,
+    times: ['18:00', '20:00'],
+    expense: 20000,
+    desc: '드론쇼 관람 및 야경 구경',
   },
 ];
 
