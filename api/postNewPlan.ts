@@ -1,6 +1,7 @@
-import { createClient } from '@/lib/supabase/client';
-import { getAblyClient } from '@/lib/ably/client';
-import type { ChannelOptions } from 'ably';
+import { createClient } from "@/lib/supabase/client";
+import { getAblyClient } from "@/lib/ably/client";
+import type { ChannelOptions } from "ably";
+import { LiveMap } from "ably/liveobjects";
 
 export type NewPlanType = {
   startLocation: string;
@@ -10,7 +11,7 @@ export type NewPlanType = {
 };
 
 const PLAN_CHANNEL_OPTIONS: ChannelOptions = {
-  modes: ['OBJECT_SUBSCRIBE', 'OBJECT_PUBLISH'],
+  modes: ["OBJECT_SUBSCRIBE", "OBJECT_PUBLISH"],
 };
 
 export async function postNewPlan(plan: NewPlanType) {
@@ -23,15 +24,15 @@ export async function postNewPlan(plan: NewPlanType) {
   if (!user) {
     return {
       data: null,
-      error: new Error('로그인이 필요합니다.'),
+      error: new Error("로그인이 필요합니다."),
       channel: null,
     };
   }
 
-  console.log('로그인 유저 정보:', user);
+  console.log("로그인 유저 정보:", user);
 
-  const title = `${plan.endLocations.join(' ')} 여행`;
-  const uuid = crypto.randomUUID();
+  const title = `${plan.endLocations.join(" ")} 여행`;
+  const uuid = "046e6379-a9bc-4bbd-aa7d-fd40b2b0b455";
 
   // plan과 같은 uuid로 Ably 채널을 만들고, cards를 담을 자리(LiveMap)를 초기 상태로 세팅
   const ably = getAblyClient();
@@ -40,26 +41,26 @@ export async function postNewPlan(plan: NewPlanType) {
   if (!root) {
     return {
       data: null,
-      error: new Error('Ably 채널 생성 실패'),
+      error: new Error("Ably 채널 생성 실패"),
       channel: null,
     };
   }
-  await root.set('cards', []);
-  await root.set('title', title);
+  await root.set("cards", LiveMap.create({}));
+  await root.set("title", title);
 
-  console.log('Ably 채널 생성 완료:', title, uuid, plan);
+  console.log("Ably 채널 생성 완료:", title, uuid, plan);
 
   const { data: newPlanData, error: newPlanError } = await supabase
-    .from('plans')
+    .from("plans")
     .insert({
       // Ably 실시간 협업 채널 이름으로 쓰는 uuid
       uuid: uuid,
       title,
       start_location: plan.startLocation,
       end_locations: plan.endLocations,
-      budget: plan.budget === '' ? 0 : Number(plan.budget.replaceAll(',', '')),
+      budget: plan.budget === "" ? 0 : Number(plan.budget.replaceAll(",", "")),
       headcount:
-        plan.headcount === '' ? 0 : Number(plan.headcount.replaceAll(',', '')),
+        plan.headcount === "" ? 0 : Number(plan.headcount.replaceAll(",", "")),
       cards: [],
     })
     .select()
@@ -72,7 +73,7 @@ export async function postNewPlan(plan: NewPlanType) {
   // plan_profiles.plan_id는 plans의 정수 PK(id)를 참조함 (Ably 채널용 uuid 아님)
   const { data: newPlanProfilesData, error: newPlanProfilesError } =
     await supabase
-      .from('plan_profiles')
+      .from("plan_profiles")
       .insert({
         plan_id: newPlanData.id,
         profile_id: user.id,

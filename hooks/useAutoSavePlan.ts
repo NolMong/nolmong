@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import { usePlanStore } from '@/store/usePlanStore';
-import { createClient } from '@/lib/supabase/client';
+import { useEffect, useRef } from "react";
+import { usePlanStore } from "@/store/usePlanStore";
+import { createClient } from "@/lib/supabase/client";
 
-export function useAutoSavePlan(planId: string) {
+export function useAutoSavePlan(uuid: string) {
   const cards = usePlanStore((state) => state.cards);
   const isDirty = usePlanStore((state) => state.isDirty);
   const resetIsDirty = usePlanStore((state) => state.resetIsDirty);
@@ -24,15 +24,15 @@ export function useAutoSavePlan(planId: string) {
       const supabase = createClient();
 
       const { error } = await supabase
-        .from('plans')
+        .from("plans")
         .update({ cards: cardsRef.current })
-        .eq('id', planId);
+        .eq("uuid", uuid);
 
       if (!error) {
         resetIsDirty();
       }
     } catch (err) {
-      console.error('자동 저장 실패:', err);
+      console.error("자동 저장 실패:", err);
     }
   };
 
@@ -41,17 +41,17 @@ export function useAutoSavePlan(planId: string) {
     const intervalId = setInterval(saveToDatabase, 3 * 60 * 1000);
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
+      if (document.visibilityState === "hidden") {
         saveToDatabase();
       }
     };
 
-    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       clearInterval(intervalId);
-      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
       saveToDatabase();
     };
-  }, [planId]);
+  }, [uuid]);
 }
