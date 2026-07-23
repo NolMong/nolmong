@@ -1,18 +1,104 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
+import { flushSync } from 'react-dom';
+import { createRoot, type Root } from 'react-dom/client';
 import { MapPin } from 'lucide-react';
 import { useKakaoLoader } from '@/hooks/useKakaoLoader';
 import { cn } from '@/lib/utils';
 import { PlanCardData } from '@/types/plans';
 
+export interface KakaoMapMarker {
+  id: string;
+  lat: number;
+  lng: number;
+  title: string;
+  address?: string;
+  data?: kakao.maps.services.PlacesSearchResultItem;
+}
+
+function DefaultMarkerContent({ marker }: { marker: KakaoMapMarker }) {
+  return (
+    <div
+      style={{
+        padding: '6px 10px',
+        fontSize: 12,
+        lineHeight: 1.4,
+        maxWidth: 200,
+        backgroundColor: 'white',
+      }}
+    >
+      <div style={{ fontWeight: 600 }}>{marker.title}</div>
+      {marker.address && (
+        <div style={{ color: '#888', marginTop: 2 }}>{marker.address}</div>
+      )}
+    </div>
+  );
+}
+
+// 카카오 InfoWindow는 자체 흰 박스/꼬리 테두리를 그려서 커스텀이 안 되니,
+// CustomOverlay 위에 우리가 렌더링한 콘텐츠만 올리고 닫기 버튼만 얹어준다
+function MarkerOverlayContent({
+  children,
+  onClose,
+}: {
+  children: ReactNode;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      // 카드 내부 클릭이 지도까지 버블링되면 지도 클릭 리스너가 오버레이를 닫아버려서 막아준다
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: 'relative',
+        marginBottom: 42,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        boxShadow: '0px 4px 10px rgba(82, 82, 82, 0.2)',
+      }}
+    >
+      <button
+        type='button'
+        onClick={onClose}
+        style={{
+          position: 'absolute',
+          top: -8,
+          right: -8,
+          width: 20,
+          height: 20,
+          borderRadius: '9999px',
+          backgroundColor: 'white',
+          border: '1px solid #ddd',
+          fontSize: 12,
+          lineHeight: '18px',
+          cursor: 'pointer',
+        }}
+      >
+        ×
+      </button>
+      {children}
+    </div>
+  );
+}
+
 interface KakaoMapProps {
+  /** 일정에 저장된 카드 목록. currentDay의 PLACE 카드들을 커스텀 핀/라인으로 그린다 (왼쪽 기능) */
   cards?: PlanCardData[];
+  /** 핀/선을 그릴 대상 day (예: 'day-1') */
   currentDay?: string;
+  /** 지도 중심 좌표 (기본값: 부산역) */
   center?: { lat: number; lng: number };
+  /** 확대 레벨 (숫자가 작을수록 확대) */
   level?: number;
   className?: string;
+  /** 지도 위에 찍을 기본 마커 (검색 결과 등, 오른쪽 기능) */
+  markers?: KakaoMapMarker[];
+  /** 지도 인스턴스가 생성된 직후 호출 (장소 검색 등에 사용) */
+  onMapLoad?: (map: kakao.maps.Map) => void;
+  /** 마커 클릭 시 오버레이 안에 렌더링할 커스텀 콘텐츠 (없으면 이름/주소 기본 표시) */
+  renderMarkerContent?: (marker: KakaoMapMarker) => ReactNode;
 }
 
 // 부산역 기본 위치
@@ -24,33 +110,88 @@ export default function KakaoMap({
   center = DEFAULT_CENTER,
   level = 5,
   className,
+  markers = [],
+  onMapLoad,
+  renderMarkerContent,
 }: KakaoMapProps) {
   const { loaded, error } = useKakaoLoader();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null);
+  const markerInstancesRef = useRef<kakao.maps.Marker[]>([]);
+  const overlayRef = useRef<kakao.maps.CustomOverlay | null>(null);
+  const overlayRootRef = useRef<Root | null>(null);
 
-  // 오버레이 및 선 보관용
+  // 일정 핀/선 보관용 (왼쪽 기능)
   const overlaysRef = useRef<{
     customOverlays: kakao.maps.CustomOverlay[];
     polyline: kakao.maps.Polyline | null;
   }>({ customOverlays: [], polyline: null });
 
-  // 지도 인스턴스 생성
+  // 최초 로드 시 지도 인스턴스 생성
   useEffect(() => {
     if (!loaded || !containerRef.current || mapRef.current) return;
 
     const { kakao } = window;
-    mapRef.current = new kakao.maps.Map(containerRef.current, {
+    const map = new kakao.maps.Map(containerRef.current, {
       center: new kakao.maps.LatLng(center.lat, center.lng),
       level,
     });
-  }, [loaded, center.lat, center.lng, level]);
+    mapRef.current = map;
 
-  // cards 및 currentDay 변경 시 핑/선 업데이트
+    // CustomOverlay content로 쓸 컨테이너에 React 컴포넌트를 렌더링해 넣는다
+    // (InfoWindow는 카카오가 그리는 흰 박스/꼬리 테두리를 커스텀할 수 없어서 CustomOverlay를 씀)
+    const overlayContainer = document.createElement('div');
+    overlayRootRef.current = createRoot(overlayContainer);
+    overlayRef.current = new kakao.maps.CustomOverlay({
+      position: new kakao.maps.LatLng(center.lat, center.lng),
+      content: overlayContainer,
+      yAnchor: 1,
+      // false(기본값)면 오버레이 위 클릭이 지도로 새서 버튼 클릭이 씹힌다
+      clickable: true,
+    });
+
+    // 지도 빈 곳을 클릭하면 열려 있던 오버레이를 닫는다
+    kakao.maps.event.addListener(map, 'click', () => {
+      overlayRef.current?.setMap(null);
+    });
+
+    onMapLoad?.(map);
+
+    // StrictMode 개발 모드의 mount→cleanup→mount 시뮬레이션에서 root만 unmount하고
+    // mapRef 등을 안 지우면, 재mount 시 위 가드에 걸려 죽은 root가 그대로 남는다.
+    // 그러니 만든 것들을 여기서 한 번에 정리하고 ref도 같이 비워야 재생성이 된다.
+    return () => {
+      const root = overlayRootRef.current;
+      overlayRootRef.current = null;
+      overlayRef.current = null;
+      mapRef.current = null;
+      // 지금 상위 컴포넌트가 렌더링/커밋 중일 수 있어서 root.unmount()을
+      // 이 자리에서 동기로 부르면 "unmount a root while React was already
+      // rendering" 경고가 난다. 현재 렌더링 사이클이 끝난 뒤로 미룬다
+      setTimeout(() => root?.unmount(), 0);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
+
+  // center prop 변경 시 중심 이동 (cards가 있으면 아래 effect가 bounds로 다시 덮어씀)
+  useEffect(() => {
+    if (!mapRef.current) return;
+    mapRef.current.setCenter(
+      new window.kakao.maps.LatLng(center.lat, center.lng),
+    );
+  }, [center.lat, center.lng]);
+
+  // cards/currentDay 변경 시 커스텀 핀 + 라인 다시 그리기 (왼쪽 기능)
   useEffect(() => {
     if (!mapRef.current || !loaded) return;
     const { kakao } = window;
     const map = mapRef.current;
+
+    // 탭 전환 직후처럼 컨테이너가 막 마운트된 시점엔 지도가 가진 픽셀/좌표 정보가
+    // 실제 div 크기와 어긋나서 타일이 안 그려질 수 있어, bounds/center를 맞추기
+    // 직전에 동기로 relayout해 크기를 다시 읽게 한다 (프레임을 걸러서 하면 아래
+    // setBounds보다 늦게 실행돼 방금 맞춘 뷰를 도로 어긋나게 만든다)
+    map.relayout();
 
     // 기존 핑 & 선 초기화
     overlaysRef.current.customOverlays.forEach((overlay) =>
@@ -90,13 +231,13 @@ export default function KakaoMap({
       linePath.push(position);
       bounds.extend(position);
 
-      // 핀 그리기
+      // 커스텀 핀 그리기 (번호가 박힌 MapPin)
       const mapPinSvg = renderToString(
         <MapPin
           size={28}
-          color="#358C1C"
-          fill="#358C1C"
-          className="drop-shadow-md"
+          color='#358C1C'
+          fill='#358C1C'
+          className='drop-shadow-md'
         />,
       );
 
@@ -139,6 +280,53 @@ export default function KakaoMap({
     // 영역 맞춤
     map.setBounds(bounds);
   }, [loaded, cards, currentDay, center.lat, center.lng]);
+
+  // 검색 결과 등 마커 목록이 바뀌면 기본 마커 다시 그리기 + 클릭 시 커스텀 오버레이(탭) 표시 (오른쪽 기능)
+  useEffect(() => {
+    if (!loaded || !mapRef.current) return;
+    const { kakao } = window;
+
+    markerInstancesRef.current.forEach((marker) => marker.setMap(null));
+    markerInstancesRef.current = markers.map((marker) => {
+      const markerInstance = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(marker.lat, marker.lng),
+        map: mapRef.current!,
+      });
+
+      kakao.maps.event.addListener(markerInstance, 'click', () => {
+        if (!overlayRef.current || !mapRef.current || !overlayRootRef.current)
+          return;
+
+        // render()가 비동기로 처리되면 setMap()이 아직 이전(빈) DOM 기준으로
+        // 오버레이 크기/클릭 영역을 계산해버려서, 렌더을 동기로 강제한다
+        flushSync(() => {
+          overlayRootRef.current!.render(
+            <MarkerOverlayContent
+              onClose={() => overlayRef.current?.setMap(null)}
+            >
+              {renderMarkerContent ? (
+                renderMarkerContent(marker)
+              ) : (
+                <DefaultMarkerContent marker={marker} />
+              )}
+            </MarkerOverlayContent>,
+          );
+        });
+
+        overlayRef.current.setPosition(
+          new kakao.maps.LatLng(marker.lat, marker.lng),
+        );
+        overlayRef.current.setMap(mapRef.current);
+      });
+
+      return markerInstance;
+    });
+
+    return () => {
+      markerInstancesRef.current.forEach((marker) => marker.setMap(null));
+      markerInstancesRef.current = [];
+    };
+  }, [loaded, markers, renderMarkerContent]);
 
   if (error) {
     return (

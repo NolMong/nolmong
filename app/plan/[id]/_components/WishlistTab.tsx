@@ -14,10 +14,12 @@ import {
   DragStartEvent,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
+import { useMapModalStore } from '@/store/useModalStore';
 
 export default function WishlistTab() {
   const { cards, moveCardToDay, reorderCardsInDay } = usePlanStore();
   const [activePlace, setActivePlace] = useState<PlaceItem | null>(null);
+  const openMapModal = useMapModalStore((state) => state.open);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -93,31 +95,32 @@ export default function WishlistTab() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-5 h-120 p-2 overflow-x-auto scrollbar-none">
+      <div className='flex gap-5 h-120 p-2 overflow-x-auto scrollbar-none'>
         <DayCard
-          dayId="day-1"
+          dayId='day-1'
           dayNumber={1}
-          dateText="8.8 (토)"
+          dateText='8.8 (토)'
           places={getPlaceItemsByDay('day-1')}
         />
         <DayCard
-          dayId="day-2"
+          dayId='day-2'
           dayNumber={2}
-          dateText="8.9 (일)"
+          dateText='8.9 (일)'
           places={getPlaceItemsByDay('day-2')}
         />
         <DayCard
-          dayId="day-3"
+          dayId='day-3'
           dayNumber={3}
-          dateText="8.10 (월)"
+          dateText='8.10 (월)'
           places={getPlaceItemsByDay('day-3')}
         />
       </div>
 
-      <div className="mt-5 p-2">
+      <div className='mt-5 p-2'>
         <PlaceListContainer
-          containerId="candidate-list"
+          containerId='candidate-list'
           places={getPlaceItemsByDay(null)}
+          onAddClick={openMapModal}
         />
       </div>
 
