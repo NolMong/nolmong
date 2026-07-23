@@ -54,7 +54,7 @@ const initialCards: PlanCardData[] = [
     id: 'card-2',
     day: 'day-1',
     order: 2,
-    type: 'PLACE', // 📌 1번 핀
+    type: 'PLACE',
     name: '부산역',
     category: '관광',
     address: '부산 동구 중앙대로 206',
@@ -76,7 +76,7 @@ const initialCards: PlanCardData[] = [
     id: 'card-4',
     day: 'day-1',
     order: 4,
-    type: 'PLACE', // 📌 2번 핀
+    type: 'PLACE',
     name: '톤쇼우 남포점',
     category: '식당',
     address: '부산 남포동',
@@ -90,7 +90,7 @@ const initialCards: PlanCardData[] = [
     id: 'card-5',
     day: 'day-1',
     order: 5,
-    type: 'PLACE', // 📌 3번 핀 (추가됨)
+    type: 'PLACE',
     name: '감천문화마을',
     category: '관광',
     address: '부산 사하구 감내2로 203',
@@ -104,7 +104,7 @@ const initialCards: PlanCardData[] = [
     id: 'card-6',
     day: 'day-1',
     order: 6,
-    type: 'PLACE', // 📌 4번 핀 (추가됨)
+    type: 'PLACE',
     name: '광안리해수욕장',
     category: '관광',
     address: '부산 수영구 광안해변로 219',
