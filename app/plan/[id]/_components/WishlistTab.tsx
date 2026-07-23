@@ -88,6 +88,7 @@ export default function WishlistTab() {
 
   return (
     <DndContext
+      id="plan-dnd-context"
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
