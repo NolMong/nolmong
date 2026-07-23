@@ -21,8 +21,14 @@ export async function postNewPlan(plan: NewPlanType) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { data: null, error: new Error('로그인이 필요합니다.') };
+    return {
+      data: null,
+      error: new Error('로그인이 필요합니다.'),
+      channel: null,
+    };
   }
+
+  console.log('로그인 유저 정보:', user);
 
   const title = `${plan.endLocations.join(' ')} 여행`;
   const uuid = crypto.randomUUID();
@@ -32,14 +38,18 @@ export async function postNewPlan(plan: NewPlanType) {
   const channel = ably.channels.get(`${uuid}`, PLAN_CHANNEL_OPTIONS);
   const root = await channel.object.get();
   if (!root) {
-    return { data: null, error: new Error('Ably 채널 생성 실패') };
+    return {
+      data: null,
+      error: new Error('Ably 채널 생성 실패'),
+      channel: null,
+    };
   }
   await root.set('cards', []);
   await root.set('title', title);
 
   console.log('Ably 채널 생성 완료:', title, uuid, plan);
 
-  const { data, error } = await supabase
+  const { data: newPlanData, error: newPlanError } = await supabase
     .from('plans')
     .insert({
       // Ably 실시간 협업 채널 이름으로 쓰는 uuid
@@ -55,9 +65,28 @@ export async function postNewPlan(plan: NewPlanType) {
     .select()
     .single();
 
-  if (error) {
-    return { data: null, error };
+  if (newPlanError) {
+    return { data: null, error: newPlanError };
   }
 
-  return { data, error: null };
+  // plan_profiles.plan_id는 plans의 정수 PK(id)를 참조함 (Ably 채널용 uuid 아님)
+  const { data: newPlanProfilesData, error: newPlanProfilesError } =
+    await supabase
+      .from('plan_profiles')
+      .insert({
+        plan_id: newPlanData.id,
+        profile_id: user.id,
+      })
+      .select()
+      .single();
+
+  if (newPlanProfilesError) {
+    return { data: null, error: newPlanProfilesError, channel: null };
+  }
+
+  return {
+    data: { newPlanData, newPlanProfilesData },
+    error: null,
+    channel: uuid,
+  };
 }
