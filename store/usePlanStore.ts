@@ -5,10 +5,10 @@ import { pushCardFields, pushCardRemove } from "@/lib/ably/planObject";
 
 // 임의로 생성한 더미데이터. 데이터 연결할때 삭제하면 됩니다.
 const initialCards: PlanCardData[] = [
-  // 후보 장소 리스트 (day: null)
+  // 후보 장소 리스트 (day: "")
   {
     id: "cand-1",
-    day: null,
+    day: "",
     order: 1,
     type: "PLACE",
     name: "해운대블루라인파크",
@@ -19,7 +19,7 @@ const initialCards: PlanCardData[] = [
   },
   {
     id: "cand-2",
-    day: null,
+    day: "",
     order: 2,
     type: "PLACE",
     name: "미피스토어 해운대점",
@@ -30,7 +30,7 @@ const initialCards: PlanCardData[] = [
   },
   {
     id: "cand-3",
-    day: null,
+    day: "",
     order: 3,
     type: "PLACE",
     name: "국이네 낙지볶음",
@@ -87,34 +87,6 @@ const initialCards: PlanCardData[] = [
     expense: 35000,
     desc: "캐치테이블 현장 대기 등록 필수!",
   },
-  {
-    id: 'card-5',
-    day: 'day-1',
-    order: 5,
-    type: 'PLACE',
-    name: '감천문화마을',
-    category: '관광',
-    address: '부산 사하구 감내2로 203',
-    x: 129.01,
-    y: 35.097,
-    times: ['15:30', '17:00'],
-    expense: 0,
-    desc: '어린왕자 동상 앞에서 사진 찍기',
-  },
-  {
-    id: 'card-6',
-    day: 'day-1',
-    order: 6,
-    type: 'PLACE',
-    name: '광안리해수욕장',
-    category: '관광',
-    address: '부산 수영구 광안해변로 219',
-    x: 129.118,
-    y: 35.153,
-    times: ['18:00', '20:00'],
-    expense: 20000,
-    desc: '드론쇼 관람 및 야경 구경',
-  },
 ];
 
 interface PlanState {
@@ -128,7 +100,7 @@ interface PlanState {
   setCards: (cards: PlanCardData[]) => void;
   updateCard: (updatedCard: PlanCardData) => void;
   deleteCard: (id: string) => void;
-  moveCardToDay: (activeId: string, targetDay: string | null) => void;
+  moveCardToDay: (activeId: string, targetDay: string) => void;
   reorderCardsInDay: (
     targetDay: string | null,
     activeId: string,
@@ -173,20 +145,35 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     const cardToMove = cards.find((c) => c.id === activeId);
     if (!cardToMove) return;
 
+    const sourceDay = cardToMove.day;
     const targetDayCards = cards.filter((c) => c.day === targetDay);
     const newOrder = targetDayCards.length + 1;
 
+    // 출발지 day에 남는 카드들을 1부터 다시 매겨 order 갭 제거
+    const sourceRenumber = new Map<string, number>();
+    let nextOrder = 1;
+    cards
+      .filter((c) => c.day === sourceDay && c.id !== activeId)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      .forEach((c) => sourceRenumber.set(c.id, nextOrder++));
+
     set({
-      cards: cards.map((card) =>
-        card.id === activeId
-          ? { ...card, day: targetDay, order: newOrder }
-          : card,
-      ),
+      cards: cards.map((card) => {
+        if (card.id === activeId) {
+          return { ...card, day: targetDay, order: newOrder };
+        }
+        const renumbered = sourceRenumber.get(card.id);
+        return renumbered !== undefined ? { ...card, order: renumbered } : card;
+      }),
       isDirty: true,
     });
 
-    // 이동한 카드의 위치만 실시간 전파 (day: null은 키 제거로 표현됨)
+    // 이동한 카드 + order가 실제로 바뀐 출발지 카드들을 실시간 전파
     pushCardFields(activeId, { day: targetDay, order: newOrder });
+    sourceRenumber.forEach((order, id) => {
+      const before = cards.find((c) => c.id === id)?.order;
+      if (before !== order) pushCardFields(id, { order });
+    });
   },
 
   reorderCardsInDay: (targetDay, activeId, overId) => {
