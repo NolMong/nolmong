@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist_Mono, Noto_Sans_KR } from 'next/font/google';
 import localFont from 'next/font/local';
-import { Header, CreatePlanModal } from '@/components';
+import { Header, CreatePlanModal, Footer } from '@/components';
 import './globals.css';
 
 const notoSansKr = Noto_Sans_KR({
@@ -46,6 +46,7 @@ export default function RootLayout({
         <Header />
 
         {children}
+        <Footer />
       </body>
     </html>
   );

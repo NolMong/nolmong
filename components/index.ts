@@ -18,6 +18,7 @@ export { default as TravelCard } from './cards/TravelCard';
 export { default as SearchResultCard } from './cards/plan/SearchResultCard';
 // template
 export { default as Header } from './templates/Header';
+export { default as Footer } from './templates/Footer';
 // modal
 export { default as LoginModal } from './modals/LoginModal';
 export { default as CreatePlanModal } from './modals/CreatePlanModal';
