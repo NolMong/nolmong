@@ -173,6 +173,22 @@ export default function KakaoMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]);
 
+  // 탭 전환 등으로 컨테이너가 나중에 자리잡는 경우, effect 시점의 동기 relayout만으론
+  // 부족할 수 있어 실제 크기 변화를 관찰해 그때그때 relayout한다 (타일이 아예 안 그려지는 문제 방지)
+  useEffect(() => {
+    if (!loaded || !containerRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      if (width > 0 && height > 0) {
+        mapRef.current?.relayout();
+      }
+    });
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, [loaded]);
+
   // center prop 변경 시 중심 이동 (cards가 있으면 아래 effect가 bounds로 다시 덮어씀)
   useEffect(() => {
     if (!mapRef.current) return;
