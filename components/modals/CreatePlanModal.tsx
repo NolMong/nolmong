@@ -354,6 +354,8 @@ export default function CreatePlanModal() {
     const { data, error, channel } = await postNewPlan({
       startLocation: plan.startLocation[0]?.text ?? '',
       endLocations: plan.endLocation.map((l) => l.text),
+      start_day: plan.startDate,
+      end_day: plan.endDate,
       budget: plan.budget,
       headcount: plan.headcount,
     });
