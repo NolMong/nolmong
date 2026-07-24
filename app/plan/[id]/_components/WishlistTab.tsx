@@ -111,7 +111,7 @@ export default function WishlistTab() {
       }}
     >
       <div
-        className='flex gap-5 h-120 p-2 overflow-x-auto scrollbar'
+        className='flex gap-5 h-120 p-2 overflow-x-auto  scrollbar-thin'
         // onWheel={handleWheelScroll}
       >
         {tripDays.map((day) => (

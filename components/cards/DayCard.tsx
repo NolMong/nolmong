@@ -51,7 +51,7 @@ export default function DayCard({
         items={places.map((p) => p.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className='flex flex-col gap-2 overflow-y-scroll scrollbar'>
+        <div className='flex flex-col gap-2 overflow-y-scroll scrollbar-thin'>
           {places.map((place) => (
             <PlaceCard key={place.id} place={place} />
           ))}
