@@ -1,6 +1,104 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
+@theme {
+  /* ===== Brand - Green ===== */
+  --color-primary-focus: #358c1c;
+  --color-primary: #a8d89a;
+  --color-primary-light: #f6fbf5;
+
+  /* ===== Brand - Pink =====*/
+  --color-pink: #ffb3b3;
+  --color-pink-light: #fff7f7;
+
+  /* ===== Brand - Caramel / Brown ===== */
+  --color-caramel: #d9b58c;
+  --color-caramel-light: #fff7e6;
+  --color-brown: #4b3f36;
+  --color-brown-light: #6f655e;
+
+  /* ===== Text & Border & Shadow ===== */
+  /* text- 접두사를 중복 유발하는 이름 대신 직관적인 컬러명으로 변경 */
+  --color-main: #525252;
+  /* 활용: text-main */
+  --color-sub: #6f6f6f;
+  /* 활용: text-sub */
+  --color-muted: #aaaaaa;
+  /* 활용: text-muted */
+  --color-gray-light: #dddddd;
+  /* 활용: text-gray-light 또는 bg-gray-light */
+  --color-border: #f0f0f0;
+  /* 활용: border-border */
+  --color-shadow: #b5b5b5;
+  /* 활용: shadow-shadow */
+
+  /* ===== Status ===== */
+  --color-success: #16a34a;
+  --color-info: #2563eb;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
+
+  /* 카드용 그림자 */
+  --shadow-card: 0 4px 10px rgba(181, 181, 181, 0.25);
+}
+
+@theme inline {
+  /* 기본 서체는 Noto Sans KR 유지, Jalnan은 선택 적용용 (font-jalnan / font-jalnan-gothic) */
+  --font-sans: var(--font-noto-sans-kr);
+  --font-jalnan: var(--jalnan-font);
+  --font-jalnan-gothic: var(--jalnan-gothic-font);
+
+  /* 가만히 있어도 옆으로 흐르는 마퀴(marquee) 애니메이션 */
+  --animate-marquee: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 스크롤은 되지만 스크롤바는 안 보이게 */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* 얇은 스크롤바. 평소엔 안 보이다가 영역에 마우스를 올렸을 때만 보임 */
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #eee transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  &:hover {
+    scrollbar-color: #ddd transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #ddd;
+    }
+  }
+}
+
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -8,7 +106,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-noto-sans-kr);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -22,5 +120,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+} */
