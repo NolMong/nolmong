@@ -106,10 +106,11 @@ const characters: {
   },
 ];
 
-export default function LandingPage() {
+// useSearchParams()는 이 컴포넌트를 감싸는 Suspense 경계가 필요해서
+// LandingPage 본문과 분리해 별도 컴포넌트로 뺐다 (자기 자신을 감싸면 경계가 안 됨)
+function UnauthorizedAlert() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const openLoginModal = useLoginModalStore((state) => state.open);
 
   useEffect(() => {
     // 미들웨어에서 비접근 제안으로 왔을 때
@@ -121,8 +122,17 @@ export default function LandingPage() {
     }
   }, [searchParams, router]);
 
+  return null;
+}
+
+export default function LandingPage() {
+  const openLoginModal = useLoginModalStore((state) => state.open);
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <>
+      <Suspense fallback={null}>
+        <UnauthorizedAlert />
+      </Suspense>
       <div>
         {/* <Header /> */}
         {/* 랜딩 이미지 */}
@@ -257,6 +267,6 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
-    </Suspense>
+    </>
   );
 }
