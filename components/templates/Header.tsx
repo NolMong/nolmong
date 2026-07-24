@@ -109,7 +109,7 @@ export default function Header() {
         ) : (
           <Link
             href={user ? '/main' : '/landing'}
-            className='font-jalnan text-2xl'
+            className='font-jalnan text-2xl cursor-pointer'
           >
             <span className='text-primary'>Nol</span>
             <span className='text-caramel'>Mong</span>
