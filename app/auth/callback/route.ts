@@ -9,18 +9,38 @@ interface PendingCookie {
   options: CookieOptions;
 }
 
+// 환경 Base URL 설정
+function getBaseUrl() {
+  if (process.env.NODE_ENV === 'production') {
+    // Vercel 환경변수로 지정한 커스텀 도메인 우선 사용
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');
+    }
+    // Vercel 자동 생성 URL
+    if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}`;
+    }
+    return 'https://nolmong.vercel.app';
+  }
+
+  // 로컬 개발 환경
+  return 'http://localhost:3000';
+}
+
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
 
-  // 로그인 후 이동할 목적지 주소
-  const next =
+  // 동적으로 Base URL 구하기 (로컬 vs 버셀)
+  const baseUrl = getBaseUrl();
+
+  const rawNext =
     searchParams.get('next') || searchParams.get('redirectTo') || '/main';
+  const next =
+    rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/main';
 
   if (code) {
     const cookieStore = await cookies();
-
-    // 임시 쿠키 수집용 배열
     const pendingCookies: PendingCookie[] = [];
 
     const supabase = createServerClient(
@@ -45,13 +65,12 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error('세션 교환 실패 에러:', error.message);
-      return NextResponse.redirect(`${origin}/landing?error=auth_failed`);
+      return NextResponse.redirect(`${baseUrl}/landing?error=auth_failed`);
     }
 
     if (data.user) {
       const user = data.user;
 
-      // profiles 테이블 조회
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
@@ -64,17 +83,16 @@ export async function GET(request: Request) {
 
       // 신규 유저 -> /travel-test 이동
       if (!profile) {
-        const testRedirect = NextResponse.redirect(`${origin}/travel-test`);
+        const testRedirect = NextResponse.redirect(
+          `${baseUrl}/travel-test?next=${encodeURIComponent(next)}`,
+        );
         pendingCookies.forEach(({ name, value, options }) => {
           testRedirect.cookies.set(name, value, options);
         });
         return testRedirect;
       }
 
-      // 기존 유저 -> next(초대 링크 주소 or /main)로 이동
-      const redirectUrl = next.startsWith('http') ? next : `${origin}${next}`;
-
-      const mainRedirect = NextResponse.redirect(redirectUrl);
+      const mainRedirect = NextResponse.redirect(`${baseUrl}${next}`);
       pendingCookies.forEach(({ name, value, options }) => {
         mainRedirect.cookies.set(name, value, options);
       });
@@ -82,5 +100,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/landing`);
+  return NextResponse.redirect(`${baseUrl}/landing`);
 }
