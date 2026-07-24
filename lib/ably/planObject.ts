@@ -24,9 +24,9 @@ export function pushCardFields(
     .batch((ctx) => {
       Object.entries(fields).forEach(([key, value]) => {
         if (key === "day") {
-          ctx.set(key, (value as string | null) ?? "day-0");
+          ctx.set(key, (value as string) ?? "day-0");
         } else if (key === "order") {
-          ctx.set(key, (value as number | null) ?? 0);
+          ctx.set(key, (value as number) ?? 0);
         } else if (value === null || value === undefined) {
           ctx.remove(key);
         } else {

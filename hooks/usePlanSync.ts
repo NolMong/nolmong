@@ -10,11 +10,10 @@ import { PlanCardData } from "@/types/plans";
 // (LiveMap은 null을 저장할 수 없어 후보 카드는 day: "day-0", order: 0 예약값으로 표현)
 type CardsMap = Record<
   string,
-  Omit<PlanCardData, "id" | "day" | "order"> & { day?: string; order?: number }
+  Omit<PlanCardData, "id" | "day" | "order"> & { day: string; order: number }
 >;
 
 // LiveMap JSON → PlanCardData[] 변환 (맵의 key를 id 필드로 합침)
-// 예약값(day: "day-0", order: 0)과 키 없음은 null로 복원
 function toCards(json?: CardsMap): PlanCardData[] {
   return (
     Object.entries(json ?? {})
@@ -23,8 +22,8 @@ function toCards(json?: CardsMap): PlanCardData[] {
       .map(([id, value]) => ({
         ...value,
         id,
-        day: !value.day || value.day === "day-0" ? null : value.day,
-        order: !value.order ? null : value.order,
+        day: value.day,
+        order: value.order,
       }))
   );
 }
