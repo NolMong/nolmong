@@ -16,10 +16,7 @@ function getBaseUrl() {
     if (process.env.NEXT_PUBLIC_SITE_URL) {
       return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');
     }
-    // Vercel 자동 생성 URL
-    if (process.env.VERCEL_URL) {
-      return `https://${process.env.VERCEL_URL}`;
-    }
+
     return 'https://nolmong.vercel.app';
   }
 
