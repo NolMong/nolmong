@@ -74,9 +74,16 @@ export default function Header() {
 
   // 로그아웃 처리
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('로그아웃 중 오류가 발생했습니다:', error.message);
+      return;
+    }
+
     setUser(null);
-    window.location.reload();
+
+    window.location.href = '/landing';
   };
 
   return (

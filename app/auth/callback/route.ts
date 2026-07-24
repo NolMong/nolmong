@@ -1,18 +1,47 @@
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+// 쿠키 보관용 인터페이스 정의
+interface PendingCookie {
+  name: string;
+  value: string;
+  options: CookieOptions;
+}
+
+// 환경 Base URL 설정
+function getBaseUrl() {
+  if (process.env.NODE_ENV === 'production') {
+    // Vercel 환경변수로 지정한 커스텀 도메인 우선 사용
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');
+    }
+    // Vercel 자동 생성 URL
+    if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}`;
+    }
+    return 'https://nolmong.vercel.app';
+  }
+
+  // 로컬 개발 환경
+  return 'http://localhost:3000';
+}
+
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
 
-  // console.log('Callback 진입 URL params code:', code ? '있음' : '없음');
+  // 동적으로 Base URL 구하기 (로컬 vs 버셀)
+  const baseUrl = getBaseUrl();
+
+  const rawNext =
+    searchParams.get('next') || searchParams.get('redirectTo') || '/main';
+  const next =
+    rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/main';
 
   if (code) {
     const cookieStore = await cookies();
-
-    // 기본 이동은 /main 으로 설정
-    let response = NextResponse.redirect(`${origin}/main`);
+    const pendingCookies: PendingCookie[] = [];
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,12 +54,7 @@ export async function GET(request: Request) {
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
-            });
-            response = NextResponse.redirect(`${origin}/main`, {
-              headers: request.headers,
-            });
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
+              pendingCookies.push({ name, value, options });
             });
           },
         },
@@ -41,13 +65,12 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error('세션 교환 실패 에러:', error.message);
-      return NextResponse.redirect(`${origin}/landing?error=auth_failed`);
+      return NextResponse.redirect(`${baseUrl}/landing?error=auth_failed`);
     }
 
     if (data.user) {
       const user = data.user;
 
-      // profiles 테이블 조회
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
@@ -58,27 +81,24 @@ export async function GET(request: Request) {
         console.error('profiles 조회 실패 에러:', profileError.message);
       }
 
-      // console.log('DB 조회 결과 profile:', profile);
-
-      // profiles 테이블에 없는 유저는 신규 저장 및 travel-test로 이동
+      // 신규 유저 -> /travel-test 이동
       if (!profile) {
-        // console.log('profile 없음 -> /travel-test 이동');
-        const testRedirect = NextResponse.redirect(`${origin}/travel-test`);
-        response.cookies.getAll().forEach((cookie) => {
-          testRedirect.cookies.set(cookie.name, cookie.value, cookie);
+        const testRedirect = NextResponse.redirect(
+          `${baseUrl}/travel-test?next=${encodeURIComponent(next)}`,
+        );
+        pendingCookies.forEach(({ name, value, options }) => {
+          testRedirect.cookies.set(name, value, options);
         });
         return testRedirect;
       }
 
-      // profiles 테이블에 기존 유저는 /main 으로 이동!
-      // console.log('profile 있음 -> /main 이동');
-      const mainRedirect = NextResponse.redirect(`${origin}/main`);
-      response.cookies.getAll().forEach((cookie) => {
-        mainRedirect.cookies.set(cookie.name, cookie.value, cookie);
+      const mainRedirect = NextResponse.redirect(`${baseUrl}${next}`);
+      pendingCookies.forEach(({ name, value, options }) => {
+        mainRedirect.cookies.set(name, value, options);
       });
       return mainRedirect;
     }
   }
 
-  return NextResponse.redirect(`${origin}/landing`);
+  return NextResponse.redirect(`${baseUrl}/landing`);
 }
