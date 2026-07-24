@@ -33,13 +33,13 @@ export default function PlanEditorCard({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        <MainButton
+        {/* <MainButton
           variant="default"
           className="p-2.5 text-sm gap-1.5"
           onClick={() => onAddCard && onAddCard("PLACE")}
         >
           <MapPin size={14} /> 장소
-        </MainButton>
+        </MainButton> */}
         <MainButton
           variant="default"
           className="p-2.5 text-sm gap-1.5"
