@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { use } from 'react';
 import { MainButton, MapModal } from '@/components';
@@ -9,8 +9,8 @@ import { LucideEdit3 } from 'lucide-react';
 import WishlistTab from './_components/WishlistTab';
 import PlanDetailsTab from './_components/PlanDetailsTab';
 import { useMapModalStore } from '@/store/useModalStore';
-import { usePlanSync } from "@/hooks/usePlanSync";
-import { usePlanStore } from "@/store/usePlanStore";
+import { usePlanSync } from '@/hooks/usePlanSync';
+import { usePlanStore } from '@/store/usePlanStore';
 
 export default function PlanPage({
   params,
@@ -20,6 +20,8 @@ export default function PlanPage({
   const { id: uuid } = use(params);
   const { activePlanTab, setPlanTab } = usePlanTabStore();
   const { title } = usePlanStore();
+
+  console.log(uuid);
 
   // 주기적 저장 활성화
   useAutoSavePlan(uuid);
@@ -34,7 +36,7 @@ export default function PlanPage({
       <div className='flex flex-col gap-5'>
         <div className='flex gap-2'>
           <div className='text-xl font-jalnan-gothic text-sub'>
-            {title || "여행"}
+            {title || '여행'}
           </div>
           <button>
             <LucideEdit3 size={14} className='text-muted' />
@@ -43,16 +45,16 @@ export default function PlanPage({
 
         <div className='flex gap-2'>
           <MainButton
-            variant={activePlanTab === "WISHLIST" ? "lightFill" : "default"}
-            className="py-2 px-4"
-            onClick={() => setPlanTab("WISHLIST")}
+            variant={activePlanTab === 'WISHLIST' ? 'lightFill' : 'default'}
+            className='py-2 px-4'
+            onClick={() => setPlanTab('WISHLIST')}
           >
             가고 싶은 곳
           </MainButton>
           <MainButton
-            variant={activePlanTab === "PLAN_DETAILS" ? "lightFill" : "default"}
-            className="py-2 px-4"
-            onClick={() => setPlanTab("PLAN_DETAILS")}
+            variant={activePlanTab === 'PLAN_DETAILS' ? 'lightFill' : 'default'}
+            className='py-2 px-4'
+            onClick={() => setPlanTab('PLAN_DETAILS')}
           >
             상세 계획
           </MainButton>
@@ -60,7 +62,7 @@ export default function PlanPage({
       </div>
 
       {/* 탭별 뷰 렌더링 */}
-      {activePlanTab === "PLAN_DETAILS" ? <PlanDetailsTab /> : <WishlistTab />}
+      {activePlanTab === 'PLAN_DETAILS' ? <PlanDetailsTab /> : <WishlistTab />}
     </main>
   );
 }

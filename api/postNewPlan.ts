@@ -1,19 +1,17 @@
 import { createClient } from '@/lib/supabase/client';
-import { getAblyClient } from '@/lib/ably/client';
-import type { ChannelOptions } from 'ably';
+import { getAblyClient, channelOptions } from '@/lib/ably/client';
 
 export type NewPlanType = {
   startLocation: string;
   endLocations: string[];
+  end_day: string; // 'YYYY-MM-DD' 형식 문자열
+  start_day: string; // 'YYYY-MM-DD' 형식 문자열
   budget: string; // '1,000,000' 같은 콤마 포맷 문자열 또는 빈 문자열
   headcount: string;
 };
 
-const PLAN_CHANNEL_OPTIONS: ChannelOptions = {
-  modes: ['OBJECT_SUBSCRIBE', 'OBJECT_PUBLISH'],
-};
-
 export async function postNewPlan(plan: NewPlanType) {
+  console.log('postNewPlan called with plan:', plan);
   const supabase = createClient();
 
   const {
@@ -35,7 +33,7 @@ export async function postNewPlan(plan: NewPlanType) {
 
   // plan과 같은 uuid로 Ably 채널을 만들고, cards를 담을 자리(LiveMap)를 초기 상태로 세팅
   const ably = getAblyClient();
-  const channel = ably.channels.get(`${uuid}`, PLAN_CHANNEL_OPTIONS);
+  const channel = ably.channels.get(`${uuid}`, channelOptions);
   const root = await channel.object.get();
   if (!root) {
     return {
@@ -46,6 +44,16 @@ export async function postNewPlan(plan: NewPlanType) {
   }
   await root.set('cards', []);
   await root.set('title', title);
+  await root.set('start_day', plan.start_day);
+  await root.set('end_day', plan.end_day);
+  await root.set(
+    'budget',
+    plan.budget === '' ? 0 : Number(plan.budget.replaceAll(',', '')),
+  );
+  await root.set(
+    'headcount',
+    plan.headcount === '' ? 0 : Number(plan.headcount.replaceAll(',', '')),
+  );
 
   console.log('Ably 채널 생성 완료:', title, uuid, plan);
 
@@ -57,6 +65,8 @@ export async function postNewPlan(plan: NewPlanType) {
       title,
       start_location: plan.startLocation,
       end_locations: plan.endLocations,
+      start_day: plan.start_day,
+      end_day: plan.end_day,
       budget: plan.budget === '' ? 0 : Number(plan.budget.replaceAll(',', '')),
       headcount:
         plan.headcount === '' ? 0 : Number(plan.headcount.replaceAll(',', '')),
