@@ -1,6 +1,6 @@
 "use client";
 
-import { Cloud, MapPin, SquareMenu, CheckSquare } from "lucide-react";
+import { Cloud, SquareMenu, CheckSquare, Replace } from "lucide-react";
 import PlanTimelineCard from "./plan/PlanTimelineCard";
 import type { PlanCardData } from "@/types/plans";
 import MainButton from "../common/MainButton";
@@ -32,30 +32,33 @@ export default function PlanEditorCard({
         <Cloud size={18} className="text-muted" />
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
-        {/* <MainButton
-          variant="default"
-          className="p-2.5 text-sm gap-1.5"
-          onClick={() => onAddCard && onAddCard("PLACE")}
-        >
-          <MapPin size={14} /> 장소
-        </MainButton> */}
-        <MainButton
-          variant="default"
-          className="p-2.5 text-sm gap-1.5"
-          onClick={() => onAddCard && onAddCard("MEMO")}
-        >
-          <SquareMenu size={14} /> 메모
-        </MainButton>
-        <MainButton
-          variant="default"
-          className="p-2.5 text-sm gap-1.5"
-          onClick={() => onAddCard && onAddCard("CHECKLIST")}
-        >
-          <CheckSquare size={14} /> 체크
-        </MainButton>
-      </div>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-2 shrink-0">
+          <MainButton
+            variant="default"
+            className="p-2.5 text-sm gap-1.5"
+            onClick={() => onAddCard && onAddCard("MEMO")}
+          >
+            <SquareMenu size={14} /> 메모
+          </MainButton>
+          <MainButton
+            variant="default"
+            className="p-2.5 text-sm gap-1.5"
+            onClick={() => onAddCard && onAddCard("CHECKLIST")}
+          >
+            <CheckSquare size={14} /> 체크
+          </MainButton>
+        </div>
 
+        <div>
+          <MainButton
+            variant="roundDefault"
+            // onClick={() => onAddCard && onAddCard("PLACE")}
+          >
+            <Replace size={14} />
+          </MainButton>
+        </div>
+      </div>
       <div className="flex flex-col flex-1 min-h-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden">
         {cards.map((card, index) => (
           <PlanTimelineCard
