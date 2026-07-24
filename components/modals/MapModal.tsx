@@ -120,13 +120,12 @@ export default function MapModal() {
     placesServiceRef.current = new window.kakao.maps.services.Places();
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!keyword.trim() || !placesServiceRef.current) return;
+  const runSearch = (searchKeyword: string) => {
+    if (!searchKeyword.trim() || !placesServiceRef.current) return;
 
     setHasSearched(true);
     placesServiceRef.current.keywordSearch(
-      keyword,
+      searchKeyword,
       (data, status) => {
         if (status === window.kakao.maps.services.Status.OK) {
           setSearchResults(data);
@@ -136,6 +135,11 @@ export default function MapModal() {
       },
       mapRef.current ? { location: mapRef.current.getCenter() } : undefined,
     );
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    runSearch(keyword);
   };
 
   const handleAddPlace = (
@@ -233,7 +237,7 @@ export default function MapModal() {
                 style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
                 onClick={() => {
                   setKeyword('맛집');
-                  handleSearch(new Event('submit') as React.FormEvent);
+                  runSearch('맛집');
                 }}
               >
                 <Hotel
@@ -249,7 +253,7 @@ export default function MapModal() {
                 style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
                 onClick={() => {
                   setKeyword('카페');
-                  handleSearch(new Event('submit') as React.FormEvent);
+                  runSearch('카페');
                 }}
               >
                 <MapPin
@@ -270,7 +274,7 @@ export default function MapModal() {
                   style={{ marginRight: '4px' }}
                   onClick={() => {
                     setKeyword('관광');
-                    handleSearch(new Event('submit') as React.FormEvent);
+                    runSearch('관광');
                   }}
                 ></Newspaper>
                 관광
@@ -294,7 +298,7 @@ export default function MapModal() {
           <MainButton
             variant='roundDefault'
             onClick={() => {
-              handleSearch(new Event('submit') as React.FormEvent);
+              runSearch(keyword);
             }}
             style={{
               position: 'absolute',
