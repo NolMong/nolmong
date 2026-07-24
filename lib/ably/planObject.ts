@@ -1,4 +1,5 @@
-import type { LiveMapPathObject } from "ably/liveobjects";
+import type { LiveMapPathObject, Value } from "ably/liveobjects";
+import { LiveMap } from "ably/liveobjects";
 import { PlanCardData } from "@/types/plans";
 
 // usePlanSync가 연결 시 보관하는 현재 계획의 root object.
@@ -7,6 +8,35 @@ let rootObject: LiveMapPathObject | null = null;
 
 export function setPlanRootObject(obj: LiveMapPathObject | null) {
   rootObject = obj;
+}
+
+// PlanCardData 필드 → LiveMap 저장용 값으로 변환.
+// day/order의 null은 예약값(day-0, 0)으로, 그 외 null/undefined 필드는 제외한다.
+function toLiveMapEntries(
+  fields: Partial<Omit<PlanCardData, "id">>,
+): Record<string, Value> {
+  const entries: Record<string, Value> = {};
+  Object.entries(fields).forEach(([key, value]) => {
+    if (key === "day") {
+      entries[key] = (value as string | null) ?? "day-0";
+    } else if (key === "order") {
+      entries[key] = (value as number | null) ?? 0;
+    } else if (value !== null && value !== undefined) {
+      entries[key] = value as Value;
+    }
+  });
+  return entries;
+}
+
+// 새 카드를 Ably "cards" LiveMap에 생성(중첩 LiveMap으로 추가)해 전파
+export function pushCardCreate(card: PlanCardData) {
+  if (!rootObject) return;
+
+  const { id, ...fields } = card;
+  rootObject
+    .get("cards")
+    .set(id, LiveMap.create(toLiveMapEntries(fields)))
+    .catch((e: unknown) => console.error("Ably 카드 생성 전송 실패:", e));
 }
 
 // 카드의 일부 필드를 Ably "cards" LiveMap에 전송 (낙관적 업데이트 후 전파용).

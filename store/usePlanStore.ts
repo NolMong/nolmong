@@ -1,7 +1,11 @@
 import { create } from "zustand";
-import { PlanCardData } from "@/types/plans";
+import { PlanCardData, PlanCardType } from "@/types/plans";
 import { arrayMove } from "@dnd-kit/sortable";
-import { pushCardFields, pushCardRemove } from "@/lib/ably/planObject";
+import {
+  pushCardCreate,
+  pushCardFields,
+  pushCardRemove,
+} from "@/lib/ably/planObject";
 
 // 임의로 생성한 더미데이터. 데이터 연결할때 삭제하면 됩니다.
 const initialCards: PlanCardData[] = [
@@ -93,11 +97,14 @@ interface PlanState {
   title: string;
   cards: PlanCardData[];
   isDirty: boolean; // 자동 저장 감지
+  newCardId: string | null; // 방금 추가돼 편집 모드로 열려야 하는 카드 id
 
   // 타이틀 관련 (수신/수정 공용 — Ably 쓰기는 편집 저장 시점에 별도 처리)
   setTitle: (title: string) => void;
   // 카드 관련
   setCards: (cards: PlanCardData[]) => void;
+  addCard: (type: PlanCardType, day: string) => void;
+  clearNewCard: () => void;
   updateCard: (updatedCard: PlanCardData) => void;
   deleteCard: (id: string) => void;
   moveCardToDay: (activeId: string, targetDay: string) => void;
@@ -113,10 +120,43 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   title: "",
   cards: [],
   isDirty: false,
+  newCardId: null,
 
   setTitle: (title) => set({ title }),
   // 수신(에코 포함)이 로컬 변경의 isDirty를 씻지 않도록 cards만 교체
   setCards: (cards) => set({ cards }),
+
+  clearNewCard: () => set({ newCardId: null }),
+
+  addCard: (type, day) => {
+    // 해당 day의 맨 뒤에 붙도록 order 계산
+    const { cards } = get();
+    const dayCards = cards.filter((c) => c.day === day);
+    const order = dayCards.length + 1;
+
+    const base = { id: crypto.randomUUID(), day, order };
+
+    let newCard: PlanCardData;
+    if (type === "CHECKLIST") {
+      newCard = {
+        ...base,
+        type: "CHECKLIST",
+        checklistItems: [
+          { id: crypto.randomUUID(), text: "", checked: false },
+        ],
+      };
+    } else if (type === "MEMO") {
+      newCard = { ...base, type: "MEMO", desc: "", times: null };
+    } else {
+      newCard = { ...base, type: "PLACE" };
+    }
+
+    // newCardId로 표시해 PlanTimelineCard가 편집 모드로 열도록 함
+    set({ cards: [...cards, newCard], isDirty: true, newCardId: newCard.id });
+
+    // 다른 참가자에게 실시간 전파
+    pushCardCreate(newCard);
+  },
 
   updateCard: (updatedCard) => {
     set((state) => ({
