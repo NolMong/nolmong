@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { DayCard, PlaceListContainer } from '@/components';
-import PlaceCard, { PlaceItem } from '@/components/cards/PlaceCard';
-import { usePlanStore } from '@/store/usePlanStore';
+import { useState } from "react";
+import { DayCard, PlaceListContainer } from "@/components";
+import PlaceCard, { PlaceItem } from "@/components/cards/PlaceCard";
+import { usePlanStore } from "@/store/usePlanStore";
 import {
   DndContext,
   DragOverlay,
@@ -12,9 +12,9 @@ import {
   useSensors,
   DragEndEvent,
   DragStartEvent,
-} from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
-import { useMapModalStore } from '@/store/useModalStore';
+} from "@dnd-kit/core";
+// import { arrayMove } from '@dnd-kit/sortable';
+import { useMapModalStore } from "@/store/useModalStore";
 
 export default function WishlistTab() {
   const { cards, moveCardToDay, reorderCardsInDay } = usePlanStore();
@@ -35,12 +35,12 @@ export default function WishlistTab() {
     const placeItems: PlaceItem[] = [];
 
     dayCards.forEach((card) => {
-      if (card.type === 'PLACE') {
+      if (card.type === "PLACE") {
         placeItems.push({
           id: card.id,
-          name: card.name || '',
-          category: card.category || '',
-          location: card.address || '',
+          name: card.name || "",
+          category: card.category || "",
+          location: card.address || "",
           orderNumber: targetDay !== null ? placeCounter++ : undefined,
         });
       }
@@ -50,8 +50,8 @@ export default function WishlistTab() {
   };
 
   const findContainerDay = (id: string): string | null => {
-    if (id === 'candidate-list') return null;
-    if (id.startsWith('day-')) return id;
+    if (id === "candidate-list") return null;
+    if (id.startsWith("day-")) return id;
 
     const card = cards.find((c) => c.id === id);
     return card ? card.day : null;
@@ -60,12 +60,12 @@ export default function WishlistTab() {
   const handleDragStart = (event: DragStartEvent) => {
     const activeId = event.active.id as string;
     const card = cards.find((c) => c.id === activeId);
-    if (card && card.type === 'PLACE') {
+    if (card && card.type === "PLACE") {
       setActivePlace({
         id: card.id,
-        name: card.name || '',
-        category: card.category || '',
-        location: card.address || '',
+        name: card.name || "",
+        category: card.category || "",
+        location: card.address || "",
       });
     }
   };
@@ -82,7 +82,7 @@ export default function WishlistTab() {
     const overDay = findContainerDay(overId);
 
     if (activeDay !== overDay) {
-      moveCardToDay(activeId, overDay);
+      moveCardToDay(activeId, overDay!);
     } else {
       reorderCardsInDay(activeDay, activeId, overId);
     }
@@ -95,31 +95,31 @@ export default function WishlistTab() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className='flex gap-5 h-120 p-2 overflow-x-auto scrollbar-none'>
+      <div className="flex gap-5 h-120 p-2 overflow-x-auto scrollbar-none">
         <DayCard
-          dayId='day-1'
+          dayId="day-1"
           dayNumber={1}
-          dateText='8.8 (토)'
-          places={getPlaceItemsByDay('day-1')}
+          dateText="8.8 (토)"
+          places={getPlaceItemsByDay("day-1")}
         />
         <DayCard
-          dayId='day-2'
+          dayId="day-2"
           dayNumber={2}
-          dateText='8.9 (일)'
-          places={getPlaceItemsByDay('day-2')}
+          dateText="8.9 (일)"
+          places={getPlaceItemsByDay("day-2")}
         />
         <DayCard
-          dayId='day-3'
+          dayId="day-3"
           dayNumber={3}
-          dateText='8.10 (월)'
-          places={getPlaceItemsByDay('day-3')}
+          dateText="8.10 (월)"
+          places={getPlaceItemsByDay("day-3")}
         />
       </div>
 
-      <div className='mt-5 p-2'>
+      <div className="mt-5 p-2">
         <PlaceListContainer
-          containerId='candidate-list'
-          places={getPlaceItemsByDay(null)}
+          containerId="candidate-list"
+          places={getPlaceItemsByDay("day-0")}
           onAddClick={openMapModal}
         />
       </div>
