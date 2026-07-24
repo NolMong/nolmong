@@ -35,15 +35,15 @@ export default function DayCard({
         className,
       )}
     >
-      <div className="flex items-center justify-between px-1">
+      <div className='flex items-center justify-between px-1'>
         {/* Day 표시 + 날씨 아이콘 */}
-        <div className="flex items-center gap-1">
-          <h2 className="text-base font-medium text-main">Day {dayNumber}</h2>
-          <Cloud size={18} className="text-muted" />
+        <div className='flex items-center gap-1'>
+          <h2 className='text-base font-medium text-main'>Day {dayNumber}</h2>
+          <Cloud size={18} className='text-muted' />
         </div>
 
         {/* 날짜 표시 */}
-        <span className="text-base font-medium text-main">{dateText}</span>
+        <span className='text-base font-medium text-main'>{dateText}</span>
       </div>
 
       {/* 목록 */}
@@ -51,7 +51,7 @@ export default function DayCard({
         items={places.map((p) => p.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="flex flex-col gap-2 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden">
+        <div className='flex flex-col gap-2 overflow-y-scroll scrollbar'>
           {places.map((place) => (
             <PlaceCard key={place.id} place={place} />
           ))}

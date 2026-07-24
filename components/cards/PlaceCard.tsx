@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GripVertical, Tag, X } from 'lucide-react';
+import { GripVertical, PlayCircle, Tag, X } from 'lucide-react';
 import { FilterButton } from '@/components';
 import { cn } from '@/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
@@ -29,6 +29,7 @@ export default function PlaceCard({
   isModal,
 }: PlaceCardProps) {
   // dnd sortable hook
+  console.log('place : ', place);
   const [selectedOption, setSelectedOption] = useState<string | null>('미정');
   const options = ['미정', 'Day1', 'Day2', 'Day3', 'Day4'];
   const {

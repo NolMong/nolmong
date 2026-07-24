@@ -23,70 +23,37 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
-  arrayMove,
 } from '@dnd-kit/sortable';
 import { Search, Hotel, MapPin, Newspaper, LocateFixed } from 'lucide-react';
+import { useAutoSavePlan } from '@/hooks/useAutoSavePlan';
+import { usePlanSync } from '@/hooks/usePlanSync';
+import { usePlanStore } from '@/store/usePlanStore';
 
-// 임의로 생성한 더미데이터. 데이터 연결할때 삭제하면 됩니다.
-const initialPlaces: PlaceItem[] = [
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '해운대블루라인파크',
-  //     category: '테마/체험',
-  //     location: '부산 해운대구 달맞이길 116',
-  //   },
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '미피스토어 해운대점',
-  //     category: '관광',
-  //     location: '나만의 장소',
-  //   },
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '국이네 낙지볶음',
-  //     category: '식당',
-  //     location: '부산 수영구 연수로 410',
-  //   },
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '국이네 낙지볶음',
-  //     category: '식당',
-  //     location: '부산 수영구 연수로 410',
-  //   },
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '국이네 낙지볶음',
-  //     category: '식당',
-  //     location: '부산 수영구 연수로 410',
-  //   },
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '국이네 낙지볶음',
-  //     category: '식당',
-  //     location: '부산 수영구 연수로 410',
-  //   },
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '국이네 낙지볶음',
-  //     category: '식당',
-  //     location: '부산 수영구 연수로 410',
-  //   },
-  //   {
-  //     id: crypto.randomUUID(),
-  //     name: '국이네 낙지볶음',
-  //     category: '식당',
-  //     location: '부산 수영구 연수로 410',
-  //   },
-];
+// 후보(장소 리스트) 카드는 day: 'day-0' 예약값으로 표현 (WishlistTab과 동일한 컨벤션)
+const CANDIDATE_DAY = 'day-0';
 
-export default function MapModal() {
+export default function MapModal({ uuid }: { uuid: string }) {
   const isOpen = useMapModalStore((state) => state.isOpen);
   const closeStore = useMapModalStore((state) => state.close);
   const { rendered, visible, handleTransitionEnd } = useModal(
     isOpen,
     closeStore,
   );
-  const [places, setPlaces] = useState<PlaceItem[]>(initialPlaces);
+
+  const { cards, updateCard, reorderCardsInDay } = usePlanStore();
+
+  // 장소 리스트는 로컬 state가 아니라 cards에서 매번 파생시켜서, Ably로 들어오는
+  // 변경(다른 참가자가 추가/삭제한 카드 등)도 그대로 반영되게 한다
+  const places: PlaceItem[] = cards
+    .filter((c) => c.day === CANDIDATE_DAY && c.type === 'PLACE')
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((c) => ({
+      id: c.id,
+      name: c.name || '',
+      category: c.category || '',
+      location: c.address || '',
+    }));
+
   const [activePlace, setActivePlace] = useState<PlaceItem | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -144,21 +111,26 @@ export default function MapModal() {
 
   const handleAddPlace = (
     result: kakao.maps.services.PlacesSearchResultItem,
+    day: string = CANDIDATE_DAY,
   ) => {
     const category =
       result.category_name.split(' > ').pop() || result.category_name;
 
-    // 리스트 항목 id는 dnd 정렬용 고유 키라서 카카오 장소 id와 분리해야
-    // 같은 장소를 여러 번 추가해도 항목마다 구분됨
-    setPlaces((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        name: result.place_name,
-        category,
-        location: result.road_address_name || result.address_name,
-      },
-    ]);
+    const dayCards = cards.filter((c) => c.day === day);
+    const nextOrder =
+      dayCards.reduce((max, c) => Math.max(max, c.order ?? 0), 0) + 1;
+
+    updateCard({
+      id: crypto.randomUUID(),
+      day,
+      order: nextOrder,
+      type: 'PLACE',
+      name: result.place_name,
+      category,
+      address: result.road_address_name || result.address_name,
+      x: Number(result.x),
+      y: Number(result.y),
+    });
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -172,11 +144,7 @@ export default function MapModal() {
     setActivePlace(null);
     if (!over || active.id === over.id) return;
 
-    const oldIndex = places.findIndex((p) => p.id === active.id);
-    const newIndex = places.findIndex((p) => p.id === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    setPlaces((prev) => arrayMove(prev, oldIndex, newIndex));
+    reorderCardsInDay(CANDIDATE_DAY, active.id as string, over.id as string);
   };
 
   return (
@@ -317,7 +285,7 @@ export default function MapModal() {
           <div className='font-jalnan-gothic text-sub w-65 mb-4'>
             장소 리스트
           </div>
-          {places.length === 0 ? (
+          {cards.length === 0 ? (
             <div className='flex items-center justify-center h-full text-muted text-sm'>
               장소가 없습니다.
             </div>
@@ -329,10 +297,10 @@ export default function MapModal() {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={places.map((p) => p.id)}
+                items={cards.map((p) => p.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className='flex flex-col gap-2.5 overflow-y-auto scrollbar'>
+                <div className='flex flex-col gap-2.5 overflow-y-auto'>
                   {places.map((place) => (
                     <PlaceCard key={place.id} place={place} isModal />
                   ))}

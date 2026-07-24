@@ -42,18 +42,20 @@ export default function PlanPage({
     router.replace(`${pathname}?${nextParams.toString()}`);
   };
 
-  console.log(uuid);
+  // console.log(uuid);
 
   // 주기적 저장 활성화
   useAutoSavePlan(uuid);
 
   // ably의 uuid 채널을 구독해서 데이터 연동
   usePlanSync(uuid);
+  // const { cards } = usePlanStore();
+  // console.log(cards);
 
   return (
     <main className='relative flex flex-col min-w-300 w-300 mx-auto px-5 pt-8 pb-10'>
       {/* 헤더 타이틀 및 탭 버튼 */}
-      <MapModal />
+      <MapModal uuid={uuid} />
       <div className='flex flex-col gap-5'>
         <div className='flex gap-2'>
           <div className='text-xl font-jalnan-gothic text-sub'>

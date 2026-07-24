@@ -70,6 +70,36 @@
   }
 }
 
+/* scrollbar-hide와 동일 (컴포넌트에서 scrollbar-none 이름으로도 쓰고 있어 별칭 추가) */
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* 얇고 항상 보이는 스크롤바 (가로/세로 공용) */
+@utility scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 999px;
+  }
+}
+
 /* 얇은 스크롤바. 평소엔 안 보이다가 영역에 마우스를 올렸을 때만 보임 */
 @utility scrollbar-thin {
   scrollbar-width: thin;
