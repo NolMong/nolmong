@@ -6,6 +6,7 @@ import { acceptInvite } from '@/api/acceptInvite';
 import {
   CalendarComponent,
   CreatePlanModal,
+  MainButton,
   Tag,
   TravelCard,
 } from '@/components';
@@ -169,13 +170,11 @@ function MainPageContent() {
       {/* 초대 수락 확인 모달 (메인 페이지에서 표출) */}
       {inviteUuid && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-center flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-200">
+          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-2xl text-center flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-200">
             <div className="text-3xl">🧳</div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900">
-                여행 계획 초대
-              </h3>
-              <p className="mt-1 text-sm text-gray-600">
+              <h3 className="text-lg font-bold text-main">여행 계획 초대</h3>
+              <p className="mt-1 text-sm text-sub">
                 새로운 여행 계획에 초대되셨습니다.
                 <br />
                 함께 여행을 계획하시겠습니까?
@@ -183,20 +182,20 @@ function MainPageContent() {
             </div>
 
             <div className="mt-2 flex w-full gap-2">
-              <button
-                type="button"
+              <MainButton
+                variant="default"
                 onClick={handleRejectInvite}
-                className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex-1"
               >
                 거절
-              </button>
-              <button
-                type="button"
+              </MainButton>
+              <MainButton
+                variant="fill"
                 onClick={handleAcceptInvite}
-                className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-white shadow-md hover:opacity-90 transition-opacity cursor-pointer"
+                className="flex-1"
               >
                 수락하기
-              </button>
+              </MainButton>
             </div>
           </div>
         </div>
