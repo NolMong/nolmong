@@ -1,22 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 
-export type PlanType = {
-  id: number;
-  uuid: string;
-  title: string;
-  start_location: string;
-  end_locations: string[];
-  start_day: string;
-  end_day: string;
-  budget: number;
-  headcount: number;
-  cards: unknown[];
-  created_at: string;
-  updated_at: string;
-};
-
-// plan_profiles에서 로그인한 유저(profile_id = user.id)와 연결된 plans를 전부 가져옴
-export async function deletePlan({ planId }: { planId: number }) {
+export async function deletePlan(planId: number) {
   const supabase = createClient();
 
   const {
@@ -27,19 +11,16 @@ export async function deletePlan({ planId }: { planId: number }) {
     return { data: null, error: new Error('로그인이 필요합니다.') };
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('plan_profiles')
-    .select('plans(*)')
-    .eq('profile_id', user.id)
-    .order('created_at', { referencedTable: 'plans', ascending: false });
+    .delete()
+    .eq('plan_id', planId)
+    .eq('profile_id', user.id);
 
   if (error) {
-    return { data: null, error };
+    console.error('방 나가기 실패:', error.message);
+    return { error };
   }
 
-  const plans = data
-    .map((row) => row.plans as unknown as PlanType | null)
-    .filter((plan): plan is PlanType => plan !== null);
-
-  return { data: plans, error: null };
+  return { error: null };
 }
