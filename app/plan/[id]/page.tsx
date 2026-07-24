@@ -51,30 +51,30 @@ export default function PlanPage({
   usePlanSync(uuid);
 
   return (
-    <main className="relative flex flex-col gap-7.5 min-w-300 w-300 mx-auto px-5 py-8">
+    <main className='relative flex flex-col min-w-300 w-300 mx-auto px-5 pt-8 pb-10'>
       {/* 헤더 타이틀 및 탭 버튼 */}
       <MapModal />
-      <div className="flex flex-col gap-5">
-        <div className="flex gap-2">
-          <div className="text-xl font-jalnan-gothic text-sub">
+      <div className='flex flex-col gap-5'>
+        <div className='flex gap-2'>
+          <div className='text-xl font-jalnan-gothic text-sub'>
             {title || '여행'}
           </div>
           <button>
-            <LucideEdit3 size={14} className="text-muted" />
+            <LucideEdit3 size={14} className='text-muted' />
           </button>
         </div>
 
-        <div className="flex gap-2">
+        <div className='flex gap-2 mb-7'>
           <MainButton
             variant={activePlanTab === 'WISHLIST' ? 'lightFill' : 'default'}
-            className="py-2 px-4"
+            className='py-2 px-4'
             onClick={() => handleTabClick('WISHLIST')}
           >
             가고 싶은 곳
           </MainButton>
           <MainButton
             variant={activePlanTab === 'PLAN_DETAILS' ? 'lightFill' : 'default'}
-            className="py-2 px-4"
+            className='py-2 px-4'
             onClick={() => handleTabClick('PLAN_DETAILS')}
           >
             상세 계획

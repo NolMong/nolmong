@@ -129,7 +129,10 @@ export default function TravelCard({ data }: { data?: PlanType }) {
         <div className='text-[12px] text-muted whitespace-nowrap'>
           최근 편집 : {data ? getRelativeTime(data.updated_at) : ''}
         </div>
-        <Link href={`/plan/${data?.uuid}`} className='flex gap-1 items-center'>
+        <Link
+          href={`/plan/${data?.uuid}?tab=WISHLIST`}
+          className='flex gap-1 items-center'
+        >
           <Tag color='primary'>수정</Tag>
         </Link>
       </div>
