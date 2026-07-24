@@ -1,5 +1,6 @@
 "use client";
 
+import { use } from 'react';
 import { MainButton, MapModal } from '@/components';
 import { usePlanTabStore } from '@/store/usePlanTabStore';
 import { useAutoSavePlan } from '@/hooks/useAutoSavePlan';
@@ -11,10 +12,14 @@ import { useMapModalStore } from '@/store/useModalStore';
 import { usePlanSync } from "@/hooks/usePlanSync";
 import { usePlanStore } from "@/store/usePlanStore";
 
-export default function PlanPage() {
+export default function PlanPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: uuid } = use(params);
   const { activePlanTab, setPlanTab } = usePlanTabStore();
   const { title } = usePlanStore();
-  const uuid = "046e6379-a9bc-4bbd-aa7d-fd40b2b0b455"; // uuid 주는 방식 변경
 
   // 주기적 저장 활성화
   useAutoSavePlan(uuid);
