@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { MainButton, LoginModal } from '@/components';
 import { ProfileAvatar, ProfileEditModal } from '@/components';
 import { useLoginModalStore } from '@/store/useModalStore';
@@ -18,6 +18,9 @@ const supabase = createClient();
 
 export default function Header() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const inviteUuid = searchParams?.get('invite');
+
   const openLoginModal = useLoginModalStore((state) => state.open);
   const setProfile = useUserStore((state) => state.setProfile);
 
@@ -96,7 +99,8 @@ export default function Header() {
 
   return (
     <div className="w-full h-17.5 border-b border-border bg-white">
-      <LoginModal />
+      <LoginModal inviteUuid={inviteUuid ?? undefined} />
+
       {/* 프로필 수정 모달 */}
       {user && (
         <ProfileEditModal

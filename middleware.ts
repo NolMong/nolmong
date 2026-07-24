@@ -47,6 +47,10 @@ export async function middleware(request: NextRequest) {
     const landingUrl = new URL('/landing', request.url);
 
     // alert 메시지를 알리기 위해 쿼리 파라미터(unauthorized=true)를 붙여서 이동
+    request.nextUrl.searchParams.forEach((value, key) => {
+      landingUrl.searchParams.set(key, value);
+    });
+
     landingUrl.searchParams.set('unauthorized', 'true');
 
     return NextResponse.redirect(landingUrl);

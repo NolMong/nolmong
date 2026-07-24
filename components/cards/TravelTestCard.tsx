@@ -11,11 +11,17 @@ type Answer = (typeof test)[number]['answers'][number];
 const DRUMROLL_DURATION = 3000;
 const FADE_DURATION = 200;
 
+interface TravelTestCardProps {
+  onShowResult?: () => void;
+  inviteUuid?: string;
+  nextUrl?: string;
+}
+
 export default function TravelTestCard({
   onShowResult,
-}: {
-  onShowResult?: () => void;
-}) {
+  inviteUuid,
+  nextUrl,
+}: TravelTestCardProps) {
   const [currentNumber, setCurrentNumber] = useState(1);
   const [answers, setAnswers] = useState<(Answer | null)[]>(
     Array(test.length).fill(null),
@@ -82,27 +88,29 @@ export default function TravelTestCard({
             result={result}
             totalCapi={totalCapi}
             totalBara={totalBara}
+            inviteUuid={inviteUuid}
+            nextUrl={nextUrl}
           />
         ) : (
-          <div className='flex flex-col gap-5 items-center'>
-            <div className='flex gap-4 items-center'>
+          <div className="flex flex-col gap-5 items-center">
+            <div className="flex gap-4 items-center">
               <Image
-                src='/images/capi2.webp'
-                alt='Travel Test Image'
+                src="/images/capi2.webp"
+                alt="Travel Test Image"
                 width={120}
                 height={175}
-                loading='eager'
+                loading="eager"
               />
               <Image
-                src='/images/bara2.webp'
-                alt='Travel Test Image'
+                src="/images/bara2.webp"
+                alt="Travel Test Image"
                 width={120}
                 height={175}
-                loading='eager'
+                loading="eager"
               />
             </div>
-            <div className='font-jalnan text-2xl text-center text-brown'>
-              <span className='text-caramel'>이주현</span>님의 결과는
+            <div className="font-jalnan text-2xl text-center text-brown">
+              <span className="text-caramel">이주현</span>님의 결과는
               <br />
               두구두구두구두구~
             </div>
@@ -117,8 +125,8 @@ export default function TravelTestCard({
   const isLastQuestion = currentNumber === test.length;
 
   return (
-    <div className='w-full flex flex-col gap-7.5'>
-      <div className='flex gap-1.5 mx-auto w-fit'>
+    <div className="w-full flex flex-col gap-7.5">
+      <div className="flex gap-1.5 mx-auto w-fit">
         {test.map((t) => (
           <div
             key={t.number}
@@ -132,36 +140,36 @@ export default function TravelTestCard({
           ></div>
         ))}
       </div>
-      <div className='font-jalnan text-[20px] text-center text-brown-light'>
+      <div className="font-jalnan text-[20px] text-center text-brown-light">
         {currentQuestion.question}
       </div>
-      <div className='flex flex-col gap-2.5 w-full'>
+      <div className="flex flex-col gap-2.5 w-full">
         {currentQuestion.answers.map((a) => (
           <div
             key={a.answer}
             onClick={() => handleSelect(a)}
-            className='w-full flex gap-2.5 items-center border border-border has-checked:border-primary has-checked:bg-primary-light rounded-[10px] px-2.5 py-3 transition-colors cursor-pointer'
+            className="w-full flex gap-2.5 items-center border border-border has-checked:border-primary has-checked:bg-primary-light rounded-[10px] px-2.5 py-3 transition-colors cursor-pointer"
           >
             <input
-              type='radio'
+              type="radio"
               name={`question-${currentQuestion.number}`}
               checked={currentAnswer?.answer === a.answer}
               onChange={() => handleSelect(a)}
-              className='peer appearance-none w-5 h-5 shrink-0 rounded-full border border-border checked:border-primary bg-clip-content p-0.75 checked:bg-primary transition-colors cursor-pointer'
+              className="peer appearance-none w-5 h-5 shrink-0 rounded-full border border-border checked:border-primary bg-clip-content p-0.75 checked:bg-primary transition-colors cursor-pointer"
             />
-            <label className='text-main peer-checked:font-medium peer-checked:text-primary'>
+            <label className="text-main peer-checked:font-medium peer-checked:text-primary">
               {a.answer}
             </label>
           </div>
         ))}
       </div>
-      <div className='flex w-fill justify-between'>
+      <div className="flex w-fill justify-between">
         {currentNumber > 1 && (
           <MainButton
             onClick={handlePrev}
-            variant='default'
-            className='font-jalnan'
-            width='80px'
+            variant="default"
+            className="font-jalnan"
+            width="80px"
           >
             이전
           </MainButton>
