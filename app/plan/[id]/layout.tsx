@@ -3,5 +3,5 @@ export default function PlanLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div className="w-full min-h-screen bg-[#FDFDFD]">{children}</div>;
+  return <div className='w-full min-h-fit bg-[#FDFDFD]'>{children}</div>;
 }

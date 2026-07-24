@@ -87,7 +87,7 @@ export default function Header() {
   };
 
   return (
-    <div className="w-full h-17.5 border-b border-border bg-white">
+    <div className='w-full h-17.5 border-b border-border bg-white'>
       <LoginModal />
       {/* 프로필 수정 모달 */}
       {user && (
@@ -98,42 +98,47 @@ export default function Header() {
         />
       )}
 
-      <div className="w-full min-w-75 max-w-300 h-full mx-auto px-5 flex items-center justify-between">
-        {pathname === '/landing' ? (
-          <div className="font-jalnan text-2xl">
-            <span className="text-primary">Nol</span>
-            <span className="text-caramel">Mong</span>
+      <div className='w-full min-w-75 max-w-300 h-full mx-auto px-5 flex items-center justify-between'>
+        {(pathname === '/landing' && !user) ||
+        (pathname === '/main' && user) ? (
+          // 랜딩+비로그인, 메인+로그인: 이미 있어야 할 곳이라 클릭해도 아무 일도 없음
+          <div className='font-jalnan text-2xl'>
+            <span className='text-primary'>Nol</span>
+            <span className='text-caramel'>Mong</span>
           </div>
         ) : (
-          <Link href="/" className="font-jalnan text-2xl">
-            <span className="text-primary">Nol</span>
-            <span className="text-caramel">Mong</span>
+          <Link
+            href={user ? '/main' : '/landing'}
+            className='font-jalnan text-2xl cursor-pointer'
+          >
+            <span className='text-primary'>Nol</span>
+            <span className='text-caramel'>Mong</span>
           </Link>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           {user ? (
             // 로그인 상태
             <>
               <div
-                className="cursor-pointer hover:opacity-90 transition-opacity"
+                className='cursor-pointer hover:opacity-90 transition-opacity'
                 onClick={() => setIsEditModalOpen(true)}
               >
                 <ProfileAvatar size={40} />
               </div>
-              <MainButton variant="default" onClick={handleLogout}>
+              <MainButton variant='default' onClick={handleLogout}>
                 로그아웃
               </MainButton>
             </>
           ) : (
             // 비로그인 상태
             <>
-              <MainButton variant="default" onClick={openLoginModal}>
+              <MainButton variant='default' onClick={openLoginModal}>
                 로그인
               </MainButton>
               <MainButton
-                variant="fill"
-                className="ml-2"
+                variant='fill'
+                className='ml-2'
                 onClick={openLoginModal}
               >
                 회원가입
