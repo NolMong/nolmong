@@ -23,6 +23,8 @@ export default function PlanTimelineCard({
   // 방금 추가된 카드면 바로 편집 모드로 열고, "임시 카드(draft)"로 표시
   const newCardId = usePlanStore((state) => state.newCardId);
   const clearNewCard = usePlanStore((state) => state.clearNewCard);
+  const commitCard = usePlanStore((state) => state.commitCard);
+  const discardCard = usePlanStore((state) => state.discardCard);
   const isNew = data.id === newCardId;
 
   const [isEditing, setIsEditing] = useState(isNew);
@@ -39,7 +41,6 @@ export default function PlanTimelineCard({
       rootRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       clearNewCard();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // times 배열 형태(['12:29', '12:50'])와 visitTime 문자열 형태 둘 다 대응
@@ -89,29 +90,31 @@ export default function PlanTimelineCard({
   };
 
   const handleSave = () => {
-    if (onUpdate) {
-      const updatedTimes =
-        editStartTime && editEndTime
-          ? [editStartTime, editEndTime]
-          : data.times;
+    const updatedTimes =
+      editStartTime && editEndTime ? [editStartTime, editEndTime] : data.times;
 
-      onUpdate({
-        ...data,
-        times: updatedTimes,
-        expense: editCost ? Number(editCost) : undefined,
-        desc: editMemo,
-        checklistItems: checklists,
-      });
+    const updatedCard: PlanCardData = {
+      ...data,
+      times: updatedTimes,
+      expense: editCost ? Number(editCost) : undefined,
+      desc: editMemo,
+      checklistItems: checklists,
+    };
+
+    if (isDraft) {
+      // draft의 첫 저장 — 이 시점에 Ably에 처음 생성 (생성 지연)
+      commitCard(updatedCard);
+      setIsDraft(false);
+    } else {
+      onUpdate?.(updatedCard);
     }
-    // 저장하면 더 이상 draft가 아님 (이후 취소해도 삭제되지 않음)
-    setIsDraft(false);
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    // 방금 추가한(저장 전) 카드는 취소 시 저장하지 않고 삭제
+    // 방금 추가한(저장 전) 카드는 취소 시 로컬에서만 제거 (Ably에 올린 적 없음)
     if (isDraft) {
-      onDelete?.(data.id);
+      discardCard(data.id);
       return;
     }
     setIsEditing(false);

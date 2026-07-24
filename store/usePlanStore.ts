@@ -105,6 +105,8 @@ interface PlanState {
   setCards: (cards: PlanCardData[]) => void;
   addCard: (type: PlanCardType, day: string) => void;
   clearNewCard: () => void;
+  commitCard: (card: PlanCardData) => void; // draft의 첫 저장(확인) — 이때 Ably 생성
+  discardCard: (id: string) => void; // draft 취소 — 로컬에서만 제거
   updateCard: (updatedCard: PlanCardData) => void;
   deleteCard: (id: string) => void;
   moveCardToDay: (activeId: string, targetDay: string) => void;
@@ -151,11 +153,27 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       newCard = { ...base, type: "PLACE" };
     }
 
-    // newCardId로 표시해 PlanTimelineCard가 편집 모드로 열도록 함
-    set({ cards: [...cards, newCard], isDirty: true, newCardId: newCard.id });
+    // newCardId로 표시해 PlanTimelineCard가 편집 모드로 열도록 함.
+    // draft 단계에서는 Ably/DB에 반영하지 않음 (isDirty·push 없음) →
+    // 취소 시 다른 참가자 화면에 빈 카드가 깜빡이지 않도록 저장(확인) 시점까지 미룸
+    set({ cards: [...cards, newCard], newCardId: newCard.id });
+  },
 
-    // 다른 참가자에게 실시간 전파
-    pushCardCreate(newCard);
+  // draft를 확정 저장: 로컬 반영 + 이 시점에 Ably에 처음 생성
+  commitCard: (card) => {
+    set((state) => ({
+      cards: state.cards.map((c) => (c.id === card.id ? card : c)),
+      isDirty: true,
+    }));
+
+    pushCardCreate(card);
+  },
+
+  // draft 취소: Ably에 올린 적 없으므로 로컬에서만 제거 (push 불필요)
+  discardCard: (id) => {
+    set((state) => ({
+      cards: state.cards.filter((c) => c.id !== id),
+    }));
   },
 
   updateCard: (updatedCard) => {
