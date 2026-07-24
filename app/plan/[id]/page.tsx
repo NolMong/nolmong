@@ -1,20 +1,42 @@
-"use client";
+'use client';
 
 import { MainButton, MapModal } from '@/components';
 import { usePlanTabStore } from '@/store/usePlanTabStore';
 import { useAutoSavePlan } from '@/hooks/useAutoSavePlan';
 import { LucideEdit3 } from 'lucide-react';
+import { useEffect } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import WishlistTab from './_components/WishlistTab';
 import PlanDetailsTab from './_components/PlanDetailsTab';
 import { useMapModalStore } from '@/store/useModalStore';
-import { usePlanSync } from "@/hooks/usePlanSync";
-import { usePlanStore } from "@/store/usePlanStore";
+import { usePlanSync } from '@/hooks/usePlanSync';
+import { usePlanStore } from '@/store/usePlanStore';
 
 export default function PlanPage() {
   const { activePlanTab, setPlanTab } = usePlanTabStore();
   const { title } = usePlanStore();
-  const uuid = "046e6379-a9bc-4bbd-aa7d-fd40b2b0b455"; // uuid 주는 방식 변경
+  const uuid = '046e6379-a9bc-4bbd-aa7d-fd40b2b0b455'; // uuid 주는 방식 변경
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const tab = searchParams?.get('tab');
+    if (tab === 'PLAN_DETAILS' || tab === 'WISHLIST') {
+      setPlanTab(tab);
+    }
+  }, [searchParams, setPlanTab]);
+
+  const handleTabClick = (tab: 'WISHLIST' | 'PLAN_DETAILS') => {
+    setPlanTab(tab);
+
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
+    nextParams.set('tab', tab);
+
+    router.replace(`${pathname}?${nextParams.toString()}`);
+  };
 
   // 주기적 저장 활성화
   useAutoSavePlan(uuid);
@@ -23,31 +45,31 @@ export default function PlanPage() {
   usePlanSync(uuid);
 
   return (
-    <main className='relative flex flex-col gap-7.5 min-w-300 w-300 mx-auto px-5 py-8'>
+    <main className="relative flex flex-col gap-7.5 min-w-300 w-300 mx-auto px-5 py-8">
       {/* 헤더 타이틀 및 탭 버튼 */}
       <MapModal />
-      <div className='flex flex-col gap-5'>
-        <div className='flex gap-2'>
-          <div className='text-xl font-jalnan-gothic text-sub'>
-            {title || "여행"}
+      <div className="flex flex-col gap-5">
+        <div className="flex gap-2">
+          <div className="text-xl font-jalnan-gothic text-sub">
+            {title || '여행'}
           </div>
           <button>
-            <LucideEdit3 size={14} className='text-muted' />
+            <LucideEdit3 size={14} className="text-muted" />
           </button>
         </div>
 
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <MainButton
-            variant={activePlanTab === "WISHLIST" ? "lightFill" : "default"}
+            variant={activePlanTab === 'WISHLIST' ? 'lightFill' : 'default'}
             className="py-2 px-4"
-            onClick={() => setPlanTab("WISHLIST")}
+            onClick={() => handleTabClick('WISHLIST')}
           >
             가고 싶은 곳
           </MainButton>
           <MainButton
-            variant={activePlanTab === "PLAN_DETAILS" ? "lightFill" : "default"}
+            variant={activePlanTab === 'PLAN_DETAILS' ? 'lightFill' : 'default'}
             className="py-2 px-4"
-            onClick={() => setPlanTab("PLAN_DETAILS")}
+            onClick={() => handleTabClick('PLAN_DETAILS')}
           >
             상세 계획
           </MainButton>
@@ -55,7 +77,7 @@ export default function PlanPage() {
       </div>
 
       {/* 탭별 뷰 렌더링 */}
-      {activePlanTab === "PLAN_DETAILS" ? <PlanDetailsTab /> : <WishlistTab />}
+      {activePlanTab === 'PLAN_DETAILS' ? <PlanDetailsTab /> : <WishlistTab />}
     </main>
   );
 }
