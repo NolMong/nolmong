@@ -77,8 +77,9 @@ export function usePlanSync(uuid: string) {
       mounted = false;
       setPlanRootObject(null);
       subscriptions.forEach((s) => s.unsubscribe());
-      // client는 앱 전체 싱글턴이라 닫지 않고, 이 계획의 채널만 정리
-      channel.detach().catch(() => {});
+      // channel도 client와 마찬가지로 이름별 공유 인스턴스라, 여기서 detach하면
+      // StrictMode의 mount→cleanup→mount 이중 실행 시 뒤이은 진짜 마운트가 같은
+      // 채널을 쓰다가 "Channel detached"를 맞는다. 구독만 정리하고 채널 연결은 유지한다.
     };
   }, [uuid, setTitle, setCards]);
 }

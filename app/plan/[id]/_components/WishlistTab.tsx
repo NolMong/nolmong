@@ -13,11 +13,13 @@ import {
   DragEndEvent,
   DragStartEvent,
 } from "@dnd-kit/core";
-// import { arrayMove } from "@dnd-kit/sortable";
+// import { arrayMove } from '@dnd-kit/sortable';
+import { useMapModalStore } from "@/store/useModalStore";
 
 export default function WishlistTab() {
   const { cards, moveCardToDay, reorderCardsInDay } = usePlanStore();
   const [activePlace, setActivePlace] = useState<PlaceItem | null>(null);
+  const openMapModal = useMapModalStore((state) => state.open);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -88,6 +90,7 @@ export default function WishlistTab() {
 
   return (
     <DndContext
+      id="plan-dnd-context"
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
@@ -117,6 +120,7 @@ export default function WishlistTab() {
         <PlaceListContainer
           containerId="candidate-list"
           places={getPlaceItemsByDay("day-0")}
+          onAddClick={openMapModal}
         />
       </div>
 

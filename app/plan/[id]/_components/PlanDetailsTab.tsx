@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { FilterGroup, PlanEditorCard, KakaoMap } from '@/components';
 import { usePlanStore } from '@/store/usePlanStore';
 import { PlanCardData } from '@/types/plans';
@@ -10,6 +10,8 @@ const dayOptions = ['day-1', 'day-2', 'day-3'];
 export default function PlanDetailsTab() {
   const [currentDay, setCurrentDay] = useState('day-1');
   const { cards, updateCard, deleteCard } = usePlanStore();
+  const mapRef = useRef<kakao.maps.Map | null>(null);
+  const placesServiceRef = useRef<kakao.maps.services.Places | null>(null);
 
   const dayId = currentDay;
 
@@ -29,9 +31,14 @@ export default function PlanDetailsTab() {
 
   const dayNumber = parseInt(currentDay.replace('day-', ''), 10) || 1;
 
+  const handleMapLoad = (map: kakao.maps.Map) => {
+    mapRef.current = map;
+    placesServiceRef.current = new window.kakao.maps.services.Places();
+  };
+
   return (
-    <div className="flex gap-5 h-161">
-      <div className="flex flex-col gap-5 h-full min-h-0 w-107.5">
+    <div className='flex gap-5 h-161'>
+      <div className='flex flex-col gap-5 h-full min-h-0 w-107.5'>
         <FilterGroup
           options={dayOptions}
           value={currentDay}
@@ -39,14 +46,19 @@ export default function PlanDetailsTab() {
         />
         <PlanEditorCard
           dayNumber={dayNumber}
-          dateText="8.8 / 토"
+          dateText='8.8 / 토'
           cards={filteredCards}
           onUpdateCard={updateCard}
           onDeleteCard={deleteCard}
         />
       </div>
 
-      <KakaoMap className="flex-1 h-full rounded-xl overflow-hidden border" />
+      <KakaoMap
+        onMapLoad={handleMapLoad}
+        cards={cards}
+        currentDay={currentDay}
+        className='flex-1 h-full rounded-xl overflow-hidden border'
+      />
     </div>
   );
 }

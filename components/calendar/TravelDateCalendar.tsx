@@ -30,17 +30,23 @@ export default function TravelDateCalendar({
   oneDayTrip?: boolean;
   onChange: (range: { startDay: string; endDay: string }) => void;
 }) {
-  const today = new Date();
-  const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  // new Date()를 render 중에 바로 쓰면 서버(UTC)와 클라이언트(KST) 타임존이 달라
+  // 자정 근처에 날짜가 어긋나 hydration mismatch가 나서, null로 시작해 클라이언트에서만 채운다
+  const [today, setToday] = useState<Date | null>(null);
 
   const [monthsAhead, setMonthsAhead] = useState(INITIAL_MONTHS_AHEAD);
   const currentMonthRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setToday(new Date()));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   // 처음 열리면 이번달이 맨 위(중심)에 오도록 스크롤
   useEffect(() => {
     currentMonthRef.current?.scrollIntoView({ block: 'start' });
-  }, []);
+  }, [today]);
 
   // 아래로 스크롤하면 다음 달들을 계속 이어서 로드
   useEffect(() => {
@@ -58,6 +64,10 @@ export default function TravelDateCalendar({
     observer.observe(target);
     return () => observer.disconnect();
   }, []);
+
+  if (!today) return null;
+
+  const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
   const months: Date[] = [
     new Date(thisMonth.getFullYear(), thisMonth.getMonth() - 1, 1),

@@ -14,11 +14,14 @@ export { default as KakaoMap } from './cards/KakaoMap';
 export { default as PlaceListContainer } from './container/PlaceListContainer';
 export { default as TravelTestResultCard } from './cards/TravelTestResultCard';
 export { default as TravelCard } from './cards/TravelCard';
+
+export { default as SearchResultCard } from './cards/plan/SearchResultCard';
 // template
 export { default as Header } from './templates/Header';
 // modal
 export { default as LoginModal } from './modals/LoginModal';
 export { default as CreatePlanModal } from './modals/CreatePlanModal';
+export { default as MapModal } from './modals/MapModal';
 export { default as ProfileEditModal } from './modals/ProfileEditModal';
 // calendar
 export { default as CalendarComponent } from './calendar/CalendarComponent';
