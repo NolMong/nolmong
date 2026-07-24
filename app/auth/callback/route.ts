@@ -1,18 +1,27 @@
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+
+// 쿠키 보관용 인터페이스 정의
+interface PendingCookie {
+  name: string;
+  value: string;
+  options: CookieOptions;
+}
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
 
-  // console.log('Callback 진입 URL params code:', code ? '있음' : '없음');
+  // 로그인 후 이동할 목적지 주소
+  const next =
+    searchParams.get('next') || searchParams.get('redirectTo') || '/main';
 
   if (code) {
     const cookieStore = await cookies();
 
-    // 기본 이동은 /main 으로 설정
-    let response = NextResponse.redirect(`${origin}/main`);
+    // 임시 쿠키 수집용 배열
+    const pendingCookies: PendingCookie[] = [];
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,12 +34,7 @@ export async function GET(request: Request) {
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
-            });
-            response = NextResponse.redirect(`${origin}/main`, {
-              headers: request.headers,
-            });
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
+              pendingCookies.push({ name, value, options });
             });
           },
         },
@@ -58,23 +62,21 @@ export async function GET(request: Request) {
         console.error('profiles 조회 실패 에러:', profileError.message);
       }
 
-      // console.log('DB 조회 결과 profile:', profile);
-
-      // profiles 테이블에 없는 유저는 신규 저장 및 travel-test로 이동
+      // 신규 유저 -> /travel-test 이동
       if (!profile) {
-        // console.log('profile 없음 -> /travel-test 이동');
         const testRedirect = NextResponse.redirect(`${origin}/travel-test`);
-        response.cookies.getAll().forEach((cookie) => {
-          testRedirect.cookies.set(cookie.name, cookie.value, cookie);
+        pendingCookies.forEach(({ name, value, options }) => {
+          testRedirect.cookies.set(name, value, options);
         });
         return testRedirect;
       }
 
-      // profiles 테이블에 기존 유저는 /main 으로 이동!
-      // console.log('profile 있음 -> /main 이동');
-      const mainRedirect = NextResponse.redirect(`${origin}/main`);
-      response.cookies.getAll().forEach((cookie) => {
-        mainRedirect.cookies.set(cookie.name, cookie.value, cookie);
+      // 기존 유저 -> next(초대 링크 주소 or /main)로 이동
+      const redirectUrl = next.startsWith('http') ? next : `${origin}${next}`;
+
+      const mainRedirect = NextResponse.redirect(redirectUrl);
+      pendingCookies.forEach(({ name, value, options }) => {
+        mainRedirect.cookies.set(name, value, options);
       });
       return mainRedirect;
     }
