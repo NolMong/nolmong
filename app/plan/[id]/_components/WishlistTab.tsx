@@ -125,6 +125,7 @@ export default function WishlistTab() {
         ))}
       </div>
 
+      {/* 미지정된 장소 리스트 (Wishlist) */}
       <div className='mt-5 p-2'>
         <PlaceListContainer
           containerId='candidate-list'

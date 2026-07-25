@@ -51,10 +51,14 @@ export default function DayCard({
         items={places.map((p) => p.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className='flex flex-col gap-2 overflow-y-scroll scrollbar-thin'>
-          {places.map((place) => (
-            <PlaceCard key={place.id} place={place} />
-          ))}
+        <div className='h-full flex flex-col gap-2 overflow-y-scroll scrollbar-thin'>
+          {places.length === 0 ? (
+            <div className='flex items-center justify-center h-full text-muted text-sm'>
+              장소가 없습니다.
+            </div>
+          ) : (
+            places.map((place) => <PlaceCard key={place.id} place={place} />)
+          )}
         </div>
       </SortableContext>
     </div>
