@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState } from "react";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import TimelineLeft from "./TimelineLeft";
-import PlanCardHeader from "./PlanCardHeader";
-import PlanCardBody from "./PlanCardBody";
-import type { PlanCardData } from "@/types/plans";
-import { usePlanStore } from "@/store/usePlanStore";
-import { cn } from "@/lib/utils";
+import React, { useEffect, useRef, useState } from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import TimelineLeft from './TimelineLeft';
+import PlanCardHeader from './PlanCardHeader';
+import PlanCardBody from './PlanCardBody';
+import type { PlanCardData } from '@/types/plans';
+import { usePlanStore } from '@/store/usePlanStore';
+import { cn } from '@/lib/utils';
 
 interface PlanTimelineCardProps {
   data: PlanCardData;
@@ -67,7 +67,7 @@ export default function PlanTimelineCard({
   useEffect(() => {
     if (isNew) {
       // 새 카드 위치로 내부 스크롤 이동
-      rootRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       clearNewCard();
     }
   }, []);
@@ -78,17 +78,18 @@ export default function PlanTimelineCard({
     if (isDraft) {
       discardCard(data.id); // 추가 중(draft)이면 로컬에서 제거
     } else if (isEditing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsEditing(false); // 수정 중이면 저장하지 않고 편집 종료
     }
   }, [isDnd]);
 
   // times 배열 형태(['12:29', '12:50'])와 visitTime 문자열 형태 둘 다 대응
-  const initialStartTime = data.times?.[0] || "";
-  const initialEndTime = data.times?.[1] || "";
+  const initialStartTime = data.times?.[0] || '';
+  const initialEndTime = data.times?.[1] || '';
 
   // cost, memo
-  const initialCost = data.expense !== undefined ? String(data.expense) : "";
-  const initialMemo = data.desc || "";
+  const initialCost = data.expense !== undefined ? String(data.expense) : '';
+  const initialMemo = data.desc || '';
 
   // State 초기화
   const [editStartTime, setEditStartTime] = useState(initialStartTime);
@@ -119,7 +120,7 @@ export default function PlanTimelineCard({
   const handleAddChecklistItem = () => {
     setChecklists((prev) => [
       ...prev,
-      { id: Date.now().toString(), text: "", checked: false },
+      { id: Date.now().toString(), text: '', checked: false },
     ]);
   };
 
@@ -163,7 +164,7 @@ export default function PlanTimelineCard({
     <div
       ref={setRefs}
       style={style}
-      className="relative flex gap-4 pl-3 select-none"
+      className='relative flex gap-4 pl-3 select-none'
     >
       {/* DnD 모드에서는 타임라인을 숨기고 카드 자체를 드래그 */}
       {!isDnd && (
@@ -174,12 +175,12 @@ export default function PlanTimelineCard({
         />
       )}
 
-      <div className={cn("flex-1", isDnd ? "pb-2.5" : "pb-6")}>
+      <div className={cn('flex-1', isDnd ? 'pb-2.5' : 'pb-6')}>
         <div
           {...(isDnd ? { ...attributes, ...listeners } : {})}
           className={cn(
-            "px-5 py-4 bg-white rounded-lg shadow-card flex flex-col gap-3",
-            isDnd && "cursor-grab active:cursor-grabbing",
+            'px-5 py-4 bg-white rounded-lg shadow-card flex flex-col gap-3',
+            isDnd && 'cursor-grab active:cursor-grabbing',
           )}
         >
           <PlanCardHeader

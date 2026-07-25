@@ -23,11 +23,6 @@ export default function WishlistTab() {
   const [activePlace, setActivePlace] = useState<PlaceItem | null>(null);
   const openMapModal = useMapModalStore((state) => state.open);
 
-  const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
-    const container = e.currentTarget;
-    container.scrollLeft += e.deltaY;
-  };
-
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
@@ -50,7 +45,8 @@ export default function WishlistTab() {
           name: card.name || '',
           category: card.category || '',
           location: card.address || '',
-          orderNumber: targetDay !== null ? placeCounter++ : undefined,
+          // 'day-0'(장소 리스트/후보)는 순서 없음, day-1/2/3 등 실제 일정에만 순번 표시
+          orderNumber: targetDay !== 'day-0' ? placeCounter++ : undefined,
         });
       }
     });
