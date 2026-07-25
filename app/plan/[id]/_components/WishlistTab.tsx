@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { DayCard, PlaceListContainer } from "@/components";
-import PlaceCard, { PlaceItem } from "@/components/cards/PlaceCard";
-import { usePlanStore } from "@/store/usePlanStore";
+import { useState } from 'react';
+import { DayCard, PlaceListContainer } from '@/components';
+import PlaceCard, { PlaceItem } from '@/components/cards/PlaceCard';
+import { usePlanStore } from '@/store/usePlanStore';
+import { getTripDays } from '@/lib/utils';
 import {
   DndContext,
   DragOverlay,
@@ -12,18 +13,26 @@ import {
   useSensors,
   DragEndEvent,
   DragStartEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 // import { arrayMove } from '@dnd-kit/sortable';
-import { useMapModalStore } from "@/store/useModalStore";
+import { useMapModalStore } from '@/store/useModalStore';
 
 export default function WishlistTab() {
-  const { cards, moveCardToDay, reorderCardsInDay } = usePlanStore();
+  const { cards, start_day, end_day, moveCardToDay, reorderCardsInDay } =
+    usePlanStore();
   const [activePlace, setActivePlace] = useState<PlaceItem | null>(null);
   const openMapModal = useMapModalStore((state) => state.open);
+
+  const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    container.scrollLeft += e.deltaY;
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
+
+  const tripDays = getTripDays(start_day, end_day);
 
   // PLACE 카드만 PlaceItem 규격으로 변함
   const getPlaceItemsByDay = (targetDay: string | null): PlaceItem[] => {
@@ -35,12 +44,12 @@ export default function WishlistTab() {
     const placeItems: PlaceItem[] = [];
 
     dayCards.forEach((card) => {
-      if (card.type === "PLACE") {
+      if (card.type === 'PLACE') {
         placeItems.push({
           id: card.id,
-          name: card.name || "",
-          category: card.category || "",
-          location: card.address || "",
+          name: card.name || '',
+          category: card.category || '',
+          location: card.address || '',
           orderNumber: targetDay !== null ? placeCounter++ : undefined,
         });
       }
@@ -50,8 +59,8 @@ export default function WishlistTab() {
   };
 
   const findContainerDay = (id: string): string | null => {
-    if (id === "candidate-list") return null;
-    if (id.startsWith("day-")) return id;
+    if (id === 'candidate-list') return null;
+    if (id.startsWith('day-')) return id;
 
     const card = cards.find((c) => c.id === id);
     return card ? card.day : null;
@@ -60,12 +69,12 @@ export default function WishlistTab() {
   const handleDragStart = (event: DragStartEvent) => {
     const activeId = event.active.id as string;
     const card = cards.find((c) => c.id === activeId);
-    if (card && card.type === "PLACE") {
+    if (card && card.type === 'PLACE') {
       setActivePlace({
         id: card.id,
-        name: card.name || "",
-        category: card.category || "",
-        location: card.address || "",
+        name: card.name || '',
+        category: card.category || '',
+        location: card.address || '',
       });
     }
   };
@@ -90,42 +99,47 @@ export default function WishlistTab() {
 
   return (
     <DndContext
-      id="plan-dnd-context"
+      id='plan-dnd-context'
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      autoScroll={{
+        // document(페이지 세로 스크롤)가 항상 최우선 후보라 포인터가 화면
+        // 위/아래 쪽에 가까우면 Day 행의 가로 오토스크롤보다 먼저 걸려버린다.
+        // dnd-kit은 한 번에 컨테이너 하나만 스크롤하므로 document는 후보에서 제외한다.
+        canScroll: (element) => element !== document.scrollingElement,
+      }}
     >
-      <div className="flex gap-5 h-120 p-2 overflow-x-auto scrollbar-none">
-        <DayCard
-          dayId="day-1"
-          dayNumber={1}
-          dateText="8.8 (토)"
-          places={getPlaceItemsByDay("day-1")}
-        />
-        <DayCard
-          dayId="day-2"
-          dayNumber={2}
-          dateText="8.9 (일)"
-          places={getPlaceItemsByDay("day-2")}
-        />
-        <DayCard
-          dayId="day-3"
-          dayNumber={3}
-          dateText="8.10 (월)"
-          places={getPlaceItemsByDay("day-3")}
-        />
+      <div
+        className='flex gap-5 h-120 p-2 overflow-x-auto  scrollbar-thin'
+        // onWheel={handleWheelScroll}
+      >
+        {tripDays.map((day) => (
+          <DayCard
+            key={day.dayId}
+            dayId={day.dayId}
+            dayNumber={day.dayNumber}
+            dateText={day.dateText}
+            places={getPlaceItemsByDay(day.dayId)}
+          />
+        ))}
       </div>
 
-      <div className="mt-5 p-2">
+      {/* 미지정된 장소 리스트 (Wishlist) */}
+      <div className='mt-5 p-2'>
         <PlaceListContainer
-          containerId="candidate-list"
-          places={getPlaceItemsByDay("day-0")}
+          containerId='candidate-list'
+          places={getPlaceItemsByDay('day-0')}
           onAddClick={openMapModal}
         />
       </div>
 
       <DragOverlay>
-        {activePlace ? <PlaceCard place={activePlace} isOverlay /> : null}
+        {activePlace ? (
+          <PlaceCard place={activePlace} isOverlay />
+        ) : (
+          <div>장소가 없습니다.</div>
+        )}
       </DragOverlay>
     </DndContext>
   );

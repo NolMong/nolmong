@@ -27,14 +27,20 @@ function getBaseUrl() {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
+  const invite = searchParams.get('invite');
 
-  // 동적으로 Base URL 구하기 (로컬 vs 버셀)
+  // base url 구하기 (로컬 버셀)
   const baseUrl = getBaseUrl();
 
   const rawNext =
     searchParams.get('next') || searchParams.get('redirectTo') || '/main';
-  const next =
+
+  const validNextPath =
     rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/main';
+
+  const targetMainUrl = new URL(validNextPath, baseUrl);
+
+  const inviteUuid = targetMainUrl.searchParams.get('invite');
 
   if (code) {
     const cookieStore = await cookies();
@@ -80,16 +86,28 @@ export async function GET(request: Request) {
 
       // 신규 유저 -> /travel-test 이동
       if (!profile) {
-        const testRedirect = NextResponse.redirect(
-          `${baseUrl}/travel-test?next=${encodeURIComponent(next)}`,
+        const testRedirectUrl = new URL('/travel-test', baseUrl);
+
+        // travel-test가 끝난 뒤 가야 할 최종 목적지 저장 (/main?invite=xxx)
+        testRedirectUrl.searchParams.set(
+          'next',
+          targetMainUrl.pathname + targetMainUrl.search,
         );
+
+        // 만약의 상황을 대비해 invite 키 챙김
+        if (inviteUuid) {
+          testRedirectUrl.searchParams.set('invite', inviteUuid);
+        }
+
+        const testRedirect = NextResponse.redirect(testRedirectUrl.toString());
         pendingCookies.forEach(({ name, value, options }) => {
           testRedirect.cookies.set(name, value, options);
         });
         return testRedirect;
       }
 
-      const mainRedirect = NextResponse.redirect(`${baseUrl}${next}`);
+      // 기존 유저 -> targetMainUrl (즉, /main?invite=xxx) 로 이동
+      const mainRedirect = NextResponse.redirect(targetMainUrl.toString());
       pendingCookies.forEach(({ name, value, options }) => {
         mainRedirect.cookies.set(name, value, options);
       });
