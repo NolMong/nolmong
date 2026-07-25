@@ -67,6 +67,41 @@ export function pushCardFields(
     .catch((e: unknown) => console.error("Ably 카드 전송 실패:", e));
 }
 
+// 여러 카드의 order를 단일 batch(한 채널 메시지)로 전송.
+export function pushCardOrders(updates: { id: string; order: number }[]) {
+  if (!rootObject || updates.length === 0) return;
+
+  rootObject
+    .get("cards")
+    .batch((ctx) => {
+      for (const { id, order } of updates) {
+        // 중첩 카드(map)로 내려가 order만 갱신 (없는 카드면 undefined → 스킵)
+        ctx.get(id)?.set("order", order);
+      }
+    })
+    .catch((e: unknown) => console.error("Ably 순서 일괄 전송 실패:", e));
+}
+
+// day 이동 1건 + 출발지 재정렬 order들을 한 batch로 전송.
+export function pushCardMove(
+  moved: { id: string; day: string | null; order: number },
+  reorders: { id: string; order: number }[],
+) {
+  if (!rootObject) return;
+
+  rootObject
+    .get("cards")
+    .batch((ctx) => {
+      const movedCtx = ctx.get(moved.id);
+      movedCtx?.set("day", moved.day ?? "day-0");
+      movedCtx?.set("order", moved.order);
+      for (const { id, order } of reorders) {
+        ctx.get(id)?.set("order", order);
+      }
+    })
+    .catch((e: unknown) => console.error("Ably 이동 전송 실패:", e));
+}
+
 // 카드 삭제를 Ably에 전파
 export function pushCardRemove(cardId: string) {
   if (!rootObject) return;

@@ -4,6 +4,8 @@ import { arrayMove } from "@dnd-kit/sortable";
 import {
   pushCardCreate,
   pushCardFields,
+  pushCardMove,
+  pushCardOrders,
   pushCardRemove,
 } from "@/lib/ably/planObject";
 
@@ -143,9 +145,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       newCard = {
         ...base,
         type: "CHECKLIST",
-        checklistItems: [
-          { id: crypto.randomUUID(), text: "", checked: false },
-        ],
+        checklistItems: [{ id: crypto.randomUUID(), text: "", checked: false }],
       };
     } else if (type === "MEMO") {
       newCard = { ...base, type: "MEMO", desc: "", times: null };
@@ -226,12 +226,13 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       isDirty: true,
     });
 
-    // 이동한 카드 + order가 실제로 바뀐 출발지 카드들을 실시간 전파
-    pushCardFields(activeId, { day: targetDay, order: newOrder });
+    // 이동한 카드 + order가 실제로 바뀐 출발지 카드들을 단일 batch로 전파
+    const reorders: { id: string; order: number }[] = [];
     sourceRenumber.forEach((order, id) => {
       const before = cards.find((c) => c.id === id)?.order;
-      if (before !== order) pushCardFields(id, { order });
+      if (before !== order) reorders.push({ id, order });
     });
+    pushCardMove({ id: activeId, day: targetDay, order: newOrder }, reorders);
   },
 
   reorderCardsInDay: (targetDay, activeId, overId) => {
@@ -262,13 +263,13 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       isDirty: true,
     });
 
-    // order가 실제로 바뀐 카드만 실시간 전파
-    updatedDayCards.forEach((card) => {
-      const before = dayCards.find((c) => c.id === card.id);
-      if (before?.order !== card.order) {
-        pushCardFields(card.id, { order: card.order });
-      }
-    });
+    // order가 실제로 바뀐 카드들을 단일 batch로 전파
+    const changed = updatedDayCards
+      .filter(
+        (card) => dayCards.find((c) => c.id === card.id)?.order !== card.order,
+      )
+      .map((card) => ({ id: card.id, order: card.order }));
+    pushCardOrders(changed);
   },
 
   resetIsDirty: () => set({ isDirty: false }),
