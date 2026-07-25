@@ -38,6 +38,10 @@ export default function Header() {
   // 현재 plan 페이지인지 확인
   const isPlanPage = pathname?.startsWith('/plan');
 
+  // 테스트 페이지 여부 확인
+  const isTestPage =
+    pathname === '/travel-test' || pathname?.startsWith('/travel-test');
+
   // DB에서 가져와 Zustand Store에 대입
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -105,6 +109,14 @@ export default function Header() {
     window.dispatchEvent(new CustomEvent('trigger-invite-copy'));
   };
 
+  // 테스트 페이지에서 로고 클릭 시 안내 알림
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (isTestPage) {
+      e.preventDefault(); // 페이지 이동 방지
+      alert('회원가입을 완료하려면 여행 테스트를 마쳐야 합니다.');
+    }
+  };
+
   return (
     <div className="w-full h-17.5 border-b border-border bg-white">
       <Suspense fallback={null}>
@@ -131,6 +143,7 @@ export default function Header() {
         ) : (
           <Link
             href={user ? '/main' : '/landing'}
+            onClick={handleLogoClick}
             className="font-jalnan text-2xl cursor-pointer"
           >
             <span className="text-primary">Nol</span>
@@ -139,38 +152,42 @@ export default function Header() {
         )}
 
         <div className="flex items-center gap-3">
-          {user ? (
-            // 로그인 상태
+          {!isTestPage && (
             <>
-              <div
-                className="cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => setIsEditModalOpen(true)}
-              >
-                <ProfileAvatar size={40} />
-              </div>
-              {isPlanPage ? (
-                <MainButton variant="fill" onClick={handleInviteClick}>
-                  초대하기
-                </MainButton>
+              {user ? (
+                // 로그인 상태
+                <>
+                  <div
+                    className="cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => setIsEditModalOpen(true)}
+                  >
+                    <ProfileAvatar size={40} />
+                  </div>
+                  {isPlanPage ? (
+                    <MainButton variant="fill" onClick={handleInviteClick}>
+                      초대하기
+                    </MainButton>
+                  ) : (
+                    <MainButton variant="default" onClick={handleLogout}>
+                      로그아웃
+                    </MainButton>
+                  )}
+                </>
               ) : (
-                <MainButton variant="default" onClick={handleLogout}>
-                  로그아웃
-                </MainButton>
+                // 비로그인 상태
+                <>
+                  <MainButton variant="default" onClick={openLoginModal}>
+                    로그인
+                  </MainButton>
+                  <MainButton
+                    variant="fill"
+                    className="ml-2"
+                    onClick={openLoginModal}
+                  >
+                    회원가입
+                  </MainButton>
+                </>
               )}
-            </>
-          ) : (
-            // 비로그인 상태
-            <>
-              <MainButton variant="default" onClick={openLoginModal}>
-                로그인
-              </MainButton>
-              <MainButton
-                variant="fill"
-                className="ml-2"
-                onClick={openLoginModal}
-              >
-                회원가입
-              </MainButton>
             </>
           )}
         </div>
