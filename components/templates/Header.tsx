@@ -12,14 +12,22 @@ import {
 } from '@/store/useUserStore';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 const supabase = createClient();
 
-export default function Header() {
-  const pathname = usePathname();
+// useSearchParams()는 이 컴포넌트를 감싸는 Suspense 경계가 필요해서
+// (프로덕션 빌드 시 정적 페이지에서 필수) Header 본문과 분리했다.
+// inviteUuid 계산 + LoginModal에 넘기는 로직 자체는 그대로 유지.
+function HeaderLoginModal() {
   const searchParams = useSearchParams();
   const inviteUuid = searchParams?.get('invite');
+
+  return <LoginModal inviteUuid={inviteUuid ?? undefined} />;
+}
+
+export default function Header() {
+  const pathname = usePathname();
 
   const openLoginModal = useLoginModalStore((state) => state.open);
   const setProfile = useUserStore((state) => state.setProfile);
@@ -99,7 +107,9 @@ export default function Header() {
 
   return (
     <div className="w-full h-17.5 border-b border-border bg-white">
-      <LoginModal inviteUuid={inviteUuid ?? undefined} />
+      <Suspense fallback={null}>
+        <HeaderLoginModal />
+      </Suspense>
 
       {/* 프로필 수정 모달 */}
       {user && (

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 import { TravelTestCard } from '@/components';
 import { useSearchParams } from 'next/navigation';
@@ -27,7 +27,7 @@ const text = [
   </div>,
 ];
 
-export default function TravelTestPage() {
+function TravelTestPage() {
   const searchParams = useSearchParams();
   const invite = searchParams?.get('invite');
   const next = searchParams?.get('next');
@@ -101,5 +101,16 @@ export default function TravelTestPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// useSearchParams()는 이 컴포넌트를 감싸는 Suspense 경계가 필요해서
+// (프로덕션 빌드 시 정적 페이지에서 필수) TravelTestPage 자체를 감싸는
+// 얇은 wrapper를 default export로 둔다. 로직/이름 변경 없음.
+export default function TravelTestPageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <TravelTestPage />
+    </Suspense>
   );
 }
