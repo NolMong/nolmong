@@ -9,7 +9,8 @@ const dayOptions = ["day-1", "day-2", "day-3"];
 
 export default function PlanDetailsTab() {
   const [currentDay, setCurrentDay] = useState("day-1");
-  const { cards, updateCard, deleteCard, addCard } = usePlanStore();
+  const { cards, updateCard, deleteCard, addCard, reorderCardsInDay } =
+    usePlanStore();
   const mapRef = useRef<kakao.maps.Map | null>(null);
   const placesServiceRef = useRef<kakao.maps.services.Places | null>(null);
 
@@ -51,6 +52,9 @@ export default function PlanDetailsTab() {
           onUpdateCard={updateCard}
           onDeleteCard={deleteCard}
           onAddCard={(type) => addCard(type, currentDay)}
+          onReorderCards={(activeId, overId) =>
+            reorderCardsInDay(currentDay, activeId, overId)
+          }
         />
       </div>
 
