@@ -17,6 +17,12 @@ type FilterGroupProps =
       onChange: (value: string[]) => void; // 선택이 바뀔 때 실행할 함수
     };
 
+// 'day-1' -> 'Day 1' (대시를 공백으로, 첫 글자만 대문자)
+function formatOptionLabel(option: string) {
+  const label = option.replace('-', ' ');
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 export default function FilterGroup(props: FilterGroupProps) {
   const { options } = props;
 
@@ -42,7 +48,7 @@ export default function FilterGroup(props: FilterGroupProps) {
           isActive={isActive(option)}
           onClick={() => handleClick(option)}
         >
-          {option}
+          {formatOptionLabel(option)}
         </FilterButton>
       ))}
     </div>

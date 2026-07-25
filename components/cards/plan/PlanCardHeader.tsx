@@ -21,15 +21,15 @@ export default function PlanCardHeader({
   onDelete,
 }: PlanCardHeaderProps) {
   return (
-    <div className="flex items-start justify-between">
+    <div className='flex items-start justify-between'>
       {data.type === 'CHECKLIST' && <Tag>체크리스트</Tag>}
       {data.type === 'MEMO' && <Tag>메모</Tag>}
       {data.type === 'PLACE' && (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-regular text-main font-jalnan-gothic">
+        <div className='flex flex-col gap-2'>
+          <h3 className='text-sm font-regular text-main font-jalnan-gothic'>
             {data.name}
           </h3>
-          <p className="text-xs text-muted font-regular">
+          <p className='text-xs text-muted font-regular'>
             {data.category} · {data.address}
           </p>
         </div>
@@ -39,14 +39,14 @@ export default function PlanCardHeader({
       {!isDnd &&
         (!isEditing ? (
           <button
-            type="button"
+            type='button'
             onClick={onEditStart}
-            className="cursor-pointer text-muted transition-colors hover:text-main"
+            className='cursor-pointer text-muted transition-colors hover:text-main'
           >
             <Edit3 size={12} />
           </button>
         ) : (
-          <Tag color="pink" onClick={() => onDelete && onDelete(data.id)}>
+          <Tag color='pink' onClick={() => onDelete && onDelete(data.id)}>
             삭제
           </Tag>
         ))}
