@@ -10,10 +10,14 @@ export default function TravelTestResultCard({
   result,
   totalCapi,
   totalBara,
+  inviteUuid,
+  nextUrl,
 }: {
   result: 'capi' | 'bara';
   totalCapi: number;
   totalBara: number;
+  inviteUuid?: string;
+  nextUrl?: string;
 }) {
   const router = useRouter();
   const supabase = createClient();
@@ -107,8 +111,14 @@ export default function TravelTestResultCard({
         return;
       }
 
-      // 메인 페이지로 이동
-      router.push('/main');
+      // 목적지 경로 판단 및 invite 쿼리 유지
+      if (nextUrl) {
+        router.push(nextUrl);
+      } else if (inviteUuid) {
+        router.push(`/main?invite=${inviteUuid}`);
+      } else {
+        router.push('/main');
+      }
     } catch (err) {
       console.error('저장 예외 발생:', err);
     }
