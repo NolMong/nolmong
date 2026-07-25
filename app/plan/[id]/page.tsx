@@ -42,7 +42,7 @@ export default function PlanPage({
     router.replace(`${pathname}?${nextParams.toString()}`);
   };
 
-  console.log(uuid);
+  // console.log(uuid);
 
   // 주기적 저장 활성화
   useAutoSavePlan(uuid);

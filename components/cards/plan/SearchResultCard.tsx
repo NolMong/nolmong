@@ -3,22 +3,35 @@
 import { useState } from 'react';
 import { FilterButton, MainButton } from '@/components';
 import { MapPin } from 'lucide-react';
+import { getTripDays } from '@/lib/utils';
+import { usePlanStore } from '@/store/usePlanStore';
 
 interface SearchResultCardProps {
   data: kakao.maps.services.PlacesSearchResultItem;
-  onAddPlace?: (data: kakao.maps.services.PlacesSearchResultItem) => void;
+  // day: 'day-0'(미정) | 'day-1' | 'day-2' | ...
+  onAddPlace?: (
+    data: kakao.maps.services.PlacesSearchResultItem,
+    day: string,
+  ) => void;
 }
 
 export default function SearchResultCard({
   data,
   onAddPlace,
 }: SearchResultCardProps) {
+  const { start_day, end_day } = usePlanStore();
   const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
     container.scrollLeft += e.deltaY;
   };
-  const [selectedOption, setSelectedOption] = useState<string | null>('미정');
-  const options = ['미정', 'Day1', 'Day2', 'Day3', 'Day4'];
+  const [selectedOption, setSelectedOption] = useState('day-0');
+  const options = [
+    { id: 'day-0', label: '미정' },
+    ...getTripDays(start_day, end_day).map((day) => ({
+      id: day.dayId,
+      label: `Day${day.dayNumber}`,
+    })),
+  ];
   const category = data.category_name.split(' > ').pop() || data.category_name;
   const address = data.road_address_name || data.address_name;
 
@@ -42,14 +55,14 @@ export default function SearchResultCard({
         onWheel={handleWheelScroll}
         className='flex flex-1 min-w-0 gap-1 overflow-x-auto scrollbar-hide mb-1.5'
       >
-        {options.map((option, index) => (
+        {options.map((option) => (
           <FilterButton
-            key={index}
+            key={option.id}
             style={{ flexShrink: 0 }}
-            isActive={selectedOption === option}
-            onClick={() => setSelectedOption(option)}
+            isActive={selectedOption === option.id}
+            onClick={() => setSelectedOption(option.id)}
           >
-            {option}
+            {option.label}
           </FilterButton>
         ))}
       </div>
@@ -67,7 +80,7 @@ export default function SearchResultCard({
             fontSize: '14px',
             flex: 1,
           }}
-          onClick={() => onAddPlace?.(data)}
+          onClick={() => onAddPlace?.(data, selectedOption)}
         >
           일정 추가
         </MainButton>

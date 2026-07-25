@@ -10,6 +10,8 @@ declare global {
 
     class LatLng {
       constructor(lat: number, lng: number);
+      getLat(): number;
+      getLng(): number;
     }
 
     class LatLngBounds {

@@ -104,13 +104,19 @@ interface KakaoMapProps {
 // 부산역 기본 위치
 const DEFAULT_CENTER = { lat: 35.115141, lng: 129.041744 };
 
+// cards/markers 미전달 시 기본값. 매 렌더마다 새 배열 리터럴(`= []`)을 만들면
+// effect 의존성 배열에서 매번 "바뀐 값"으로 취급돼 불필요하게 재실행되고,
+// 그 안의 map.setCenter(center)가 사용자가 옮겨둔 위치를 계속 되돌려버린다.
+const EMPTY_CARDS: PlanCardData[] = [];
+const EMPTY_MARKERS: KakaoMapMarker[] = [];
+
 export default function KakaoMap({
-  cards = [],
+  cards = EMPTY_CARDS,
   currentDay = 'day-1',
   center = DEFAULT_CENTER,
   level = 5,
   className,
-  markers = [],
+  markers = EMPTY_MARKERS,
   onMapLoad,
   renderMarkerContent,
 }: KakaoMapProps) {
