@@ -74,13 +74,16 @@ export default function PlanPage({
         <div className="flex gap-2">
           <div
             ref={titleRef}
-            className="text-xl font-jalnan-gothic text-sub"
+            className={`text-xl font-jalnan-gothic text-sub outline-0`}
             contentEditable={titleEditMode}
             suppressContentEditableWarning
           >
             {title || "여행"}
           </div>
-          <button onClick={() => setTitleEditMode(!titleEditMode)}>
+          <button
+            className="cursor-pointer"
+            onClick={() => setTitleEditMode(!titleEditMode)}
+          >
             {titleEditMode ? (
               <Check size={18} className="text-primary" />
             ) : (
