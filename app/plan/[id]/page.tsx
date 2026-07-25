@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { use, useCallback, useState } from 'react';
-import { MainButton, MapModal } from '@/components';
-import { usePlanTabStore } from '@/store/usePlanTabStore';
-import { useAutoSavePlan } from '@/hooks/useAutoSavePlan';
-import { LucideEdit3 } from 'lucide-react';
-import { useEffect } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { use, useCallback, useRef, useState } from "react";
+import { MainButton, MapModal } from "@/components";
+import { usePlanTabStore } from "@/store/usePlanTabStore";
+import { useAutoSavePlan } from "@/hooks/useAutoSavePlan";
+import { Check, LucideEdit3 } from "lucide-react";
+import { useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import WishlistTab from './_components/WishlistTab';
-import PlanDetailsTab from './_components/PlanDetailsTab';
-import { usePlanSync } from '@/hooks/usePlanSync';
-import { usePlanStore } from '@/store/usePlanStore';
-import { createClient } from '@/lib/supabase/client';
+import WishlistTab from "./_components/WishlistTab";
+import PlanDetailsTab from "./_components/PlanDetailsTab";
+import { usePlanSync } from "@/hooks/usePlanSync";
+import { usePlanStore } from "@/store/usePlanStore";
+import { createClient } from "@/lib/supabase/client";
 
 const supabase = createClient();
 
@@ -23,13 +23,30 @@ export default function PlanPage({
 }) {
   const { id: uuid } = use(params);
   const { activePlanTab, setPlanTab } = usePlanTabStore();
-  const { title } = usePlanStore();
+  const { title, updateTitle } = usePlanStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
+  const [titleEditMode, setTitleEditMode] = useState(false);
+  const titleRef = useRef<HTMLDivElement>(null);
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
+  // 타이틀 수정 기능
+  useEffect(() => {
+    const newTitle = titleRef.current?.innerText.trim();
+    if (titleEditMode) {
+      titleRef.current?.focus();
+    } else if (
+      newTitle !== undefined &&
+      newTitle !== "" &&
+      title !== newTitle
+    ) {
+      updateTitle(newTitle);
+    }
+  }, [titleEditMode]);
 
   // 토스트 메세지 함수
   const showToast = useCallback((msg: string) => {
@@ -43,21 +60,21 @@ export default function PlanPage({
   const handleCopyInviteLink = useCallback(async () => {
     try {
       const origin =
-        typeof window !== 'undefined' ? window.location.origin : '';
+        typeof window !== "undefined" ? window.location.origin : "";
       const inviteUrl = `${window.location.origin}/main?invite=${uuid}`;
 
       await navigator.clipboard.writeText(inviteUrl);
-      showToast('초대 링크가 복사되었습니다!');
+      showToast("초대 링크가 복사되었습니다!");
     } catch (error) {
-      console.error('링크 복사 실패:', error);
-      showToast('링크 복사에 실패했습니다.');
+      console.error("링크 복사 실패:", error);
+      showToast("링크 복사에 실패했습니다.");
     }
   }, [uuid, showToast]);
 
   // 탭 상태 동기화
   useEffect(() => {
-    const tab = searchParams?.get('tab');
-    if (tab === 'PLAN_DETAILS' || tab === 'WISHLIST') {
+    const tab = searchParams?.get("tab");
+    if (tab === "PLAN_DETAILS" || tab === "WISHLIST") {
       setPlanTab(tab);
     }
   }, [searchParams, setPlanTab]);
@@ -68,22 +85,20 @@ export default function PlanPage({
       handleCopyInviteLink();
     };
 
-    window.addEventListener('trigger-invite-copy', handleTriggerCopy);
+    window.addEventListener("trigger-invite-copy", handleTriggerCopy);
     return () => {
-      window.removeEventListener('trigger-invite-copy', handleTriggerCopy);
+      window.removeEventListener("trigger-invite-copy", handleTriggerCopy);
     };
   }, [handleCopyInviteLink]);
 
-  const handleTabClick = (tab: 'WISHLIST' | 'PLAN_DETAILS') => {
+  const handleTabClick = (tab: "WISHLIST" | "PLAN_DETAILS") => {
     setPlanTab(tab);
 
-    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
-    nextParams.set('tab', tab);
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? "");
+    nextParams.set("tab", tab);
 
     router.replace(`${pathname}?${nextParams.toString()}`);
   };
-
-  // console.log(uuid);
 
   // 주기적 저장 활성화
   useAutoSavePlan(uuid);
@@ -97,26 +112,38 @@ export default function PlanPage({
       <MapModal />
       <div className="flex flex-col gap-5">
         <div className="flex gap-2">
-          <div className="text-xl font-jalnan-gothic text-sub">
-            {title || '여행'}
+          <div
+            ref={titleRef}
+            className={`text-xl font-jalnan-gothic text-sub outline-0`}
+            contentEditable={titleEditMode}
+            suppressContentEditableWarning
+          >
+            {title || "여행"}
           </div>
-          <button>
-            <LucideEdit3 size={14} className="text-muted" />
+          <button
+            className="cursor-pointer"
+            onClick={() => setTitleEditMode(!titleEditMode)}
+          >
+            {titleEditMode ? (
+              <Check size={18} className="text-primary" />
+            ) : (
+              <LucideEdit3 size={14} className="text-muted" />
+            )}
           </button>
         </div>
 
         <div className="flex gap-2 mb-7">
           <MainButton
-            variant={activePlanTab === 'WISHLIST' ? 'lightFill' : 'default'}
+            variant={activePlanTab === "WISHLIST" ? "lightFill" : "default"}
             className="py-2 px-4"
-            onClick={() => handleTabClick('WISHLIST')}
+            onClick={() => handleTabClick("WISHLIST")}
           >
             가고 싶은 곳
           </MainButton>
           <MainButton
-            variant={activePlanTab === 'PLAN_DETAILS' ? 'lightFill' : 'default'}
+            variant={activePlanTab === "PLAN_DETAILS" ? "lightFill" : "default"}
             className="py-2 px-4"
-            onClick={() => handleTabClick('PLAN_DETAILS')}
+            onClick={() => handleTabClick("PLAN_DETAILS")}
           >
             상세 계획
           </MainButton>
@@ -124,7 +151,7 @@ export default function PlanPage({
       </div>
 
       {/* 탭별 뷰 렌더링 */}
-      {activePlanTab === 'PLAN_DETAILS' ? <PlanDetailsTab /> : <WishlistTab />}
+      {activePlanTab === "PLAN_DETAILS" ? <PlanDetailsTab /> : <WishlistTab />}
 
       {toastMessage && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-black/80 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all animate-bounce">

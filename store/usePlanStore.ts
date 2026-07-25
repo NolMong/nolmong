@@ -7,6 +7,7 @@ import {
   pushCardMove,
   pushCardOrders,
   pushCardRemove,
+  pushTitle,
 } from "@/lib/ably/planObject";
 
 // 임의로 생성한 더미데이터. 데이터 연결할때 삭제하면 됩니다.
@@ -105,8 +106,10 @@ interface PlanState {
   isDirty: boolean; // 자동 저장 감지
   newCardId: string | null; // 방금 추가돼 편집 모드로 열려야 하는 카드 id
 
-  // 타이틀 관련 (수신/수정 공용 — Ably 쓰기는 편집 저장 시점에 별도 처리)
+  // 타이틀 수신 전용 (Ably subscribe로부터 반영 — 여기서 push하면 에코 루프 발생)
   setTitle: (title: string) => void;
+  // 타이틀 편집 저장: 로컬 반영 + Ably로 전파
+  updateTitle: (title: string) => void;
   // 카드 관련
   setCards: (cards: PlanCardData[]) => void;
   addCard: (type: PlanCardType, day: string) => void;
@@ -139,6 +142,12 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   newCardId: null,
 
   setTitle: (title) => set({ title }),
+
+  updateTitle: (title) => {
+    set({ title, isDirty: true });
+    pushTitle(title);
+  },
+
   // 수신(에코 포함)이 로컬 변경의 isDirty를 씻지 않도록 cards만 교체
   setCards: (cards) => set({ cards }),
   setStartDay: (start_day) => set({ start_day }),
