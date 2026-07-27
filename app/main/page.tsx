@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { getPlans, PlanType } from "@/api/getPlans";
-import { acceptInvite } from "@/api/acceptInvite";
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { getPlans, PlanType } from '@/api/getPlans';
+import { acceptInvite } from '@/api/acceptInvite';
 import {
   CalendarComponent,
   CreatePlanModal,
@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { TravelEntry } from '@/types/calendar';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // 한 페이지에 보여줄 여행 카드 수
 // 9, 12, 15 | default = 12
@@ -45,8 +46,8 @@ function MainPageContent() {
   const travelSectionRef = useRef<HTMLDivElement>(null);
   const scrollToTravelSection = () => {
     travelSectionRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+      behavior: 'smooth',
+      block: 'start',
     });
   };
 
@@ -67,7 +68,7 @@ function MainPageContent() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const inviteUuid = searchParams?.get("invite") ?? null;
+  const inviteUuid = searchParams?.get('invite') ?? null;
 
   const isAlreadyMember = Boolean(
     inviteUuid && plans.some((plan) => plan.uuid === inviteUuid),
@@ -75,7 +76,7 @@ function MainPageContent() {
 
   // 디버깅용 로그
   useEffect(() => {
-    console.log("Current inviteUuid:", inviteUuid);
+    console.log('Current inviteUuid:', inviteUuid);
   }, [inviteUuid]);
 
   // 토스트 메시지
@@ -88,8 +89,8 @@ function MainPageContent() {
 
   // URL 쿼리 파라미터(?invite=uuid) 제거 유틸
   const clearInviteQuery = useCallback(() => {
-    const nextParams = new URLSearchParams(searchParams?.toString() ?? "");
-    nextParams.delete("invite");
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
+    nextParams.delete('invite');
     const query = nextParams.toString();
     router.replace(query ? `${pathname}?${query}` : pathname);
   }, [searchParams, pathname, router]);
@@ -98,9 +99,9 @@ function MainPageContent() {
   const fetchPlans = useCallback(() => {
     getPlans().then((res) => {
       if (res.error) {
-        console.error("Error fetching plans:", res.error);
+        console.error('Error fetching plans:', res.error);
       } else {
-        console.log("Fetched plans:", res.data);
+        console.log('Fetched plans:', res.data);
         setPlans(res.data);
         // 여행 일정 데이터 변환
         const travelEntries: TravelEntry[] = res.data.map((plan) => {
@@ -123,7 +124,7 @@ function MainPageContent() {
   useEffect(() => {
     if (isAlreadyMember) {
       const timer = setTimeout(() => {
-        showToast("이미 참여 중인 여행입니다.");
+        showToast('이미 참여 중인 여행입니다.');
         clearInviteQuery();
       }, 0);
 
@@ -146,8 +147,8 @@ function MainPageContent() {
         clearInviteQuery();
       }
     } catch (error) {
-      console.error("초대 수락 실패:", error);
-      showToast("초대 수락 중 오류가 발생했습니다.");
+      console.error('초대 수락 실패:', error);
+      showToast('초대 수락 중 오류가 발생했습니다.');
       clearInviteQuery();
     }
   };
@@ -220,10 +221,10 @@ function MainPageContent() {
             </div>
           </button>
         </div>
-        <div ref={travelSectionRef} className="px-4 scroll-mt-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <div className="text-2xl font-jalnan text-main mr-2">
+        <div ref={travelSectionRef} className='px-4 scroll-mt-8'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-1'>
+              <div className='text-2xl font-jalnan text-main mr-2'>
                 나의 여행
               </div>
               <Tag>{plans.length}개</Tag>
@@ -231,7 +232,7 @@ function MainPageContent() {
 
             {/* 페이지당 카드 수 */}
             <div
-              className={`flex items-center gap-1 ${plans.length === 0 ? "hidden" : ""}`}
+              className={`flex items-center gap-1 ${plans.length === 0 ? 'hidden' : ''}`}
             >
               {PAGE_SIZE_OPTIONS.map((size) => (
                 <FilterButton
@@ -239,14 +240,14 @@ function MainPageContent() {
                   isActive={size === pageSize}
                   onClick={() => handlePageSizeChange(size)}
                 >
-                  <span className="text-md font-jalnan">{size}개</span>
+                  <span className='text-md font-jalnan'>{size}개</span>
                 </FilterButton>
               ))}
             </div>
           </div>
 
           {isPlansLoaded && plans.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 rounded-2xl bg-primary-light border-2 border-main/20 border-dashed gap-8 mt-4">
+            <div className='flex flex-col items-center justify-center py-20 rounded-2xl bg-primary-light border-2 border-main/20 border-dashed gap-8 mt-4'>
               {/* 이미지 */}
               <div className='flex'>
                 <div className='relative w-30 h-30 -mr-2.5'>
@@ -287,7 +288,7 @@ function MainPageContent() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-y-6 py-6 ">
+            <div className='grid grid-cols-3 gap-y-6 py-6 '>
               {pagedPlans.map((plan) => (
                 <TravelCard
                   key={plan.id}
@@ -300,13 +301,13 @@ function MainPageContent() {
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-1.5 pb-6">
+            <div className='flex items-center justify-center gap-1.5 pb-6'>
               <button
-                type="button"
+                type='button'
                 onClick={() => handlePageChange(safePage - 1)}
                 disabled={safePage === 1}
-                className="flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
-                aria-label="이전 페이지"
+                className='flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer'
+                aria-label='이전 페이지'
               >
                 <ChevronLeft size={16} />
               </button>
@@ -315,13 +316,13 @@ function MainPageContent() {
                 (page) => (
                   <button
                     key={page}
-                    type="button"
+                    type='button'
                     onClick={() => handlePageChange(page)}
-                    aria-current={page === safePage ? "page" : undefined}
+                    aria-current={page === safePage ? 'page' : undefined}
                     className={`w-8 h-8 rounded-full text-sm cursor-pointer ${
                       page === safePage
-                        ? "bg-primary text-white font-semibold"
-                        : "text-muted hover:bg-border"
+                        ? 'bg-primary text-white font-semibold'
+                        : 'text-muted hover:bg-border'
                     }`}
                   >
                     {page}
@@ -330,11 +331,11 @@ function MainPageContent() {
               )}
 
               <button
-                type="button"
+                type='button'
                 onClick={() => handlePageChange(safePage + 1)}
                 disabled={safePage === totalPages}
-                className="flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
-                aria-label="다음 페이지"
+                className='flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer'
+                aria-label='다음 페이지'
               >
                 <ChevronRight size={16} />
               </button>
