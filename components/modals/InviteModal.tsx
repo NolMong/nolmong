@@ -10,10 +10,12 @@ import { createClient } from '@/lib/supabase/client';
 
 export function InviteModal() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isAlreadyMember, setIsAlreadyMember] = useState(false);
+  const [memberStatus, setMemberStatus] = useState<
+    'idle' | 'checking' | 'already_member' | 'not_member'
+  >('idle');
   const [isLoading, setIsLoading] = useState(false);
 
-  // 로그인 상태 관리 추가
+  // 로그인 상태 관리
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   const searchParams = useSearchParams();
@@ -53,18 +55,35 @@ export function InviteModal() {
 
   // 로그인된 사용자일 때만 이미 멤버인지 검사
   useEffect(() => {
+    // 초대 코드가 없거나 로그인이 안 되어 있다면 검사를 진행하지 않음
     if (!inviteUuid || isAuthenticated !== true) return;
 
-    getPlans().then((res) => {
-      if (res.data) {
-        const alreadyIn = res.data.some((plan) => plan.uuid === inviteUuid);
-        if (alreadyIn) {
-          setIsAlreadyMember(true);
-          showToast('이미 참여 중인 여행입니다.');
-          clearInviteQuery();
+    let isSubscribed = true;
+
+    getPlans()
+      .then((res) => {
+        if (!isSubscribed) return;
+
+        if (res.data) {
+          const alreadyIn = res.data.some((plan) => plan.uuid === inviteUuid);
+          if (alreadyIn) {
+            setMemberStatus('already_member');
+            showToast('이미 참여 중인 여행입니다.');
+            clearInviteQuery();
+            return;
+          }
         }
-      }
-    });
+        setMemberStatus('not_member');
+      })
+      .catch(() => {
+        if (isSubscribed) {
+          setMemberStatus('not_member');
+        }
+      });
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [inviteUuid, isAuthenticated, clearInviteQuery, showToast]);
 
   // 초대 수락 처리
@@ -97,7 +116,7 @@ export function InviteModal() {
   };
 
   const showInviteModal = Boolean(
-    inviteUuid && isAuthenticated === true && !isAlreadyMember,
+    inviteUuid && isAuthenticated === true && memberStatus === 'not_member',
   );
 
   return (
