@@ -94,7 +94,10 @@ export default function TravelDateCalendar({
 
   const getTileClassName = (date: Date) => {
     const dateKey = formatDateKey(date);
-    if (dateKey === startDay || dateKey === endDay) return 'travel-edge';
+    const classNames: string[] = [];
+    if (dateKey === startDay) classNames.push('travel-start');
+    if (dateKey === endDay) classNames.push('travel-end');
+    if (classNames.length > 0) return classNames.join(' ');
     if (startDay && endDay && dateKey > startDay && dateKey < endDay) {
       return 'travel-between';
     }
