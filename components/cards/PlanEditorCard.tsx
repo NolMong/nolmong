@@ -50,7 +50,7 @@ export default function PlanEditorCard({
     onReorderCards?.(active.id as string, over.id as string);
   };
   return (
-    <div className='flex flex-col gap-2.5 h-full min-h-0 w-full max-w-107.5 mx-auto bg-white'>
+    <div className='flex flex-col gap-2.5 h-full min-h-0 w-full max-w-107.5 mx-auto bg-transparent'>
       <div className='flex items-center gap-3 shrink-0'>
         <div className='flex items-center gap-1'>
           <div className='text-md font-medium text-main'>Day {dayNumber}</div>
@@ -107,16 +107,22 @@ export default function PlanEditorCard({
             items={cards.map((card) => card.id)}
             strategy={verticalListSortingStrategy}
           >
-            {cards.map((card, index) => (
-              <PlanTimelineCard
-                key={card.id}
-                data={card}
-                isLast={index === cards.length - 1}
-                isDnd={isDnd}
-                onUpdate={onUpdateCard}
-                onDelete={onDeleteCard}
-              />
-            ))}
+            {cards.length === 0 ? (
+              <div className='flex justify-center items-center text-muted h-full'>
+                계획이 없습니다.
+              </div>
+            ) : (
+              cards.map((card, index) => (
+                <PlanTimelineCard
+                  key={card.id}
+                  data={card}
+                  isLast={index === cards.length - 1}
+                  isDnd={isDnd}
+                  onUpdate={onUpdateCard}
+                  onDelete={onDeleteCard}
+                />
+              ))
+            )}
           </SortableContext>
         </DndContext>
       </div>
