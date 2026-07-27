@@ -1,32 +1,58 @@
-'use client';
+"use client";
 
-import { Suspense, useCallback, useEffect, useState } from 'react';
-import { getPlans, PlanType } from '@/api/getPlans';
-import { acceptInvite } from '@/api/acceptInvite';
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { getPlans, PlanType } from "@/api/getPlans";
+import { acceptInvite } from "@/api/acceptInvite";
 import {
   CalendarComponent,
   CreatePlanModal,
+  FilterButton,
   MainButton,
   Tag,
   TravelCard,
-} from '@/components';
-import { useCreatePlanModalStore } from '@/store/useModalStore';
-import Image from 'next/image';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+} from "@/components";
+import { useCreatePlanModalStore } from "@/store/useModalStore";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+
+// 한 페이지에 보여줄 여행 카드 수
+// 9, 12, 15 | default = 12
+const PAGE_SIZE_OPTIONS = [9, 12, 15];
 
 function MainPageContent() {
   const [plans, setPlans] = useState<PlanType[]>([]);
+  const [isPlansLoaded, setIsPlansLoaded] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const openCreatePlanModal = useCreatePlanModalStore((state) => state.open);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+
+  // 플랜 전체를 이미 받아온 상태라 화면에 보일 만큼만 잘라서 렌더
+  const totalPages = Math.max(1, Math.ceil(plans.length / pageSize));
+  // 카드가 줄어(방 나가기 등) 현재 페이지가 사라진 경우를 렌더 시점에 보정.
+  // 이후 페이지 계산은 전부 safePage 기준으로 한다.
+  const safePage = Math.min(currentPage, totalPages);
+  const pagedPlans = plans.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
+  );
+
+  // 페이지당 개수가 바뀌면 빈 페이지에 갇히지 않도록 1페이지로
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  const inviteUuid = searchParams?.get('invite') ?? null;
+  const inviteUuid = searchParams?.get("invite") ?? null;
   // 디버깅용 로그
   useEffect(() => {
-    console.log('Current inviteUuid:', inviteUuid);
+    console.log("Current inviteUuid:", inviteUuid);
   }, [inviteUuid]);
 
   // 토스트 메시지
@@ -41,11 +67,12 @@ function MainPageContent() {
   const fetchPlans = useCallback(() => {
     getPlans().then((res) => {
       if (res.error) {
-        console.error('Error fetching plans:', res.error);
+        console.error("Error fetching plans:", res.error);
       } else {
-        console.log('Fetched plans:', res.data);
+        console.log("Fetched plans:", res.data);
         setPlans(res.data);
       }
+      setIsPlansLoaded(true);
     });
   }, []);
 
@@ -55,8 +82,8 @@ function MainPageContent() {
 
   // URL 쿼리 파라미터(?invite=uuid) 제거 유틸
   const clearInviteQuery = useCallback(() => {
-    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
-    nextParams.delete('invite');
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? "");
+    nextParams.delete("invite");
     const query = nextParams.toString();
     router.replace(query ? `${pathname}?${query}` : pathname);
   }, [searchParams, pathname, router]);
@@ -79,8 +106,8 @@ function MainPageContent() {
         clearInviteQuery();
       }
     } catch (error) {
-      console.error('초대 수락 실패:', error);
-      showToast('초대 수락 중 오류가 발생했습니다.');
+      console.error("초대 수락 실패:", error);
+      showToast("초대 수락 중 오류가 발생했습니다.");
       clearInviteQuery();
     }
   };
@@ -91,6 +118,7 @@ function MainPageContent() {
   };
 
   // 방에서 나간 카드를 화면에서 즉시 제거하는 핸들러
+  // 페이지 수가 줄어드는 경우는 safePage가 렌더 시점에 보정
   const handleLeaveSuccess = (leftPlanId: number) => {
     setPlans((prevPlans) => prevPlans.filter((p) => p.id !== leftPlanId));
   };
@@ -150,20 +178,87 @@ function MainPageContent() {
           </button>
         </div>
         <div className="px-4">
-          <div className="flex items-center gap-1">
-            <div className="text-2xl font-jalnan text-main mr-2">나의 여행</div>
-            <Tag>{plans.length}개</Tag>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <div className="text-2xl font-jalnan text-main mr-2">
+                나의 여행
+              </div>
+              <Tag>{plans.length}개</Tag>
+            </div>
+
+            {/* 페이지당 카드 수 */}
+            <div className="flex items-center gap-1">
+              {PAGE_SIZE_OPTIONS.map((size) => (
+                <FilterButton
+                  key={size}
+                  isActive={size === pageSize}
+                  onClick={() => handlePageSizeChange(size)}
+                >
+                  <span className="text-md font-jalnan">{size}개</span>
+                </FilterButton>
+              ))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-y-6 py-6 ">
-            {plans.map((plan) => (
-              <TravelCard
-                key={plan.id}
-                data={plan}
-                onLeave={handleLeaveSuccess}
-              />
-            ))}
-          </div>
+          {/* 임시 온보딩 */}
+          {isPlansLoaded && plans.length === 0 ? (
+            <div className="py-20 text-center text-md text-muted">
+              아직 만든 여행이 없어요. 새 여행 일정을 만들어보세요!
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-y-6 py-6 ">
+              {pagedPlans.map((plan) => (
+                <TravelCard
+                  key={plan.id}
+                  data={plan}
+                  onLeave={handleLeaveSuccess}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* 페이지네이션 */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-1.5 pb-6">
+              <button
+                type="button"
+                onClick={() => setCurrentPage(safePage - 1)}
+                disabled={safePage === 1}
+                className="flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
+                aria-label="이전 페이지"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setCurrentPage(page)}
+                    aria-current={page === safePage ? "page" : undefined}
+                    className={`w-8 h-8 rounded-full text-sm transition-colors cursor-pointer ${
+                      page === safePage
+                        ? "bg-primary text-white font-medium"
+                        : "text-muted hover:bg-border"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+
+              <button
+                type="button"
+                onClick={() => setCurrentPage(safePage + 1)}
+                disabled={safePage === totalPages}
+                className="flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
+                aria-label="다음 페이지"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
