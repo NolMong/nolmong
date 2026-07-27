@@ -16,6 +16,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import WishlistTab from './_components/WishlistTab';
 import PlanDetailsTab from './_components/PlanDetailsTab';
+import { updateSupabaseTitle } from '@/api/updateSupabaseTitle';
 import { usePlanSync } from '@/hooks/usePlanSync';
 import { usePlanStore } from '@/store/usePlanStore';
 import { createClient } from '@/lib/supabase/client';
@@ -41,25 +42,44 @@ export default function PlanPage({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-  // 타이틀 수정 기능
+  // 편집 모드 진입 시에만 포커스 이동 (DOM 동기화 목적이라 effect가 적절)
   useEffect(() => {
-    const newTitle = titleRef.current?.innerText.trim();
     if (titleEditMode) {
       titleRef.current?.focus();
-    } else if (
-      newTitle !== undefined &&
-      newTitle !== '' &&
-      title !== newTitle
-    ) {
-      updateTitle(newTitle);
     }
   }, [titleEditMode]);
+
+  // 타이틀 편집 종료(체크 버튼 클릭 / Enter) 시 확인 후 저장
+  const handleTitleEditToggle = () => {
+    if (titleEditMode) {
+      const newTitle = titleRef.current?.innerText.trim();
+      let applied = false;
+      if (newTitle && newTitle !== title) {
+        if (
+          confirm(
+            '여행 제목을 수정하시겠습니까?\n(※ 다른 사람들에게도 동일하게 보입니다.)',
+          )
+        ) {
+          updateTitle(newTitle);
+          updateSupabaseTitle({ data: { planId: uuid, title: newTitle } });
+          applied = true;
+        }
+      }
+      // 저장하지 않은 경우(취소 / 빈 값) contentEditable에 남은 입력값을
+      // 원래 제목으로 되돌린다. React는 title state가 안 바뀌면 이 텍스트
+      // 노드를 갱신하지 않아서, 안 해주면 취소해도 바뀐 것처럼 보인다.
+      if (!applied && titleRef.current) {
+        titleRef.current.innerText = title || '여행';
+      }
+    }
+    setTitleEditMode(!titleEditMode);
+  };
 
   // 타이틀 수정 - 키 다운 이벤트
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      setTitleEditMode(!titleEditMode);
+      handleTitleEditToggle();
     }
   };
 
@@ -129,19 +149,16 @@ export default function PlanPage({
         <div className="flex gap-2">
           <div
             ref={titleRef}
-            className={`text-xl font-jalnan-gothic text-sub outline-0`}
+            className={`text-xl font-jalnan-gothic text-sub outline-0 ${titleEditMode ? 'w-200 border border-border bg-white py-2 px-3 rounded-md' : ''}`}
             contentEditable={titleEditMode}
             suppressContentEditableWarning
             onKeyDown={handleKeyDown}
           >
             {title || '여행'}
           </div>
-          <button
-            className="cursor-pointer"
-            onClick={() => setTitleEditMode(!titleEditMode)}
-          >
+          <button className="cursor-pointer" onClick={handleTitleEditToggle}>
             {titleEditMode ? (
-              <Check size={18} className="text-primary" />
+              <Check size={24} className="text-primary" />
             ) : (
               <LucideEdit3 size={14} className="text-muted" />
             )}
