@@ -164,7 +164,7 @@ export default function PlanTimelineCard({
     <div
       ref={setRefs}
       style={style}
-      className='relative flex gap-4 pl-3 select-none'
+      className="relative flex gap-4 pl-3 select-none"
     >
       {/* DnD 모드에서는 타임라인을 숨기고 카드 자체를 드래그 */}
       {!isDnd && (
@@ -179,7 +179,7 @@ export default function PlanTimelineCard({
         <div
           {...(isDnd ? { ...attributes, ...listeners } : {})}
           className={cn(
-            'px-5 py-4 bg-white rounded-lg shadow-card flex flex-col gap-3',
+            'px-5 py-4 bg-white rounded-lg shadow-card flex flex-col',
             isDnd && 'cursor-grab active:cursor-grabbing',
           )}
         >
