@@ -1,6 +1,6 @@
 'use client';
 
-import { Cloud, SquareMenu, CheckSquare, Replace } from 'lucide-react';
+import { SquareMenu, CheckSquare, Replace } from 'lucide-react';
 import { useState } from 'react';
 import {
   DndContext,
@@ -50,23 +50,23 @@ export default function PlanEditorCard({
     onReorderCards?.(active.id as string, over.id as string);
   };
   return (
-    <div className='flex flex-col gap-2.5 h-full min-h-0 w-full max-w-107.5 mx-auto bg-transparent'>
-      <div className='flex items-center gap-3 shrink-0'>
-        <div className='flex items-center gap-1'>
-          <div className='text-md font-medium text-main'>Day {dayNumber}</div>
-          <span className='text-xs font-regular text-muted mt-0.5'>
+    <div className="flex flex-col gap-2.5 h-full min-h-0 w-full max-w-107.5 mx-auto bg-transparent">
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-1">
+          <div className="text-md font-medium text-main">Day {dayNumber}</div>
+          <span className="text-xs font-regular text-muted mt-0.5">
             {dateText}
           </span>
         </div>
-        <Cloud size={18} className='text-muted mt-0.5' />
+        {/* <Cloud size={18} className="text-muted mt-0.5" /> */}
       </div>
 
-      <div className='flex justify-between'>
-        <div className='flex items-center gap-2 shrink-0'>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-2 shrink-0">
           <MainButton
             // 사이즈 변경 있음
             variant={isDnd ? `disabled` : `default`}
-            className='p-2.5 text-sm gap-1.5'
+            className="p-2.5 text-sm gap-1.5"
             onClick={() => !isDnd && onAddCard && onAddCard('MEMO')}
           >
             <SquareMenu size={14} /> 메모
@@ -74,7 +74,7 @@ export default function PlanEditorCard({
           <MainButton
             // 사이즈 변경 있음
             variant={isDnd ? `disabled` : `default`}
-            className='p-2.5 text-sm gap-1.5'
+            className="p-2.5 text-sm gap-1.5"
             onClick={() => !isDnd && onAddCard && onAddCard('CHECKLIST')}
           >
             <CheckSquare size={14} /> 체크
@@ -97,7 +97,7 @@ export default function PlanEditorCard({
           </MainButton>
         </div>
       </div>
-      <div className='flex flex-col flex-1 min-h-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden'>
+      <div className="flex flex-col flex-1 min-h-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -108,7 +108,7 @@ export default function PlanEditorCard({
             strategy={verticalListSortingStrategy}
           >
             {cards.length === 0 ? (
-              <div className='flex justify-center items-center text-muted h-full'>
+              <div className="flex justify-center items-center text-muted h-full">
                 계획이 없습니다.
               </div>
             ) : (

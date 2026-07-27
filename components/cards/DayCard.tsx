@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Cloud } from 'lucide-react';
+// import { Cloud } from 'lucide-react';
 import PlaceCard, { type PlaceItem } from './PlaceCard';
 import { cn } from '@/lib/utils';
 import { useDroppable } from '@dnd-kit/core';
@@ -35,15 +35,15 @@ export default function DayCard({
         className,
       )}
     >
-      <div className='flex items-center justify-between px-1'>
+      <div className="flex items-center justify-between px-1">
         {/* Day 표시 + 날씨 아이콘 */}
-        <div className='flex items-center gap-1'>
-          <h2 className='text-base font-medium text-main'>Day {dayNumber}</h2>
-          <Cloud size={18} className='text-muted' />
+        <div className="flex items-center gap-1">
+          <h2 className="text-base font-medium text-main">Day {dayNumber}</h2>
+          {/* <Cloud size={18} className='text-muted' /> */}
         </div>
 
         {/* 날짜 표시 */}
-        <span className='text-base font-medium text-main'>{dateText}</span>
+        <span className="text-base font-medium text-main">{dateText}</span>
       </div>
 
       {/* 목록 */}
@@ -51,9 +51,9 @@ export default function DayCard({
         items={places.map((p) => p.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className='h-full flex flex-col gap-2 overflow-y-scroll scrollbar-thin'>
+        <div className="h-full flex flex-col gap-2 overflow-y-scroll scrollbar-thin">
           {places.length === 0 ? (
-            <div className='flex items-center justify-center h-full text-muted text-sm'>
+            <div className="flex items-center justify-center h-full text-muted text-sm">
               장소가 없습니다.
             </div>
           ) : (
