@@ -2,7 +2,11 @@
 
 import { useEffect } from "react";
 import { LiveMap } from "ably/liveobjects";
-import { channelOptions, getAblyClient } from "@/lib/ably/client";
+import {
+  channelOptions,
+  getAblyClient,
+  getAblyClientId,
+} from "@/lib/ably/client";
 import { setPlanRootObject } from "@/lib/ably/planObject";
 import { setPlanPresence, toPresenceMembers } from "@/lib/ably/planPresence";
 import { getMyProfile } from "@/api/getMyProfile";
@@ -43,7 +47,8 @@ export function usePlanSync(uuid: string) {
   const setBudget = usePlanStore((s) => s.setBudget);
   const setHeadcount = usePlanStore((s) => s.setHeadcount);
   const setMembers = usePresenceStore((s) => s.setMembers);
-  const clearMembers = usePresenceStore((s) => s.clearMembers);
+  const setMe = usePresenceStore((s) => s.setMe);
+  const clearPresence = usePresenceStore((s) => s.clearPresence);
 
   useEffect(() => {
     const channel = getAblyClient().channels.get(uuid, channelOptions);
@@ -113,6 +118,8 @@ export function usePlanSync(uuid: string) {
 
         // 편집 중인 카드 없는 상태로 입장
         const myData: PlanPresenceData = { ...profile, editingCardIds: [] };
+        // 표시 문구 분기(나 / 내 다른 탭 / 다른 사람)에 쓸 내 식별자 보관
+        setMe(getAblyClientId(), profile.userId);
         setPlanPresence(channel, myData);
         await channel.presence.enter(myData);
         if (!mounted) return;
@@ -139,7 +146,7 @@ export function usePlanSync(uuid: string) {
       // presence는 채널과 달리 명시적으로 정리한다.
       // (연결이 끊기면 서버가 자동 leave 처리하지만, 페이지 이동 시엔 연결이 유지되므로)
       setPlanPresence(null, null);
-      clearMembers();
+      clearPresence();
       channel.presence.unsubscribe();
       channel.presence.leave().catch(() => {});
       // channel도 client와 마찬가지로 이름별 공유 인스턴스라, 여기서 detach하면
@@ -155,6 +162,7 @@ export function usePlanSync(uuid: string) {
     setBudget,
     setHeadcount,
     setMembers,
-    clearMembers,
+    setMe,
+    clearPresence,
   ]);
 }
