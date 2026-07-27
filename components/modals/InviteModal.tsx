@@ -76,8 +76,8 @@ export function InviteModal() {
       const result = await acceptInvite(inviteUuid);
 
       if (result.success) {
-        clearInviteQuery();
-        router.push(`/plan/${inviteUuid}?tab=WISHLIST`);
+        router.replace(`/plan/${inviteUuid}?tab=WISHLIST`);
+        showToast('계획에 참여했습니다!');
       } else {
         showToast(result.message);
         clearInviteQuery();
