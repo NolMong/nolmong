@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   use,
@@ -7,18 +7,19 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
-} from "react";
-import { MainButton, MapModal } from "@/components";
-import { usePlanTabStore } from "@/store/usePlanTabStore";
-import { useAutoSavePlan } from "@/hooks/useAutoSavePlan";
-import { Check, LucideEdit3 } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+} from 'react';
+import { MainButton, MapModal } from '@/components';
+import { usePlanTabStore } from '@/store/usePlanTabStore';
+import { useAutoSavePlan } from '@/hooks/useAutoSavePlan';
+import { Check, LucideEdit3 } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import WishlistTab from "./_components/WishlistTab";
-import PlanDetailsTab from "./_components/PlanDetailsTab";
-import { usePlanSync } from "@/hooks/usePlanSync";
-import { usePlanStore } from "@/store/usePlanStore";
-import { createClient } from "@/lib/supabase/client";
+import WishlistTab from './_components/WishlistTab';
+import PlanDetailsTab from './_components/PlanDetailsTab';
+import { usePlanSync } from '@/hooks/usePlanSync';
+import { usePlanStore } from '@/store/usePlanStore';
+import { createClient } from '@/lib/supabase/client';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const supabase = createClient();
 
@@ -47,7 +48,7 @@ export default function PlanPage({
       titleRef.current?.focus();
     } else if (
       newTitle !== undefined &&
-      newTitle !== "" &&
+      newTitle !== '' &&
       title !== newTitle
     ) {
       updateTitle(newTitle);
@@ -56,7 +57,7 @@ export default function PlanPage({
 
   // 타이틀 수정 - 키 다운 이벤트
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       setTitleEditMode(!titleEditMode);
     }
@@ -74,21 +75,21 @@ export default function PlanPage({
   const handleCopyInviteLink = useCallback(async () => {
     try {
       const origin =
-        typeof window !== "undefined" ? window.location.origin : "";
+        typeof window !== 'undefined' ? window.location.origin : '';
       const inviteUrl = `${window.location.origin}/main?invite=${uuid}`;
 
       await navigator.clipboard.writeText(inviteUrl);
-      showToast("초대 링크가 복사되었습니다!");
+      showToast('초대 링크가 복사되었습니다!');
     } catch (error) {
-      console.error("링크 복사 실패:", error);
-      showToast("링크 복사에 실패했습니다.");
+      console.error('링크 복사 실패:', error);
+      showToast('링크 복사에 실패했습니다.');
     }
   }, [uuid, showToast]);
 
   // 탭 상태 동기화
   useEffect(() => {
-    const tab = searchParams?.get("tab");
-    if (tab === "PLAN_DETAILS" || tab === "WISHLIST") {
+    const tab = searchParams?.get('tab');
+    if (tab === 'PLAN_DETAILS' || tab === 'WISHLIST') {
       setPlanTab(tab);
     }
   }, [searchParams, setPlanTab]);
@@ -99,17 +100,17 @@ export default function PlanPage({
       handleCopyInviteLink();
     };
 
-    window.addEventListener("trigger-invite-copy", handleTriggerCopy);
+    window.addEventListener('trigger-invite-copy', handleTriggerCopy);
     return () => {
-      window.removeEventListener("trigger-invite-copy", handleTriggerCopy);
+      window.removeEventListener('trigger-invite-copy', handleTriggerCopy);
     };
   }, [handleCopyInviteLink]);
 
-  const handleTabClick = (tab: "WISHLIST" | "PLAN_DETAILS") => {
+  const handleTabClick = (tab: 'WISHLIST' | 'PLAN_DETAILS') => {
     setPlanTab(tab);
 
-    const nextParams = new URLSearchParams(searchParams?.toString() ?? "");
-    nextParams.set("tab", tab);
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
+    nextParams.set('tab', tab);
 
     router.replace(`${pathname}?${nextParams.toString()}`);
   };
@@ -133,7 +134,7 @@ export default function PlanPage({
             suppressContentEditableWarning
             onKeyDown={handleKeyDown}
           >
-            {title || "여행"}
+            {title || '여행'}
           </div>
           <button
             className="cursor-pointer"
@@ -149,16 +150,16 @@ export default function PlanPage({
 
         <div className="flex gap-2 mb-7">
           <MainButton
-            variant={activePlanTab === "WISHLIST" ? "lightFill" : "default"}
+            variant={activePlanTab === 'WISHLIST' ? 'lightFill' : 'default'}
             className="py-2 px-4"
-            onClick={() => handleTabClick("WISHLIST")}
+            onClick={() => handleTabClick('WISHLIST')}
           >
             가고 싶은 곳
           </MainButton>
           <MainButton
-            variant={activePlanTab === "PLAN_DETAILS" ? "lightFill" : "default"}
+            variant={activePlanTab === 'PLAN_DETAILS' ? 'lightFill' : 'default'}
             className="py-2 px-4"
-            onClick={() => handleTabClick("PLAN_DETAILS")}
+            onClick={() => handleTabClick('PLAN_DETAILS')}
           >
             상세 계획
           </MainButton>
@@ -166,13 +167,21 @@ export default function PlanPage({
       </div>
 
       {/* 탭별 뷰 렌더링 */}
-      {activePlanTab === "PLAN_DETAILS" ? <PlanDetailsTab /> : <WishlistTab />}
+      {activePlanTab === 'PLAN_DETAILS' ? <PlanDetailsTab /> : <WishlistTab />}
 
-      {toastMessage && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-black/80 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all animate-bounce">
-          {toastMessage}
-        </div>
-      )}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            className="fixed bottom-10 left-1/2 z-50 rounded-lg bg-black/80 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
