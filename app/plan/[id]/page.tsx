@@ -20,6 +20,7 @@ import { updateSupabaseTitle } from '@/api/updateSupabaseTitle';
 import { usePlanSync } from '@/hooks/usePlanSync';
 import { usePlanStore } from '@/store/usePlanStore';
 import { createClient } from '@/lib/supabase/client';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const supabase = createClient();
 
@@ -141,11 +142,11 @@ export default function PlanPage({
   usePlanSync(uuid);
 
   return (
-    <main className='relative flex flex-col min-w-300 w-300 mx-auto px-5 pt-8 pb-10'>
+    <main className="relative flex flex-col min-w-300 w-300 mx-auto px-5 pt-8 pb-10">
       {/* 헤더 타이틀 및 탭 버튼 */}
       <MapModal />
-      <div className='flex flex-col gap-5'>
-        <div className='flex gap-2'>
+      <div className="flex flex-col gap-5">
+        <div className="flex gap-2">
           <div
             ref={titleRef}
             className={`text-xl font-jalnan-gothic text-sub outline-0 ${titleEditMode ? 'w-200 border border-border bg-white py-2 px-3 rounded-md' : ''}`}
@@ -155,26 +156,26 @@ export default function PlanPage({
           >
             {title || '여행'}
           </div>
-          <button className='cursor-pointer' onClick={handleTitleEditToggle}>
+          <button className="cursor-pointer" onClick={handleTitleEditToggle}>
             {titleEditMode ? (
-              <Check size={24} className='text-primary' />
+              <Check size={24} className="text-primary" />
             ) : (
-              <LucideEdit3 size={14} className='text-muted' />
+              <LucideEdit3 size={14} className="text-muted" />
             )}
           </button>
         </div>
 
-        <div className='flex gap-2 mb-7'>
+        <div className="flex gap-2 mb-7">
           <MainButton
             variant={activePlanTab === 'WISHLIST' ? 'lightFill' : 'default'}
-            className='py-2 px-4'
+            className="py-2 px-4"
             onClick={() => handleTabClick('WISHLIST')}
           >
             가고 싶은 곳
           </MainButton>
           <MainButton
             variant={activePlanTab === 'PLAN_DETAILS' ? 'lightFill' : 'default'}
-            className='py-2 px-4'
+            className="py-2 px-4"
             onClick={() => handleTabClick('PLAN_DETAILS')}
           >
             상세 계획
@@ -185,11 +186,19 @@ export default function PlanPage({
       {/* 탭별 뷰 렌더링 */}
       {activePlanTab === 'PLAN_DETAILS' ? <PlanDetailsTab /> : <WishlistTab />}
 
-      {toastMessage && (
-        <div className='fixed bottom-10 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-black/80 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all animate-bounce'>
-          {toastMessage}
-        </div>
-      )}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            className="fixed bottom-10 left-1/2 z-50 rounded-lg bg-black/80 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
