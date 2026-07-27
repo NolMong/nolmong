@@ -1,17 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { LiveMap } from 'ably/liveobjects';
-import { channelOptions, getAblyClient } from '@/lib/ably/client';
-import { setPlanRootObject } from '@/lib/ably/planObject';
-import { usePlanStore } from '@/store/usePlanStore';
-import { PlanCardData } from '@/types/plans';
+import { useEffect } from "react";
+import { LiveMap } from "ably/liveobjects";
+import {
+  channelOptions,
+  getAblyClient,
+  getAblyClientId,
+} from "@/lib/ably/client";
+import { setPlanRootObject } from "@/lib/ably/planObject";
+import { setPlanPresence, toPresenceMembers } from "@/lib/ably/planPresence";
+import { getMyProfile } from "@/api/getMyProfile";
+import { usePlanStore } from "@/store/usePlanStore";
+import { usePresenceStore } from "@/store/usePresenceStore";
+import { PlanCardData } from "@/types/plans";
+import { PlanPresenceData } from "@/types/presence";
 
 // Ably "cards" LiveMap의 JSON 형태: key = 카드 id, value = 카드 내용
 // (LiveMap은 null을 저장할 수 없어 후보 카드는 day: "day-0", order: 0 예약값으로 표현)
 type CardsMap = Record<
   string,
-  Omit<PlanCardData, 'id' | 'day' | 'order'> & { day: string; order: number }
+  Omit<PlanCardData, "id" | "day" | "order"> & { day: string; order: number }
 >;
 
 // LiveMap JSON → PlanCardData[] 변환 (맵의 key를 id 필드로 합침)
@@ -19,7 +27,7 @@ function toCards(json?: CardsMap): PlanCardData[] {
   return (
     Object.entries(json ?? {})
       // 값이 객체(정상 카드)인 것만 사용 — 오염된 flat 필드 방어
-      .filter(([, value]) => value !== null && typeof value === 'object')
+      .filter(([, value]) => value !== null && typeof value === "object")
       .map(([id, value]) => ({
         ...value,
         id,
@@ -38,6 +46,9 @@ export function usePlanSync(uuid: string) {
   const setEndDay = usePlanStore((s) => s.setEndDay);
   const setBudget = usePlanStore((s) => s.setBudget);
   const setHeadcount = usePlanStore((s) => s.setHeadcount);
+  const setMembers = usePresenceStore((s) => s.setMembers);
+  const setMe = usePresenceStore((s) => s.setMe);
+  const clearPresence = usePresenceStore((s) => s.clearPresence);
 
   useEffect(() => {
     const channel = getAblyClient().channels.get(uuid, channelOptions);
@@ -53,28 +64,28 @@ export function usePlanSync(uuid: string) {
         // store 액션(pushCardFields 등)이 Ably에 쓸 수 있도록 등록
         setPlanRootObject(rootObject);
 
-        const titlePath = rootObject.get('title');
-        const startDayPath = rootObject.get('start_day');
-        const endDayPath = rootObject.get('end_day');
-        const budgetPath = rootObject.get('budget');
-        const headcountPath = rootObject.get('headcount');
-        let cardsPath = rootObject.get('cards');
+        const titlePath = rootObject.get("title");
+        const startDayPath = rootObject.get("start_day");
+        const endDayPath = rootObject.get("end_day");
+        const budgetPath = rootObject.get("budget");
+        const headcountPath = rootObject.get("headcount");
+        let cardsPath = rootObject.get("cards");
 
         // 과거 버그 등으로 "cards"가 LiveMap이 아닌 값(배열 등)으로 저장된
         // 채널이면 pushCardFields의 cards.get(id) 경로 탐색이 매번 실패한다.
         // instance()가 undefined면 맵으로 해석 안 되는 상태라, 빈 LiveMap으로
         // 되살려서 이후 카드 추가/수정이 정상 동작하게 한다.
         if (cardsPath.instance() === undefined) {
-          await rootObject.set('cards', LiveMap.create({}));
-          cardsPath = rootObject.get('cards');
+          await rootObject.set("cards", LiveMap.create({}));
+          cardsPath = rootObject.get("cards");
         }
 
         // 마운트 시점에 저장돼 있는 값을 1회 읽어서 반영
         // (subscribe는 "변경 시"에만 발화하므로 초기값은 여기서 직접 반영)
-        setTitle((titlePath.value() as string | undefined) ?? '');
+        setTitle((titlePath.value() as string | undefined) ?? "");
         setCards(toCards(cardsPath.compactJson() as CardsMap | undefined));
-        setStartDay((startDayPath.value() as string | undefined) ?? '');
-        setEndDay((endDayPath.value() as string | undefined) ?? '');
+        setStartDay((startDayPath.value() as string | undefined) ?? "");
+        setEndDay((endDayPath.value() as string | undefined) ?? "");
         setBudget((budgetPath.value() as number | undefined) ?? 0);
         setHeadcount((headcountPath.value() as number | undefined) ?? 0);
 
@@ -82,16 +93,16 @@ export function usePlanSync(uuid: string) {
         // 경로에 값이 아직 없어도 구독은 유효 — 생성되는 순간부터 발화됨
         subscriptions.push(
           titlePath.subscribe(() => {
-            setTitle((titlePath.value() as string | undefined) ?? '');
+            setTitle((titlePath.value() as string | undefined) ?? "");
           }),
           cardsPath.subscribe(() => {
             setCards(toCards(cardsPath.compactJson() as CardsMap | undefined));
           }),
           startDayPath.subscribe(() => {
-            setStartDay((startDayPath.value() as string | undefined) ?? '');
+            setStartDay((startDayPath.value() as string | undefined) ?? "");
           }),
           endDayPath.subscribe(() => {
-            setEndDay((endDayPath.value() as string | undefined) ?? '');
+            setEndDay((endDayPath.value() as string | undefined) ?? "");
           }),
           budgetPath.subscribe(() => {
             setBudget((budgetPath.value() as number | undefined) ?? 0);
@@ -100,10 +111,30 @@ export function usePlanSync(uuid: string) {
             setHeadcount((headcountPath.value() as number | undefined) ?? 0);
           }),
         );
+
+        // ---- Presence: 누가 접속해 어떤 카드를 편집 중인지 ----
+        const profile = await getMyProfile();
+        if (!mounted || !profile) return;
+
+        // 편집 중인 카드 없는 상태로 입장
+        const myData: PlanPresenceData = { ...profile, editingCardIds: [] };
+        // 표시 문구 분기(나 / 내 다른 탭 / 다른 사람)에 쓸 내 식별자 보관
+        setMe(getAblyClientId(), profile.userId);
+        setPlanPresence(channel, myData);
+        await channel.presence.enter(myData);
+        if (!mounted) return;
+
+        // presence가 바뀔 때마다(입장/이탈/편집 상태 변경) 전체 목록을 다시 읽어 반영
+        const syncPresence = async () => {
+          const messages = await channel.presence.get();
+          if (mounted) setMembers(toPresenceMembers(messages));
+        };
+        await syncPresence();
+        channel.presence.subscribe(syncPresence);
       } catch (e) {
         // StrictMode의 mount→cleanup→mount 이중 실행 등으로 연결이 닫힌 뒤
         // 남은 요청이 실패하는 건 정상이라 무시하고, 그 외의 에러만 로그
-        if (mounted) console.error('Ably 계획 동기화 실패:', e);
+        if (mounted) console.error("Ably 계획 동기화 실패:", e);
       }
     })();
 
@@ -111,6 +142,13 @@ export function usePlanSync(uuid: string) {
       mounted = false;
       setPlanRootObject(null);
       subscriptions.forEach((s) => s.unsubscribe());
+
+      // presence는 채널과 달리 명시적으로 정리한다.
+      // (연결이 끊기면 서버가 자동 leave 처리하지만, 페이지 이동 시엔 연결이 유지되므로)
+      setPlanPresence(null, null);
+      clearPresence();
+      channel.presence.unsubscribe();
+      channel.presence.leave().catch(() => {});
       // channel도 client와 마찬가지로 이름별 공유 인스턴스라, 여기서 detach하면
       // StrictMode의 mount→cleanup→mount 이중 실행 시 뒤이은 진짜 마운트가 같은
       // 채널을 쓰다가 "Channel detached"를 맞는다. 구독만 정리하고 채널 연결은 유지한다.
@@ -123,5 +161,8 @@ export function usePlanSync(uuid: string) {
     setEndDay,
     setBudget,
     setHeadcount,
+    setMembers,
+    setMe,
+    clearPresence,
   ]);
 }

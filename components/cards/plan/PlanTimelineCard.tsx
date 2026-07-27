@@ -1,14 +1,17 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import TimelineLeft from './TimelineLeft';
-import PlanCardHeader from './PlanCardHeader';
-import PlanCardBody from './PlanCardBody';
-import type { PlanCardData } from '@/types/plans';
-import { usePlanStore } from '@/store/usePlanStore';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useRef, useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import TimelineLeft from "./TimelineLeft";
+import PlanCardHeader from "./PlanCardHeader";
+import PlanCardBody from "./PlanCardBody";
+import type { PlanCardData } from "@/types/plans";
+import { usePlanStore } from "@/store/usePlanStore";
+import { addEditingCard, removeEditingCard } from "@/lib/ably/planPresence";
+import { getEditorsLabel, useCardEditors } from "@/hooks/useCardEditors";
+import ProfileAvatar from "@/components/common/ProfileAvatar";
+import { cn } from "@/lib/utils";
 
 interface PlanTimelineCardProps {
   data: PlanCardData;
@@ -67,10 +70,22 @@ export default function PlanTimelineCard({
   useEffect(() => {
     if (isNew) {
       // 새 카드 위치로 내부 스크롤 이동
-      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      rootRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       clearNewCard();
     }
   }, []);
+
+  // 이 카드를 편집 중인 다른 참여자 (본인 탭 제외)
+  const editors = useCardEditors(data.id);
+
+  // 편집 중인 카드를 다른 참여자에게 알림 (presence).
+  // 편집 종료(저장/취소/DnD 전환)뿐 아니라 언마운트(카드 삭제, 페이지 이동)에도
+  // cleanup이 실행되므로 "수정 중" 표시가 남지 않는다.
+  useEffect(() => {
+    if (!isEditing) return;
+    addEditingCard(data.id);
+    return () => removeEditingCard(data.id);
+  }, [isEditing, data.id]);
 
   // DnD 모드로 전환되면 편집/추가 중이던 카드는 모두 취소
   useEffect(() => {
@@ -84,12 +99,12 @@ export default function PlanTimelineCard({
   }, [isDnd]);
 
   // times 배열 형태(['12:29', '12:50'])와 visitTime 문자열 형태 둘 다 대응
-  const initialStartTime = data.times?.[0] || '';
-  const initialEndTime = data.times?.[1] || '';
+  const initialStartTime = data.times?.[0] || "";
+  const initialEndTime = data.times?.[1] || "";
 
   // cost, memo
-  const initialCost = data.expense !== undefined ? String(data.expense) : '';
-  const initialMemo = data.desc || '';
+  const initialCost = data.expense !== undefined ? String(data.expense) : "";
+  const initialMemo = data.desc || "";
 
   // State 초기화
   const [editStartTime, setEditStartTime] = useState(initialStartTime);
@@ -120,7 +135,7 @@ export default function PlanTimelineCard({
   const handleAddChecklistItem = () => {
     setChecklists((prev) => [
       ...prev,
-      { id: Date.now().toString(), text: '', checked: false },
+      { id: Date.now().toString(), text: "", checked: false },
     ]);
   };
 
@@ -175,14 +190,35 @@ export default function PlanTimelineCard({
         />
       )}
 
-      <div className={cn('flex-1', isDnd ? 'pb-2.5' : 'pb-6')}>
+      <div className={cn("flex-1", isDnd ? "pb-2.5" : "pb-6")}>
         <div
           {...(isDnd ? { ...attributes, ...listeners } : {})}
           className={cn(
-            'px-5 py-4 bg-white rounded-lg shadow-card flex flex-col',
-            isDnd && 'cursor-grab active:cursor-grabbing',
+            "px-5 py-4 bg-white rounded-lg shadow-card flex flex-col",
+            isDnd && "cursor-grab active:cursor-grabbing",
           )}
         >
+          {/* 다른 참여자가 이 카드를 편집 중일 때 표시 */}
+          {/* 이후 컴포넌트로 분리 시, 수정 */}
+          {editors.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center">
+                {editors.map((editor, index) => (
+                  <ProfileAvatar
+                    key={editor.clientId}
+                    size={18}
+                    type={editor.character}
+                    theme={editor.theme}
+                    className={index > 0 ? "-ml-2" : ""}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-primary font-medium truncate">
+                {getEditorsLabel(editors)}
+              </span>
+            </div>
+          )}
+
           <PlanCardHeader
             data={data}
             isEditing={isEditing}
