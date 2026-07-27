@@ -9,6 +9,7 @@ import Link from 'next/link';
 import dayjs from 'dayjs';
 import { deletePlan } from '@/api/deletePlan';
 import { useMemo } from 'react';
+import { ProfileAvatar } from '@/components';
 
 const Locations = ({
   startLocation,
@@ -153,14 +154,33 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
       {/* 카드 몸통 */}
       <div className="w-full px-4 pt-3 pb-2 bg-[#FEFFFD]">
         {/* 목적지와 누구 */}
-        <div className="w-full flex justify-between">
+        <div className="w-full flex justify-between items-start">
           <Locations
             startLocation={data?.start_location || ''}
             endLocations={data?.end_locations || []}
           ></Locations>
 
-          <div>
-            <div className="w-6 h-6 rounded-full bg-primary"></div>
+          {/* 프로필 리스트 */}
+          <div className="flex items-center pl-2">
+            {data?.members && data.members.length > 0 ? (
+              data.members.map((member, index) => {
+                const type = member.features?.[0];
+                const theme = member.features?.[1];
+
+                return (
+                  <ProfileAvatar
+                    key={member.id || index}
+                    size={28}
+                    type={type}
+                    theme={theme}
+                    className={index > 0 ? ' shadow-sm' : ''}
+                  />
+                );
+              })
+            ) : (
+              // members가 비어있을 경우 고정 기본값 표시
+              <ProfileAvatar size={28} />
+            )}
           </div>
         </div>
         {/* 가는 날짜 */}
