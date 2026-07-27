@@ -6,11 +6,15 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { acceptInvite } from '@/api/acceptInvite';
 import { getPlans } from '@/api/getPlans';
 import { MainButton } from '@/components';
+import { createClient } from '@/lib/supabase/client';
 
 export function InviteModal() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isAlreadyMember, setIsAlreadyMember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // 로그인 상태 관리 추가
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -34,9 +38,22 @@ export function InviteModal() {
     router.replace(query ? `${pathname}?${query}` : pathname);
   }, [searchParams, pathname, router]);
 
-  // 접속한 유저가 해당 플랜의 멤버인지 확인
+  // 유저의 로그인 상태 확인
   useEffect(() => {
-    if (!inviteUuid) return;
+    const supabase = createClient();
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    });
+  }, []);
+
+  // 로그인된 사용자일 때만 이미 멤버인지 검사
+  useEffect(() => {
+    if (!inviteUuid || isAuthenticated !== true) return;
 
     getPlans().then((res) => {
       if (res.data) {
@@ -48,7 +65,7 @@ export function InviteModal() {
         }
       }
     });
-  }, [inviteUuid, clearInviteQuery, showToast]);
+  }, [inviteUuid, isAuthenticated, clearInviteQuery, showToast]);
 
   // 초대 수락 처리
   const handleAcceptInvite = async () => {
@@ -79,7 +96,9 @@ export function InviteModal() {
     clearInviteQuery();
   };
 
-  const showInviteModal = Boolean(inviteUuid && !isAlreadyMember);
+  const showInviteModal = Boolean(
+    inviteUuid && isAuthenticated === true && !isAlreadyMember,
+  );
 
   return (
     <>
