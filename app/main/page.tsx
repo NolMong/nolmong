@@ -25,6 +25,11 @@ function MainPageContent() {
   const pathname = usePathname();
 
   const inviteUuid = searchParams?.get('invite') ?? null;
+
+  const isAlreadyMember = Boolean(
+    inviteUuid && plans.some((plan) => plan.uuid === inviteUuid),
+  );
+
   // 디버깅용 로그
   useEffect(() => {
     console.log('Current inviteUuid:', inviteUuid);
@@ -37,6 +42,14 @@ function MainPageContent() {
       setToastMessage(null);
     }, 2500);
   }, []);
+
+  // URL 쿼리 파라미터(?invite=uuid) 제거 유틸
+  const clearInviteQuery = useCallback(() => {
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
+    nextParams.delete('invite');
+    const query = nextParams.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  }, [searchParams, pathname, router]);
 
   // 플랜 목록 불러오기
   const fetchPlans = useCallback(() => {
@@ -54,13 +67,16 @@ function MainPageContent() {
     fetchPlans();
   }, [fetchPlans]);
 
-  // URL 쿼리 파라미터(?invite=uuid) 제거 유틸
-  const clearInviteQuery = useCallback(() => {
-    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
-    nextParams.delete('invite');
-    const query = nextParams.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname);
-  }, [searchParams, pathname, router]);
+  useEffect(() => {
+    if (isAlreadyMember) {
+      const timer = setTimeout(() => {
+        showToast('이미 참여 중인 여행입니다.');
+        clearInviteQuery();
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isAlreadyMember, showToast, clearInviteQuery]);
 
   // 초대 수락 처리
   const handleAcceptInvite = async () => {
@@ -70,9 +86,6 @@ function MainPageContent() {
       const result = await acceptInvite(inviteUuid);
 
       if (result.success) {
-        showToast(result.message);
-        fetchPlans(); // 내 플랜 목록 갱신
-        clearInviteQuery();
         // 수락 후 해당 여행 상세 페이지로 바로 이동
         router.push(`/plan/${inviteUuid}?tab=WISHLIST`);
       } else {
@@ -95,6 +108,9 @@ function MainPageContent() {
   const handleLeaveSuccess = (leftPlanId: number) => {
     setPlans((prevPlans) => prevPlans.filter((p) => p.id !== leftPlanId));
   };
+
+  // 모달을 표시할 조건
+  const showInviteModal = Boolean(inviteUuid && !isAlreadyMember);
 
   return (
     <div className=" bg-[#FDFDFD] min-h-screen">
@@ -213,7 +229,7 @@ function MainPageContent() {
 
       {/* 초대 수락 확인 모달 */}
       <AnimatePresence>
-        {inviteUuid && (
+        {showInviteModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
