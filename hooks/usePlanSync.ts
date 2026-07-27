@@ -111,8 +111,8 @@ export function usePlanSync(uuid: string) {
         const profile = await getMyProfile();
         if (!mounted || !profile) return;
 
-        // 편집 중인 카드 없음(null) 상태로 입장
-        const myData: PlanPresenceData = { ...profile, editingCardId: null };
+        // 편집 중인 카드 없는 상태로 입장
+        const myData: PlanPresenceData = { ...profile, editingCardIds: [] };
         setPlanPresence(channel, myData);
         await channel.presence.enter(myData);
         if (!mounted) return;
