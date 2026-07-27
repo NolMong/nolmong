@@ -27,12 +27,30 @@ export function toPresenceMembers(
     }));
 }
 
-// 내가 편집 중인 카드를 다른 참여자에게 알림 (편집 종료 시 null)
-export function updateEditingCard(cardId: string | null) {
+// 편집 중인 카드 목록을 갱신해 다른 참여자에게 전송
+function sendEditingCardIds(editingCardIds: string[]) {
   if (!presenceChannel || !myPresenceData) return;
 
-  myPresenceData = { ...myPresenceData, editingCardId: cardId };
+  myPresenceData = { ...myPresenceData, editingCardIds };
   presenceChannel.presence
     .update(myPresenceData)
     .catch((e: unknown) => console.error("presence 편집 상태 전송 실패:", e));
+}
+
+// 편집 시작 알림
+export function addEditingCard(cardId: string) {
+  const current = myPresenceData?.editingCardIds;
+  if (!current || current.includes(cardId)) return; // 이미 있으면 전송 생략
+
+  sendEditingCardIds([...current, cardId]);
+}
+
+// 편집 종료 알림.
+// 카드별로 따로 넣고 빼므로, 여러 카드를 동시에 열어둔 경우에도
+// 하나를 닫을 때 나머지 표시가 지워지지 않는다.
+export function removeEditingCard(cardId: string) {
+  const current = myPresenceData?.editingCardIds;
+  if (!current || !current.includes(cardId)) return;
+
+  sendEditingCardIds(current.filter((id) => id !== cardId));
 }

@@ -8,7 +8,8 @@ export type PlanPresenceData = {
   name: string; // 표시 이름 (카카오 닉네임)
   character: UserType; // capi | bara
   theme: ProfileTheme;
-  editingCardId: string | null; // 지금 편집 중인 카드 (편집 중이 아니면 null)
+  // 지금 편집 모드로 열어둔 카드들. 한 탭에서 여러 카드를 동시에 열 수 있어 배열이다.
+  editingCardIds: string[];
 };
 
 // 화면에서 사용하는 형태 (Ably가 붙여주는 clientId를 합침)
