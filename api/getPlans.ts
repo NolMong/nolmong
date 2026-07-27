@@ -1,5 +1,17 @@
 import { createClient } from '@/lib/supabase/client';
 
+export type CardType = {
+  id: string;
+  x: number;
+  y: number;
+  day: string;
+  name: string;
+  type: string;
+  order: number;
+  address: string;
+  category: string;
+};
+
 export type PlanType = {
   id: number;
   uuid: string;
