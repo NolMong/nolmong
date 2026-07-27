@@ -39,10 +39,11 @@ function MainPageContent() {
     safePage * pageSize,
   );
 
-  // 페이지당 개수가 바뀌면 빈 페이지에 갇히지 않도록 1페이지로
+  // 페이지당 개수가 바뀌면 현재 첫 카드가 속하는 새 페이지로 이동
   const handlePageSizeChange = (size: number) => {
+    const firstIndex = (safePage - 1) * pageSize;
     setPageSize(size);
-    setCurrentPage(1);
+    setCurrentPage(Math.floor(firstIndex / size) + 1);
   };
 
   const searchParams = useSearchParams();
@@ -237,9 +238,9 @@ function MainPageContent() {
                     type="button"
                     onClick={() => setCurrentPage(page)}
                     aria-current={page === safePage ? "page" : undefined}
-                    className={`w-8 h-8 rounded-full text-sm transition-colors cursor-pointer ${
+                    className={`w-8 h-8 rounded-full text-sm cursor-pointer ${
                       page === safePage
-                        ? "bg-primary text-white font-medium"
+                        ? "bg-primary text-white font-semibold"
                         : "text-muted hover:bg-border"
                     }`}
                   >
