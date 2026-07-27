@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { getPlans, PlanType } from "@/api/getPlans";
 import { acceptInvite } from "@/api/acceptInvite";
 import {
@@ -39,11 +39,26 @@ function MainPageContent() {
     safePage * pageSize,
   );
 
+  // 목록 상단으로 이동 처리
+  const travelSectionRef = useRef<HTMLDivElement>(null);
+  const scrollToTravelSection = () => {
+    travelSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   // 페이지당 개수가 바뀌면 현재 첫 카드가 속하는 새 페이지로 이동
   const handlePageSizeChange = (size: number) => {
     const firstIndex = (safePage - 1) * pageSize;
     setPageSize(size);
     setCurrentPage(Math.floor(firstIndex / size) + 1);
+    scrollToTravelSection();
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    scrollToTravelSection();
   };
 
   const searchParams = useSearchParams();
@@ -178,7 +193,7 @@ function MainPageContent() {
             </div>
           </button>
         </div>
-        <div className="px-4">
+        <div ref={travelSectionRef} className="px-4 scroll-mt-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               <div className="text-2xl font-jalnan text-main mr-2">
@@ -223,7 +238,7 @@ function MainPageContent() {
             <div className="flex items-center justify-center gap-1.5 pb-6">
               <button
                 type="button"
-                onClick={() => setCurrentPage(safePage - 1)}
+                onClick={() => handlePageChange(safePage - 1)}
                 disabled={safePage === 1}
                 className="flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
                 aria-label="이전 페이지"
@@ -236,7 +251,7 @@ function MainPageContent() {
                   <button
                     key={page}
                     type="button"
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => handlePageChange(page)}
                     aria-current={page === safePage ? "page" : undefined}
                     className={`w-8 h-8 rounded-full text-sm cursor-pointer ${
                       page === safePage
@@ -251,7 +266,7 @@ function MainPageContent() {
 
               <button
                 type="button"
-                onClick={() => setCurrentPage(safePage + 1)}
+                onClick={() => handlePageChange(safePage + 1)}
                 disabled={safePage === totalPages}
                 className="flex items-center justify-center w-8 h-8 rounded-full text-muted transition-colors hover:bg-border disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer"
                 aria-label="다음 페이지"
