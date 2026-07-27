@@ -7,6 +7,7 @@ import {
   KakaoMap,
   MainButton,
   SearchResultCard,
+  Nothing,
 } from '@/components';
 import { usePlanStore } from '@/store/usePlanStore';
 import { PlanCardData } from '@/types/plans';
@@ -66,6 +67,20 @@ export default function PlanDetailsTab() {
   });
 
   const dayNumber = parseInt(currentDay.replace('day-', ''), 10) || 1;
+
+  const handleNextDay = () => {
+    const idx = dayOptions.indexOf(currentDay);
+    if (idx >= 0 && idx < dayOptions.length - 1) {
+      setCurrentDay(dayOptions[idx + 1]);
+    }
+  };
+
+  const handlePrevDay = () => {
+    const idx = dayOptions.indexOf(currentDay);
+    if (idx > 0) {
+      setCurrentDay(dayOptions[idx - 1]);
+    }
+  };
 
   const handleMapLoad = (map: kakao.maps.Map) => {
     mapRef.current = map;
@@ -169,6 +184,8 @@ export default function PlanDetailsTab() {
           onReorderCards={(activeId, overId) =>
             reorderCardsInDay(currentDay, activeId, overId)
           }
+          onNextDay={handleNextDay}
+          onPrevDay={handlePrevDay}
         />
       </div>
 
@@ -185,9 +202,7 @@ export default function PlanDetailsTab() {
           </div>
           <div className='w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin flex-1 min-h-0'>
             {searchResults.length === 0 ? (
-              <div className='flex items-center justify-center h-full text-muted text-sm'>
-                검색 결과가 없습니다.
-              </div>
+              <Nothing text='검색 결과가 없습니다.' />
             ) : (
               searchResults.map((result) => (
                 <SearchResultCard
