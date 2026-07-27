@@ -25,6 +25,7 @@ declare global {
         options: { center: LatLng; level?: number },
       );
       setCenter(latlng: LatLng): void;
+      panTo(latlng: LatLng): void;
       setLevel(level: number): void;
       setBounds(bounds: LatLngBounds): void;
       getCenter(): LatLng;
