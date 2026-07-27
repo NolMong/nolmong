@@ -13,11 +13,14 @@ interface SearchResultCardProps {
     data: kakao.maps.services.PlacesSearchResultItem,
     day: string,
   ) => void;
+  // 카드를 클릭하면 KakaoMap을 해당 위치로 이동시키기 위한 콜백
+  onSelect?: (data: kakao.maps.services.PlacesSearchResultItem) => void;
 }
 
 export default function SearchResultCard({
   data,
   onAddPlace,
+  onSelect,
 }: SearchResultCardProps) {
   const { start_day, end_day } = usePlanStore();
   const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
@@ -38,9 +41,7 @@ export default function SearchResultCard({
   return (
     <div
       className=' box w-65 rounded-lg border border-border p-3'
-      onClick={() => {
-        console.log('SearchResultCard clicked:', data);
-      }}
+      onClick={() => onSelect?.(data)}
     >
       <div className='font-jalnan-gothic text-sm text-main mb-1 truncate'>
         {data.place_name}
@@ -53,7 +54,7 @@ export default function SearchResultCard({
       </div>
       <div
         onWheel={handleWheelScroll}
-        className='flex flex-1 min-w-0 gap-1 overflow-x-auto scrollbar-hide mb-1.5'
+        className='flex flex-1 min-w-0 gap-1 overflow-x-auto scrollbar-thin mb-1.5'
       >
         {options.map((option) => (
           <FilterButton

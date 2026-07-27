@@ -177,7 +177,7 @@ export default function MapModal() {
           <div className='font-jalnan-gothic text-sub w-60 mb-4 shrink-0'>
             검색 결과
           </div>
-          <div className='w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin h-full shrink-0'>
+          <div className='w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin h-full'>
             {searchResults.length === 0 ? (
               <div className='flex items-center justify-center h-full text-muted text-sm'>
                 검색 결과가 없습니다.
