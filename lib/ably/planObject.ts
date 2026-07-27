@@ -33,6 +33,15 @@ function toLiveMapEntries(
   return entries;
 }
 
+// 계획 제목을 Ably root object에 전송
+export function pushTitle(title: string) {
+  if (!rootObject) return;
+
+  rootObject
+    .set("title", title)
+    .catch((e: unknown) => console.error("Ably 타이틀 전송 실패:", e));
+}
+
 // 새 카드를 Ably "cards" LiveMap에 생성(중첩 LiveMap으로 추가)해 전파
 export function pushCardCreate(card: PlanCardData) {
   if (!rootObject) return;

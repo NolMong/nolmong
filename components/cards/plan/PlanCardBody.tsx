@@ -93,16 +93,16 @@ export default function PlanCardBody({
   };
 
   return (
-    <div className="flex flex-col gap-3 text-xs font-regular text-main">
+    <div className='flex flex-col gap-3 text-xs font-regular text-main'>
       {renderContent()}
 
       {/* 수정 중일 때만 하단에 공통 취소/확인 버튼 표시 */}
       {isEditing && (
-        <div className="mt-2 flex items-center justify-end gap-2">
-          <Tag color="gray" onClick={onCancel}>
+        <div className='flex items-center justify-end gap-2'>
+          <Tag color='gray' onClick={onCancel}>
             취소
           </Tag>
-          <Tag color="primary" onClick={onSave}>
+          <Tag color='primary' onClick={onSave}>
             확인
           </Tag>
         </div>

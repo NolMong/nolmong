@@ -6,6 +6,7 @@ import { FilterButton } from '@/components';
 import { cn } from '@/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { usePlanStore } from '@/store/usePlanStore';
 
 export interface PlaceItem {
   id: string;
@@ -22,6 +23,8 @@ interface PlaceCardProps {
   isModal?: boolean;
 }
 
+// 가고 싶은 곳에서 사용하는 카드
+
 export default function PlaceCard({
   place,
   className,
@@ -30,6 +33,7 @@ export default function PlaceCard({
 }: PlaceCardProps) {
   // dnd sortable hook
   console.log('place : ', place);
+  const { deleteCard } = usePlanStore();
   const [selectedOption, setSelectedOption] = useState<string | null>('미정');
   const options = ['미정', 'Day1', 'Day2', 'Day3', 'Day4'];
   const {
@@ -47,10 +51,10 @@ export default function PlaceCard({
     opacity: isDragging ? 0.3 : 1, // 드래그 중인 카드는 반투명 처리
   };
 
-  const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
-    const container = e.currentTarget;
-    container.scrollLeft += e.deltaY;
-  };
+  // const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
+  //   const container = e.currentTarget;
+  //   container.scrollLeft += e.deltaY;
+  // };
 
   return (
     <div
@@ -88,6 +92,10 @@ export default function PlaceCard({
             size={16}
             color='var(--color-muted)'
             className='shrink-0 cursor-pointer hover:text-sub transition-colors mr-0.5'
+            onClick={() => {
+              console.log('DEBUG X clicked, deleting id:', place.id);
+              deleteCard(place.id);
+            }}
           />
         </div>
 
@@ -106,8 +114,8 @@ export default function PlaceCard({
 
         {isModal && (
           <div
-            onWheel={handleWheelScroll}
-            className='flex flex-1 min-w-0 gap-1 overflow-x-auto scrollbar-hide mt-1.5'
+            // onWheel={handleWheelScroll}
+            className='flex flex-1 min-w-0 gap-1 overflow-x-auto scrollbar-thin mt-1.5 '
           >
             {options.map((option, index) => (
               <FilterButton

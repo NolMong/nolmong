@@ -16,7 +16,7 @@ const buttonVariants = cva(
         default:
           'border border-border bg-white text-main rounded-lg hover:bg-border',
         // fill: primary 배경 + none 테두리 + white 글씨
-        fill: 'bg-primary text-white rounded-lg hover:bg-[#95CC85]',
+        fill: 'border border-primary bg-primary text-white rounded-lg hover:bg-[#95CC85]',
         // lightFill
         lightFill:
           'bg-primary-light text-primary rounded-lg hover:bg-[#d9ebd5]',
@@ -26,9 +26,11 @@ const buttonVariants = cva(
         emptyColor:
           'border border-primary bg-color-primary-light text-primary rounded-lg hover:bg-[#95CC85] hover:text-white',
         // disabled
-        disabled: 'bg-border text-white rounded-lg cursor-not-allowed',
+        disabled:
+          'border border-border bg-border text-white rounded-lg cursor-not-allowed',
         // round: radius 999
-        round: 'bg-primary text-white rounded-full hover:bg-[#95CC85]',
+        round:
+          'border border-primary bg-primary text-white rounded-full hover:bg-[#95CC85]',
         roundDefault:
           'border border-border bg-white text-main hover:bg-border rounded-full',
       },

@@ -17,7 +17,7 @@ export default function FilterButton({
     <button
       type='button'
       className={cn(
-        'inline-flex items-center justify-center text-sm font-medium rounded-full w-fit py-1.5 px-3.5 cursor-pointer select-none transition-colors border border-border',
+        'inline-flex items-center justify-center text-sm font-medium rounded-full w-fit shrink-0 py-1.5 px-3.5 cursor-pointer select-none transition-colors border border-border',
         isActive
           ? // Active
             'bg-primary border-primary text-white'

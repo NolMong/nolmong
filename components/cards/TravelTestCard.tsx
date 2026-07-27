@@ -5,6 +5,9 @@ import { MainButton } from '@/components';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { test } from '@/data/test';
+import { createClient } from '@/lib/supabase/client';
+
+const supabase = createClient();
 
 type Answer = (typeof test)[number]['answers'][number];
 
@@ -28,6 +31,30 @@ export default function TravelTestCard({
   );
   const [showResult, setShowResult] = useState(false);
   const [visible, setVisible] = useState(false);
+
+  // kakao 로그인 사용자 이름
+  const [userName, setUserName] = useState<string>('이름없는유저');
+
+  // 마운트 시 Supabase Auth 세션에서 카카오 닉네임 가져옴
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.user?.user_metadata) {
+        const metadata = session.user.user_metadata;
+        // 카카오 프로필 닉네임
+        const name =
+          metadata.full_name || metadata.name || metadata.preferred_username;
+        if (name) {
+          setUserName(name);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   const isFinished = currentNumber > test.length;
 
@@ -110,7 +137,7 @@ export default function TravelTestCard({
               />
             </div>
             <div className="font-jalnan text-2xl text-center text-brown">
-              <span className="text-caramel">이주현</span>님의 결과는
+              <span className="text-caramel">{userName}</span>님의 결과는
               <br />
               두구두구두구두구~
             </div>

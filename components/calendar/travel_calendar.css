@@ -92,7 +92,9 @@
 .travel-date-calendar .travel-edge {
   background-color: var(--color-primary) !important;
   color: var(--color-primary-light) !important;
-  border-radius: 999px !important;
+  /* border-radius: 999px !important; */
+  border-top-right-radius: 999px !important;
+  border-bottom-right-radius: 999px !important;
 }
 
 /* 여행 일정 하이라이트: 범위(startDay~endDay) 사이에 낀 날짜들 */
