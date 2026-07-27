@@ -2,32 +2,13 @@
 
 import { Tag } from '@/components';
 import { X } from 'lucide-react';
-import { PlanType } from '@/api/getPlans';
+import { CardType, PlanType } from '@/api/getPlans';
 import { getRelativeTime } from '@/utils/getRelativeTime';
 import { locations } from '@/data/locations';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { deletePlan } from '@/api/deletePlan';
-
-const WAYPOINTS = (
-  <div>
-    <span className="font-bold mr-4 text-sub ">Day1</span>
-    <span className="mr-3">제주국제공항</span>
-    <span className="mr-3">제주샴발리5성급호텔</span>
-    <span className="mr-3">감귤농장</span>
-    <span className="mr-3">한라산정상</span>
-    <span className="mr-3">유우우우명한</span>
-    <span className="mr-14">제주고기국수</span>
-
-    <span className="font-bold mr-4 text-sub">Day2</span>
-    <span className="mr-3">호텔</span>
-    <span className="mr-3">고오오오급 돼지 국밥</span>
-    <span className="mr-3">이쁜 카페</span>
-    <span className="mr-3">끼깔난 점심</span>
-    <span className="mr-3">고급진 카페</span>
-    <span className="mr-3">훌륭한 갈치 조림집</span>
-  </div>
-);
+import { useMemo } from 'react';
 
 const Locations = ({
   startLocation,
@@ -76,6 +57,54 @@ interface TravelCardProps {
 export default function TravelCard({ data, onLeave }: TravelCardProps) {
   console.log(data);
 
+  const renderedWaypoints = useMemo(() => {
+    if (!data?.cards || data.cards.length === 0) return null;
+
+    // day 별로 그룹화
+    const groupedByDay = (data.cards as CardType[]).reduce<
+      Record<string, CardType[]>
+    >((acc, card: CardType) => {
+      const dayKey = card.day || 'day-1';
+      if (!acc[dayKey]) acc[dayKey] = [];
+      acc[dayKey].push(card);
+      return acc;
+    }, {});
+
+    // day 키 정렬
+    const sortedDays = Object.keys(groupedByDay).sort((a, b) => {
+      const numA = parseInt(a.replace(/[^0-9]/g, ''), 10) || 0;
+      const numB = parseInt(b.replace(/[^0-9]/g, ''), 10) || 0;
+      return numA - numB;
+    });
+
+    return (
+      <div className="inline-flex items-center">
+        {sortedDays.map((dayKey) => {
+          // 일자 내에서 order 순으로 정렬
+          const dayCards = [...groupedByDay[dayKey]].sort(
+            (a: CardType, b: CardType) => (a.order || 0) - (b.order || 0),
+          );
+
+          // Day-1 형식으로 변환
+          const dayLabel = dayKey
+            .replace('day-', 'Day ')
+            .replace('day', 'Day ');
+
+          return (
+            <div key={dayKey} className="inline-flex items-center mr-6">
+              <span className="font-bold mr-4 text-sub">{dayLabel}</span>
+              {dayCards.map((card: CardType) => (
+                <span key={card.id} className="mr-3">
+                  {card.name}
+                </span>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }, [data?.cards]);
+
   const handleLeavePlan = async () => {
     if (!data) return;
 
@@ -97,6 +126,8 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
       onLeave(data.id); // 부모에게 나간 plan.id 전달
     }
   };
+
+  const hasCards = Boolean(data?.cards && data.cards.length > 0);
 
   return (
     <div className="box w-90 rounded-[10px] border-2 border-border overflow-hidden shadow-[0px_4px_10px_0px_#b5b5b540] group hover:border-primary hover:scale-105 transition-all duration-300">
@@ -139,15 +170,16 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
       <div className="w-full px-3.5 py-2 bg-primary-light overflow-hidden">
         <div className="flex w-max group-hover:animate-marquee">
           <div className="text-[12px] text-muted whitespace-nowrap pr-8">
-            {data?.cards.length === 0 ? '아직 일정이 없습니다.' : WAYPOINTS}
-            {/* {WAYPOINTS} */}
+            {hasCards ? renderedWaypoints : '아직 일정이 없습니다.'}
           </div>
-          {/* <div
-            className='text-[12px] text-muted whitespace-nowrap pr-8'
-            aria-hidden='true'
-          >
-            {data?.cards.length === 0 ? '아직 일정이 없습니다.' : WAYPOINTS}
-          </div> */}
+          {hasCards && (
+            <div
+              className="text-[12px] text-muted whitespace-nowrap pr-8"
+              aria-hidden="true"
+            >
+              {renderedWaypoints}
+            </div>
+          )}
         </div>
       </div>
 
