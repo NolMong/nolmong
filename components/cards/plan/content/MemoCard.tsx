@@ -34,7 +34,7 @@ export default function MemoCard({
 
   if (isEditing) {
     return (
-      <div className="flex flex-col gap-3 text-xs font-regular text-main">
+      <div className="flex flex-col gap-3 text-xs font-regular text-main mt-3">
         <div className="flex items-center gap-2">
           <Clock size={12} className="shrink-0 text-main" />
           <input

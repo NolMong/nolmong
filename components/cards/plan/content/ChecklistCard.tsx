@@ -30,7 +30,7 @@ export default function ChecklistCard({
     : data.checklistItems || [];
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5 mt-3">
       {isEditing ? (
         <div className="flex flex-col gap-2">
           {itemsToRender.map((item) => (
