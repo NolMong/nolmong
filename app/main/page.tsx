@@ -220,7 +220,9 @@ function MainPageContent() {
             </div>
 
             {/* 페이지당 카드 수 */}
-            <div className="flex items-center gap-1">
+            <div
+              className={`flex items-center gap-1 ${plans.length === 0 ? "hidden" : ""}`}
+            >
               {PAGE_SIZE_OPTIONS.map((size) => (
                 <FilterButton
                   key={size}
