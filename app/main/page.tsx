@@ -155,19 +155,62 @@ function MainPageContent() {
             <Tag>{plans.length}개</Tag>
           </div>
 
-          <div className="grid grid-cols-3 gap-y-6 py-6 ">
-            {plans.map((plan) => (
-              <TravelCard
-                key={plan.id}
-                data={plan}
-                onLeave={handleLeaveSuccess}
-              />
-            ))}
-          </div>
+          {plans.length > 0 ? (
+            <div className="grid grid-cols-3 gap-y-6 py-6 ">
+              {plans.map((plan) => (
+                <TravelCard
+                  key={plan.id}
+                  data={plan}
+                  onLeave={handleLeaveSuccess}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 rounded-2xl bg-gray-100 border-2 border-main/20 border-dashed gap-8 mt-4">
+              {/* 이미지 */}
+              <div className="flex">
+                <div className="relative w-30 h-30 -mr-2.5">
+                  <Image
+                    src="/images/capi2.webp"
+                    alt="카피"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <div className="relative w-30 h-30 -ml-2.5">
+                  <Image
+                    src="/images/bara2.webp"
+                    alt="바라"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center justify-center gap-2">
+                <h3 className="text-xl font-jalnan text-main">
+                  아직 등록된 여행 계획이 없어요!
+                </h3>
+                <p className="text-sm text-sub text-center leading-relaxed">
+                  친구들과 함께 새로운 여행 계획을 만들고
+                  <br />
+                  실시간으로 일정을 공유해보세요.
+                </p>
+
+                <MainButton
+                  onClick={openCreatePlanModal}
+                  variant={'round'}
+                  className="px-10 mt-4 shadow-card"
+                >
+                  새 여행 일정 만들러 가기
+                </MainButton>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 초대 수락 확인 모달 (메인 페이지에서 표출) */}
+      {/* 초대 수락 확인 모달 */}
       {inviteUuid && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-2xl text-center flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-200">
