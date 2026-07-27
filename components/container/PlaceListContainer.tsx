@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Nothing } from '@/components';
 import { Plus } from 'lucide-react';
 import PlaceCard, { type PlaceItem } from '../cards/PlaceCard';
 import { cn } from '@/lib/utils';
@@ -54,9 +55,7 @@ export default function PlaceListContainer({
       >
         <div className='flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-thin min-h-20'>
           {places.length === 0 ? (
-            <div className='flex items-center justify-center h-full text-muted text-sm'>
-              장소가 없습니다.
-            </div>
+            <Nothing text='장소가 없습니다.' />
           ) : (
             places.map((place) => (
               <div key={place.id} className='w-55 shrink-0'>

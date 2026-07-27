@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { DayCard, PlaceListContainer } from '@/components';
+import { DayCard, PlaceListContainer, Nothing } from '@/components';
 import PlaceCard, { PlaceItem } from '@/components/cards/PlaceCard';
 import { usePlanStore } from '@/store/usePlanStore';
 import { getTripDays } from '@/lib/utils';
@@ -134,7 +134,7 @@ export default function WishlistTab() {
         {activePlace ? (
           <PlaceCard place={activePlace} isOverlay />
         ) : (
-          <div>장소가 없습니다.</div>
+          <Nothing text='장소가 없습니다.' />
         )}
       </DragOverlay>
     </DndContext>
