@@ -58,24 +58,30 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
   console.log(data);
 
   const renderedWaypoints = useMemo(() => {
-    if (!data?.cards || data.cards.length === 0) return null;
+    const cards = data?.cards as CardType[] | undefined;
+    if (!cards || cards.length === 0) return null;
 
     // day 별로 그룹화
-    const groupedByDay = (data.cards as CardType[]).reduce<
-      Record<string, CardType[]>
-    >((acc, card: CardType) => {
-      const dayKey = card.day || 'day-1';
-      if (!acc[dayKey]) acc[dayKey] = [];
-      acc[dayKey].push(card);
-      return acc;
-    }, {});
+    const groupedByDay = cards.reduce<Record<string, CardType[]>>(
+      (acc, card: CardType) => {
+        const dayKey = card.day || 'day-1';
+        if (!acc[dayKey]) acc[dayKey] = [];
+        acc[dayKey].push(card);
+        return acc;
+      },
+      {},
+    );
 
     // day 키 정렬
-    const sortedDays = Object.keys(groupedByDay).sort((a, b) => {
-      const numA = parseInt(a.replace(/[^0-9]/g, ''), 10) || 0;
-      const numB = parseInt(b.replace(/[^0-9]/g, ''), 10) || 0;
-      return numA - numB;
-    });
+    const sortedDays = Object.keys(groupedByDay)
+      .filter((dayKey) => dayKey !== 'day-0' && dayKey !== 'day0')
+      .sort((a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, ''), 10) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, ''), 10) || 0;
+        return numA - numB;
+      });
+
+    if (sortedDays.length === 0) return null;
 
     return (
       <div className="inline-flex items-center">
@@ -103,7 +109,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
         })}
       </div>
     );
-  }, [data?.cards]);
+  }, [data]);
 
   const handleLeavePlan = async () => {
     if (!data) return;
@@ -127,7 +133,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
     }
   };
 
-  const hasCards = Boolean(data?.cards && data.cards.length > 0);
+  const hasValidWaypoints = Boolean(renderedWaypoints);
 
   return (
     <div className="box w-90 rounded-[10px] border-2 border-border overflow-hidden shadow-[0px_4px_10px_0px_#b5b5b540] group hover:border-primary hover:scale-105 transition-all duration-300">
@@ -170,9 +176,9 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
       <div className="w-full px-3.5 py-2 bg-primary-light overflow-hidden">
         <div className="flex w-max group-hover:animate-marquee">
           <div className="text-[12px] text-muted whitespace-nowrap pr-8">
-            {hasCards ? renderedWaypoints : '아직 일정이 없습니다.'}
+            {hasValidWaypoints ? renderedWaypoints : '아직 일정이 없습니다.'}
           </div>
-          {hasCards && (
+          {hasValidWaypoints && (
             <div
               className="text-[12px] text-muted whitespace-nowrap pr-8"
               aria-hidden="true"
