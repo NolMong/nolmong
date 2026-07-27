@@ -1,11 +1,17 @@
 "use client";
 
-import { use, useCallback, useRef, useState } from "react";
+import {
+  use,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
 import { MainButton, MapModal } from "@/components";
 import { usePlanTabStore } from "@/store/usePlanTabStore";
 import { useAutoSavePlan } from "@/hooks/useAutoSavePlan";
 import { Check, LucideEdit3 } from "lucide-react";
-import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import WishlistTab from "./_components/WishlistTab";
@@ -47,6 +53,14 @@ export default function PlanPage({
       updateTitle(newTitle);
     }
   }, [titleEditMode]);
+
+  // 타이틀 수정 - 키 다운 이벤트
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setTitleEditMode(!titleEditMode);
+    }
+  };
 
   // 토스트 메세지 함수
   const showToast = useCallback((msg: string) => {
@@ -117,6 +131,7 @@ export default function PlanPage({
             className={`text-xl font-jalnan-gothic text-sub outline-0`}
             contentEditable={titleEditMode}
             suppressContentEditableWarning
+            onKeyDown={handleKeyDown}
           >
             {title || "여행"}
           </div>
