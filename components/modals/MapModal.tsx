@@ -6,6 +6,7 @@ import {
   SearchResultCard,
   PlaceCard,
   MainButton,
+  Nothing,
 } from '@/components';
 import { useMemo, useRef, useState } from 'react';
 import { usePlanStore } from '@/store/usePlanStore';
@@ -179,9 +180,7 @@ export default function MapModal() {
           </div>
           <div className='w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin h-full'>
             {searchResults.length === 0 ? (
-              <div className='flex items-center justify-center h-full text-muted text-sm'>
-                검색 결과가 없습니다.
-              </div>
+              <Nothing text='검색 결과가 없습니다.' />
             ) : (
               searchResults.map((result) => (
                 <SearchResultCard
