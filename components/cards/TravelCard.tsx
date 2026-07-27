@@ -173,12 +173,11 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
                     size={28}
                     type={type}
                     theme={theme}
-                    className={index > 0 ? ' shadow-sm' : ''}
+                    className={index > 0 ? '-ml-3' : ''}
                   />
                 );
               })
             ) : (
-              // members가 비어있을 경우 고정 기본값 표시
               <ProfileAvatar size={28} />
             )}
           </div>
