@@ -198,27 +198,6 @@ export default function PlanTimelineCard({
             isDnd && 'cursor-grab active:cursor-grabbing',
           )}
         >
-          {/* 다른 참여자가 이 카드를 편집 중일 때 표시 */}
-          {/* 이후 컴포넌트로 분리 시, 수정 */}
-          {editors.length > 0 && (
-            <div className="flex items-center gap-1.5 mb-2">
-              <div className="flex items-center">
-                {editors.map((editor, index) => (
-                  <ProfileAvatar
-                    key={editor.clientId}
-                    size={20}
-                    type={editor.character}
-                    theme={editor.theme}
-                    className={index > 0 ? '-ml-2' : ''}
-                  />
-                ))}
-              </div>
-              <span className="text-xs font-regular truncate text-muted">
-                {getEditorsLabel(editors)}
-              </span>
-            </div>
-          )}
-
           <PlanCardHeader
             data={data}
             isEditing={isEditing}
@@ -246,6 +225,14 @@ export default function PlanTimelineCard({
             onCancel={handleCancel}
             onSave={handleSave}
           />
+
+          {editors.length > 0 && (
+            <div className="flex items-center justify-end gap-1.5 mt-2">
+              <span className="text-xs font-regular truncate text-muted">
+                {getEditorsLabel(editors)}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

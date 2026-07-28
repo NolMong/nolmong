@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { usePresenceStore } from "@/store/usePresenceStore";
-import { ProfileTheme, UserType } from "@/store/useUserStore";
+import { useMemo } from 'react';
+import { usePresenceStore } from '@/store/usePresenceStore';
+import { ProfileTheme, UserType } from '@/store/useUserStore';
 
 export type CardEditor = {
   clientId: string;
@@ -49,17 +49,21 @@ export function useCardEditors(cardId: string): CardEditor[] {
 // 편집 중인 사람들을 한 줄 문구로
 // 예: "OOO님이 수정 중", "다른 탭에서 수정 중", "OOO님 외 O명이 수정 중"
 export function getEditorsLabel(editors: CardEditor[]) {
-  if (editors.length === 0) return "";
+  if (editors.length === 0) return '';
 
   const [first, ...rest] = editors;
 
   if (rest.length === 0) {
-    return first.isMyOtherTab
-      ? "다른 탭에서 수정 중"
-      : `${first.name || "OOO"}님이 수정 중`;
+    return first.isMyOtherTab ? '다른 탭에서 수정 중' : `수정 중`;
   }
 
-  const firstName = first.isMyOtherTab ? "다른 탭" : `${first.name || "OOO"}님`;
+  // if (rest.length === 0) {
+  //   return first.isMyOtherTab
+  //     ? "다른 탭에서 수정 중"
+  //     : `${first.name || "OOO"}님이 수정 중`;
+  // }
+
+  const firstName = first.isMyOtherTab ? '다른 탭' : `${first.name || 'OOO'}님`;
 
   return `${firstName} 외 ${rest.length}명이 수정 중`;
 }
