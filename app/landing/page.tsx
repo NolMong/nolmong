@@ -215,7 +215,7 @@ function LandingContent() {
           alt='cloud1'
           width={500}
           height={50}
-          className='absolute top-[20%] left-[10%] w-[24%] h-auto'
+          className='absolute top-[20%] left-[10%] w-[24%] h-auto -translate-y-1/2'
           style={{
             animation:
               'fade-in 1.1s ease-out 0s both, float 4s ease-in-out 0s infinite backwards',
@@ -227,7 +227,7 @@ function LandingContent() {
           alt='cloud2'
           width={300}
           height={50}
-          className='absolute top-[48%] left-[3%] w-[14%] h-auto'
+          className='absolute top-[48%] left-[3%] w-[14%] h-auto -translate-y-1/2'
           style={{
             animation:
               'fade-in 1.1s ease-out 0.05s both, float 4.6s ease-in-out 0.6s infinite backwards',
@@ -239,7 +239,7 @@ function LandingContent() {
           alt='cloud3'
           width={300}
           height={50}
-          className='absolute top-[36%] left-[38%] w-[16%] h-auto'
+          className='absolute top-[36%] left-[38%] w-[16%] h-auto -translate-y-1/2'
           style={{
             animation:
               'fade-in 1.1s ease-out 0.08s both, float 4.2s ease-in-out 1.2s infinite backwards',
@@ -251,7 +251,7 @@ function LandingContent() {
           alt='cloud4'
           width={1000}
           height={50}
-          className='absolute top-[32%] right-[27%] w-[12%] h-auto'
+          className='absolute top-[32%] right-[27%] w-[12%] h-auto -translate-y-1/2'
           style={{
             animation:
               'fade-in 1.1s ease-out 0.1s both, float 3.8s ease-in-out 0.3s infinite backwards',
@@ -263,7 +263,7 @@ function LandingContent() {
           alt='cloud5'
           width={300}
           height={50}
-          className='absolute top-[56%] left-[30%] w-[8%] h-auto'
+          className='absolute top-[56%] left-[30%] w-[8%] h-auto -translate-y-1/2'
           style={{
             animation:
               'fade-in 1.1s ease-out 0.12s both, float 5s ease-in-out 0.9s infinite backwards',
@@ -275,7 +275,7 @@ function LandingContent() {
           alt='cloud5'
           width={300}
           height={50}
-          className='absolute top-[46%] right-[20%] w-[6%] h-auto'
+          className='absolute top-[46%] right-[20%] w-[6%] h-auto -translate-y-1/2'
           style={{
             animation:
               'fade-in 1.1s ease-out 0.15s both, float 5s ease-in-out 0.9s infinite backwards',
@@ -288,7 +288,7 @@ function LandingContent() {
           width={222}
           height={295}
           loading='eager'
-          className='absolute bottom-[-10%] left-[12%] w-[14.68%] h-auto origin-bottom animate-hum'
+          className='absolute bottom-[-10%] left-[12%] w-[14.68%] h-auto -translate-y-1/2 origin-bottom animate-hum'
         />
         <Image
           src='/images/bara1.png'
@@ -296,7 +296,7 @@ function LandingContent() {
           width={222}
           height={295}
           loading='eager'
-          className='absolute bottom-[-10%] left-[30%] w-[14.68%] h-auto origin-bottom animate-nod'
+          className='absolute bottom-[-10%] left-[30%] w-[14.68%] h-auto -translate-y-1/2 origin-bottom animate-nod'
         />
         <Image
           src='/images/title1.png'

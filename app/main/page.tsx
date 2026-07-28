@@ -253,14 +253,14 @@ function MainPageContent() {
               alt='Capi Image'
               width={100}
               height={100}
-              className='absolute bottom-[-15%] left-[17%] w-[10%] h-auto -translate-y-1/2'
+              className='absolute bottom-[-15%] left-[17%] w-[10%] h-auto -translate-y-1/2 origin-bottom animate-hum'
             />
             <Image
               src='/images/bara1.webp'
               alt='Bara Image'
               width={100}
               height={100}
-              className='absolute bottom-[-15%] left-[27%] w-[10%] h-auto -translate-y-1/2'
+              className='absolute bottom-[-15%] left-[30%] w-[10%] h-auto -translate-y-1/2 origin-bottom animate-nod'
             />
             <div className='absolute top-5.5 left-8 text-white font-jalnan text-2xl text-left leading-[1.4]'>
               카피, 바라와 함께
@@ -273,6 +273,34 @@ function MainPageContent() {
             <div className='absolute top-5.5 right-8 bg-[#36B9FD] text-white rounded-full w-50 h-10 text-sm font-bold flex items-center justify-center transition-transform duration-200 hover:scale-105 active:scale-95'>
               새 여행 일정 만들러 가기
             </div>
+            <Image
+              src='/images/cloud1.png'
+              alt='Cloud Image'
+              width={200}
+              height={100}
+              className='absolute top-[6%] left-[46%] w-[15%] h-auto -translate-y-1/2 animate-float [animation-delay:0s]'
+            />
+            <Image
+              src='/images/cloud4.png'
+              alt='Cloud Image'
+              width={200}
+              height={100}
+              className='absolute top-[31%] right-[21%] w-[11%] h-auto -translate-y-1/2 animate-float [animation-delay:0.6s] [animation-duration:4.6s]'
+            />
+            <Image
+              src='/images/cloud5.png'
+              alt='Cloud Image'
+              width={200}
+              height={100}
+              className='absolute top-[50%] left-[5%] w-[8%] h-auto -translate-y-1/2 animate-float [animation-delay:1.2s] [animation-duration:4.2s]'
+            />
+            <Image
+              src='/images/cloud2.png'
+              alt='Cloud Image'
+              width={200}
+              height={100}
+              className='absolute top-[50%] left-[30%] w-[8%] h-auto -translate-y-1/2 animate-float [animation-delay:0.3s] [animation-duration:3.8s]'
+            />
           </button>
         </div>
         <div ref={travelSectionRef} className='px-4 scroll-mt-8'>

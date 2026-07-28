@@ -163,6 +163,7 @@ export default function TravelDateCalendar({
             <Calendar
               activeStartDate={monthDate}
               calendarType='gregory'
+              locale='ko-KR'
               showNavigation={false}
               minDetail='month'
               maxDetail='month'

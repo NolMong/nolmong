@@ -64,6 +64,7 @@ export default function CalendarComponent({
   return (
     <Calendar
       calendarType='gregory'
+      locale='ko-KR'
       className={['font-jalnan', 'main-calendar']}
       formatDay={(_locale, date) => String(date.getDate())}
       tileClassName={({ date, view }) =>
