@@ -9,6 +9,7 @@ import {
   CircleDollarSign,
   PersonStanding,
   Check,
+  Loader2,
 } from 'lucide-react';
 import { MainButton, TravelDateCalendar, LocationTag } from '@/components';
 import { useModal } from '@/hooks/useModal';
@@ -151,7 +152,11 @@ function PanelSection({
   );
 }
 
-export default function CreatePlanModal() {
+export default function CreatePlanModal({
+  travels,
+}: {
+  travels: (string | { start_day: string; end_day: string })[];
+}) {
   const isOpen = useCreatePlanModalStore((state) => state.isOpen);
   const closeStore = useCreatePlanModalStore((state) => state.close);
   const router = useRouter();
@@ -163,6 +168,7 @@ export default function CreatePlanModal() {
     'date' as 'date' | 'startLocation' | 'endLocation',
   );
   const [plan, setPlan] = useState(initialPlan);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 정상적으로 닫힐 때(배경 클릭, 라우트 이동, 완료 버튼 등) plan을 처음 상태로 초기화
   const close = useCallback(() => {
@@ -171,6 +177,7 @@ export default function CreatePlanModal() {
     setWriteStartLocation(false);
     setWriteEndLocation(false);
     setState('date');
+    setIsSubmitting(false);
     closeStore();
   }, [closeStore]);
 
@@ -350,25 +357,31 @@ export default function CreatePlanModal() {
         (plan.headcount ? plan.headcount + '명' : '미정'),
     );
     if (!confirmed) return;
+    if (isSubmitting) return;
 
-    const { data, error, channel } = await postNewPlan({
-      startLocation: plan.startLocation[0]?.text ?? '',
-      endLocations: plan.endLocation.map((l) => l.text),
-      start_day: plan.startDate,
-      end_day: plan.endDate,
-      budget: plan.budget,
-      headcount: plan.headcount,
-    });
+    setIsSubmitting(true);
+    try {
+      const { error, channel } = await postNewPlan({
+        startLocation: plan.startLocation[0]?.text ?? '',
+        endLocations: plan.endLocation.map((l) => l.text),
+        start_day: plan.startDate,
+        end_day: plan.endDate,
+        budget: plan.budget,
+        headcount: plan.headcount,
+      });
 
-    if (error) {
-      alert('여행 계획 생성에 실패했습니다.');
-      return;
-    }
+      if (error) {
+        alert('여행 계획 생성에 실패했습니다.');
+        return;
+      }
 
-    alert('여행 계획이 생성되었습니다.');
-    close();
-    if (channel) {
-      router.push(`/plan/${channel}`);
+      alert('여행 계획이 생성되었습니다.');
+      close();
+      if (channel) {
+        router.push(`/plan/${channel}`);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -385,6 +398,7 @@ export default function CreatePlanModal() {
               endDay={plan.endDate}
               oneDayTrip={oneDayTrip}
               onChange={handleChangeDate}
+              travels={travels}
             />
           </div>
         </div>
@@ -420,7 +434,10 @@ export default function CreatePlanModal() {
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
-      onClick={close}
+      onClick={() => {
+        if (isSubmitting) return;
+        close();
+      }}
       onTransitionEnd={handleTransitionEnd}
     >
       <div
@@ -528,6 +545,7 @@ export default function CreatePlanModal() {
             <MainButton
               onClick={handleSubmit}
               variant='fill'
+              disabled={isSubmitting}
               style={{
                 fontWeight: 700,
                 marginTop: 'auto',
@@ -535,7 +553,14 @@ export default function CreatePlanModal() {
                 width: 'fit-content',
               }}
             >
-              여행 시작
+              {isSubmitting ? (
+                <span className='flex items-center gap-1.5'>
+                  <Loader2 size={16} className='animate-spin' />
+                  생성 중...
+                </span>
+              ) : (
+                '여행 시작'
+              )}
             </MainButton>
           </div>
         </div>

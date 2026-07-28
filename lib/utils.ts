@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
+import { clsx, type ClassValue } from 'clsx';
 
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
@@ -10,7 +10,7 @@ export interface TripDay {
   dateText: string; // '8.8 (토)'
 }
 
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 // start_day ~ end_day('YYYY-MM-DD', 양끝 포함) 구간을 하루 단위 Day 목록으로 펼친다.
 // 날짜만 있는 문자열은 UTC 자정으로 파싱되므로, 로컬 타임존으로 하루씩 밀리는 걸
@@ -38,3 +38,13 @@ export function getTripDays(startDay: string, endDay: string): TripDay[] {
 
   return days;
 }
+
+// 시간 포맷 함수
+export const formatTimeInput = (value: string): string => {
+  const numbersOnly = value.replace(/\D/g, '').slice(0, 4);
+
+  if (numbersOnly.length <= 2) {
+    return numbersOnly;
+  }
+  return `${numbersOnly.slice(0, 2)}:${numbersOnly.slice(2)}`;
+};

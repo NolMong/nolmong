@@ -3,5 +3,5 @@ export default function LandingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>{children}</>;
+  return <div className='min-w-300'>{children}</div>;
 }

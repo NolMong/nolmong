@@ -3,6 +3,8 @@ import { Geist_Mono, Noto_Sans_KR } from 'next/font/google';
 import localFont from 'next/font/local';
 import { Header, CreatePlanModal, Footer } from '@/components';
 import './globals.css';
+import { Suspense } from 'react';
+import { InviteModal } from '@/components/modals/InviteModal';
 
 const notoSansKr = Noto_Sans_KR({
   variable: '--font-noto-sans-kr',
@@ -39,13 +41,17 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang='en'
+      lang="en"
       className={`${notoSansKr.variable} ${geistMono.variable} ${jalnan.variable} ${jalnanGothic.variable} h-full antialiased`}
     >
-      <body className='relative min-h-full flex flex-col'>
+      <body className="relative min-h-full flex flex-col">
         <Header />
 
         {children}
+
+        <Suspense fallback={null}>
+          <InviteModal />
+        </Suspense>
         <Footer />
       </body>
     </html>

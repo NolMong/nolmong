@@ -49,6 +49,22 @@
 
   /* 가만히 있어도 옆으로 흐르는 마퀴(marquee) 애니메이션 */
   --animate-marquee: marquee 10s linear infinite;
+
+  /* 구름이 위아래로 둥실거리는 애니메이션 */
+  --animate-float: float 4s ease-in-out infinite;
+
+  /* 캐릭터가 발밑을 축으로 까딱까딱 끄덕이는 애니메이션 */
+  --animate-nod: nod 2.5s ease-in-out infinite;
+
+  /* 캐릭터가 흥얼거리며 좌우로 스윙하는 애니메이션 */
+  --animate-hum: hum 1.6s ease-in-out infinite;
+
+  /* 마운트 시 부드럽게 나타나는 페이드인 */
+  --animate-fade-in: fade-in 0.7s ease-out both;
+
+  /* 발자국이 순서대로 나타났다 사라지길 반복하며 걸어가는 것처럼 보이는 애니메이션.
+     delay만 다르게 줘서 여러 개를 이어붙이면 걸음걸이처럼 보인다 */
+  --animate-footstep: footstep 3s ease-in-out infinite backwards;
 }
 
 @keyframes marquee {
@@ -57,6 +73,75 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+/* translate(-50% 등 위치 보정)는 각 요소에 -translate-y-1/2 클래스로 따로 준다.
+   Tailwind v4에서 translate는 transform과 별개 CSS 속성이라 여기서 transform만
+   다뤄도 서로 안 부딪히고 그대로 합쳐진다 */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes nod {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+/* scale만 다뤄서(transform 아님) 발자국에 준 회전용 rotate-* 클래스와 안 부딪힘 */
+@keyframes footstep {
+  0%,
+  8% {
+    opacity: 0;
+    scale: 0.6;
+  }
+  20%,
+  60% {
+    opacity: 1;
+    scale: 1;
+  }
+  75%,
+  100% {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes hum {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+}
+
+/* 마운트 시 부드럽게 나타나는 페이드인 (opacity만 다뤄서 float/hum/nod 같은
+   transform 애니메이션과 같이 써도 서로 안 부딪힘) */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

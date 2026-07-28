@@ -7,27 +7,30 @@ interface FilterButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
   isActive?: boolean; // 현재 버튼이 선택된 상태인지 여부
 }
 
-export default function FilterButton({
-  children,
-  isActive = false,
-  className,
-  ...props
-}: FilterButtonProps) {
-  return (
-    <button
-      type='button'
-      className={cn(
-        'inline-flex items-center justify-center text-sm font-medium rounded-full w-fit shrink-0 py-1.5 px-3.5 cursor-pointer select-none transition-colors border border-border',
-        isActive
-          ? // Active
-            'bg-primary border-primary text-white'
-          : // Inactive
-            'bg-white border-border text-muted hover:bg-border/30',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-}
+const FilterButton = React.forwardRef<HTMLButtonElement, FilterButtonProps>(
+  function FilterButton(
+    { children, isActive = false, className, ...props },
+    ref,
+  ) {
+    return (
+      <button
+        ref={ref}
+        type='button'
+        className={cn(
+          'inline-flex items-center justify-center text-sm font-medium rounded-full w-fit shrink-0 py-1.5 px-3.5 cursor-pointer select-none transition-colors border border-border',
+          isActive
+            ? // Active
+              'bg-primary border-primary text-white'
+            : // Inactive
+              'bg-white border-border text-muted hover:bg-border/30',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  },
+);
+
+export default FilterButton;

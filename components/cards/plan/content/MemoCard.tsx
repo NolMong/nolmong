@@ -3,6 +3,7 @@
 import React from 'react';
 import { Clock, SquareMenu } from 'lucide-react';
 import type { PlanCardData } from '@/types/plans';
+import { formatTimeInput } from '@/lib/utils';
 
 interface MemoCardProps {
   data: PlanCardData;
@@ -34,22 +35,28 @@ export default function MemoCard({
 
   if (isEditing) {
     return (
-      <div className="flex flex-col gap-3 text-xs font-regular text-main">
+      <div className="flex flex-col gap-3 text-xs font-regular text-main mt-3">
         <div className="flex items-center gap-2">
           <Clock size={12} className="shrink-0 text-main" />
           <input
             type="text"
             placeholder="00:00"
+            maxLength={5}
             value={editStartTime}
-            onChange={(event) => setEditStartTime(event.target.value)}
+            onChange={(event) =>
+              setEditStartTime(formatTimeInput(event.target.value))
+            }
             className="w-20 rounded-sm border border-border p-1.5 text-left focus:outline-1 focus:outline-muted"
           />
           <span>~</span>
           <input
             type="text"
             placeholder="00:00"
+            maxLength={5}
             value={editEndTime}
-            onChange={(event) => setEditEndTime(event.target.value)}
+            onChange={(event) =>
+              setEditEndTime(formatTimeInput(event.target.value))
+            }
             className="w-20 rounded-sm border border-border p-1.5 text-left focus:outline-1 focus:outline-muted"
           />
         </div>
@@ -68,10 +75,10 @@ export default function MemoCard({
   }
 
   return (
-    <div className="flex flex-col gap-1.5 text-sub">
+    <div className="flex flex-col gap-1.5 text-sub mt-2">
       {displayTime && (
         <div className="flex items-center gap-1.5">
-          <Clock size={13} className="shrink-0 text-muted" />
+          <Clock size={12} className="shrink-0 text-main mt-[3px]" />
           <span>{displayTime}</span>
         </div>
       )}

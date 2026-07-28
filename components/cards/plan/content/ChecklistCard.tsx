@@ -24,13 +24,12 @@ export default function ChecklistCard({
   onAddChecklistItem,
   onRemoveChecklistItem,
 }: ChecklistCardProps) {
-  // checklist가 비어있으면 data.checklistItems를 사용
-  const itemsToRender = checklists?.length
-    ? checklists
-    : data.checklistItems || [];
+  // 편집 중일 때만 로컬 편집본을 쓰고, 조회 모드에서는 항상 data를 본다.
+  // (조회 모드에서 로컬을 우선하면 다른 참여자의 변경이 화면에 반영되지 않음)
+  const itemsToRender = isEditing ? checklists : data.checklistItems || [];
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5 mt-3">
       {isEditing ? (
         <div className="flex flex-col gap-2">
           {itemsToRender.map((item) => (

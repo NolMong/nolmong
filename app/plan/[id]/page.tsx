@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   use,
@@ -7,18 +7,22 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
-} from "react";
-import { MainButton, MapModal } from "@/components";
-import { usePlanTabStore } from "@/store/usePlanTabStore";
-import { useAutoSavePlan } from "@/hooks/useAutoSavePlan";
-import { Check, LucideEdit3 } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+} from 'react';
+import { MainButton, MapModal } from '@/components';
+import { usePlanTabStore } from '@/store/usePlanTabStore';
+import { useAutoSavePlan } from '@/hooks/useAutoSavePlan';
+import { Check, LucideEdit3 } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import WishlistTab from "./_components/WishlistTab";
-import PlanDetailsTab from "./_components/PlanDetailsTab";
-import { usePlanSync } from "@/hooks/usePlanSync";
-import { usePlanStore } from "@/store/usePlanStore";
-import { createClient } from "@/lib/supabase/client";
+import WishlistTab from './_components/WishlistTab';
+import PlanDetailsTab from './_components/PlanDetailsTab';
+import { updateSupabaseTitle } from '@/api/updateSupabaseTitle';
+import { usePlanSync } from '@/hooks/usePlanSync';
+import { usePlanStore } from '@/store/usePlanStore';
+import { createClient } from '@/lib/supabase/client';
+import { AnimatePresence, motion } from 'framer-motion';
+import WishlistSkeleton from './_components/WishlistSkeleton';
+import PlanDetailsSkeleton from './_components/PlanDetailSkeleton';
 
 const supabase = createClient();
 
@@ -29,6 +33,7 @@ export default function PlanPage({
 }) {
   const { id: uuid } = use(params);
   const { activePlanTab, setPlanTab } = usePlanTabStore();
+  const { isLoaded, resetPlan } = usePlanStore();
   const { title, updateTitle } = usePlanStore();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -38,27 +43,53 @@ export default function PlanPage({
   const titleRef = useRef<HTMLDivElement>(null);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-  // 타이틀 수정 기능
+  // plan id 바뀔 때마다 이전 스토어 상태 초기화
   useEffect(() => {
-    const newTitle = titleRef.current?.innerText.trim();
+    resetPlan();
+  }, [uuid, resetPlan]);
+
+  useAutoSavePlan(uuid);
+  usePlanSync(uuid);
+
+  // 편집 모드 진입 시에만 포커스 이동 (DOM 동기화 목적이라 effect가 적절)
+  useEffect(() => {
     if (titleEditMode) {
       titleRef.current?.focus();
-    } else if (
-      newTitle !== undefined &&
-      newTitle !== "" &&
-      title !== newTitle
-    ) {
-      updateTitle(newTitle);
     }
   }, [titleEditMode]);
 
+  // 타이틀 편집 종료(체크 버튼 클릭 / Enter) 시 확인 후 저장
+  const handleTitleEditToggle = () => {
+    if (titleEditMode) {
+      const newTitle = titleRef.current?.innerText.trim();
+      let applied = false;
+      if (newTitle && newTitle !== title) {
+        if (
+          confirm(
+            '여행 제목을 수정하시겠습니까?\n(※ 다른 사람들에게도 동일하게 보입니다.)',
+          )
+        ) {
+          updateTitle(newTitle);
+          updateSupabaseTitle({ data: { planId: uuid, title: newTitle } });
+          applied = true;
+        }
+      }
+      // 저장하지 않은 경우(취소 / 빈 값) contentEditable에 남은 입력값을
+      // 원래 제목으로 되돌린다. React는 title state가 안 바뀌면 이 텍스트
+      // 노드를 갱신하지 않아서, 안 해주면 취소해도 바뀐 것처럼 보인다.
+      if (!applied && titleRef.current) {
+        titleRef.current.innerText = title || '여행';
+      }
+    }
+    setTitleEditMode(!titleEditMode);
+  };
+
   // 타이틀 수정 - 키 다운 이벤트
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      setTitleEditMode(!titleEditMode);
+      handleTitleEditToggle();
     }
   };
 
@@ -74,21 +105,21 @@ export default function PlanPage({
   const handleCopyInviteLink = useCallback(async () => {
     try {
       const origin =
-        typeof window !== "undefined" ? window.location.origin : "";
+        typeof window !== 'undefined' ? window.location.origin : '';
       const inviteUrl = `${window.location.origin}/main?invite=${uuid}`;
 
       await navigator.clipboard.writeText(inviteUrl);
-      showToast("초대 링크가 복사되었습니다!");
+      showToast('초대 링크가 복사되었습니다!');
     } catch (error) {
-      console.error("링크 복사 실패:", error);
-      showToast("링크 복사에 실패했습니다.");
+      console.error('링크 복사 실패:', error);
+      showToast('링크 복사에 실패했습니다.');
     }
   }, [uuid, showToast]);
 
   // 탭 상태 동기화
   useEffect(() => {
-    const tab = searchParams?.get("tab");
-    if (tab === "PLAN_DETAILS" || tab === "WISHLIST") {
+    const tab = searchParams?.get('tab');
+    if (tab === 'PLAN_DETAILS' || tab === 'WISHLIST') {
       setPlanTab(tab);
     }
   }, [searchParams, setPlanTab]);
@@ -99,17 +130,17 @@ export default function PlanPage({
       handleCopyInviteLink();
     };
 
-    window.addEventListener("trigger-invite-copy", handleTriggerCopy);
+    window.addEventListener('trigger-invite-copy', handleTriggerCopy);
     return () => {
-      window.removeEventListener("trigger-invite-copy", handleTriggerCopy);
+      window.removeEventListener('trigger-invite-copy', handleTriggerCopy);
     };
   }, [handleCopyInviteLink]);
 
-  const handleTabClick = (tab: "WISHLIST" | "PLAN_DETAILS") => {
+  const handleTabClick = (tab: 'WISHLIST' | 'PLAN_DETAILS') => {
     setPlanTab(tab);
 
-    const nextParams = new URLSearchParams(searchParams?.toString() ?? "");
-    nextParams.set("tab", tab);
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? '');
+    nextParams.set('tab', tab);
 
     router.replace(`${pathname}?${nextParams.toString()}`);
   };
@@ -125,54 +156,99 @@ export default function PlanPage({
       {/* 헤더 타이틀 및 탭 버튼 */}
       <MapModal />
       <div className="flex flex-col gap-5">
-        <div className="flex gap-2">
-          <div
-            ref={titleRef}
-            className={`text-xl font-jalnan-gothic text-sub outline-0`}
-            contentEditable={titleEditMode}
-            suppressContentEditableWarning
-            onKeyDown={handleKeyDown}
-          >
-            {title || "여행"}
-          </div>
-          <button
-            className="cursor-pointer"
-            onClick={() => setTitleEditMode(!titleEditMode)}
-          >
-            {titleEditMode ? (
-              <Check size={18} className="text-primary" />
-            ) : (
-              <LucideEdit3 size={14} className="text-muted" />
-            )}
-          </button>
+        <div className="flex gap-2 items-center min-h-6">
+          {!isLoaded ? (
+            // 로딩 중
+            <div className="h-6 w-40 animate-pulse rounded-md bg-gray-200 my-1" />
+          ) : (
+            // 로딩 완료
+            <>
+              <div
+                ref={titleRef}
+                className={`text-xl font-jalnan-gothic text-sub outline-0 ${titleEditMode ? 'w-200 border border-border bg-white py-2 px-3 rounded-md' : ''}`}
+                contentEditable={titleEditMode}
+                suppressContentEditableWarning
+                onKeyDown={handleKeyDown}
+              >
+                {title || '여행'}
+              </div>
+              <button
+                className="cursor-pointer"
+                onClick={handleTitleEditToggle}
+              >
+                {titleEditMode ? (
+                  <Check size={24} className="text-primary" />
+                ) : (
+                  <LucideEdit3 size={14} className="text-muted" />
+                )}
+              </button>
+            </>
+          )}
         </div>
 
         <div className="flex gap-2 mb-7">
           <MainButton
-            variant={activePlanTab === "WISHLIST" ? "lightFill" : "default"}
+            variant={activePlanTab === 'WISHLIST' ? 'lightFill' : 'default'}
             className="py-2 px-4"
-            onClick={() => handleTabClick("WISHLIST")}
+            onClick={() => handleTabClick('WISHLIST')}
           >
             가고 싶은 곳
           </MainButton>
           <MainButton
-            variant={activePlanTab === "PLAN_DETAILS" ? "lightFill" : "default"}
+            variant={activePlanTab === 'PLAN_DETAILS' ? 'lightFill' : 'default'}
             className="py-2 px-4"
-            onClick={() => handleTabClick("PLAN_DETAILS")}
+            onClick={() => handleTabClick('PLAN_DETAILS')}
           >
             상세 계획
           </MainButton>
         </div>
       </div>
 
-      {/* 탭별 뷰 렌더링 */}
-      {activePlanTab === "PLAN_DETAILS" ? <PlanDetailsTab /> : <WishlistTab />}
+      <AnimatePresence mode="wait">
+        {!isLoaded ? (
+          <motion.div
+            key={`skeleton-${uuid}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            {activePlanTab === 'PLAN_DETAILS' ? (
+              <PlanDetailsSkeleton />
+            ) : (
+              <WishlistSkeleton />
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key={`content-${uuid}-${activePlanTab}`}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activePlanTab === 'PLAN_DETAILS' ? (
+              <PlanDetailsTab />
+            ) : (
+              <WishlistTab />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {toastMessage && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-black/80 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all animate-bounce">
-          {toastMessage}
-        </div>
-      )}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            className="fixed bottom-10 left-1/2 z-50 rounded-lg bg-black/80 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

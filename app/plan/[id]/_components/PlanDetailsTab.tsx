@@ -1,26 +1,27 @@
-'use client';
+"use client";
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FilterGroup,
   PlanEditorCard,
   KakaoMap,
   MainButton,
   SearchResultCard,
-} from '@/components';
-import { usePlanStore } from '@/store/usePlanStore';
-import { PlanCardData } from '@/types/plans';
-import { getTripDays } from '@/lib/utils';
-import { Hotel, LocateFixed, MapPin, Newspaper, Search } from 'lucide-react';
+  Nothing,
+} from "@/components";
+import { usePlanStore } from "@/store/usePlanStore";
+import { PlanCardData } from "@/types/plans";
+import { getTripDays } from "@/lib/utils";
+import { Hotel, LocateFixed, MapPin, Newspaper, Search } from "lucide-react";
 
 export default function PlanDetailsTab() {
-  const CANDIDATE_DAY = 'day-0';
-  const [keyword, setKeyword] = useState('');
+  const CANDIDATE_DAY = "day-0";
+  const [keyword, setKeyword] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const [searchResults, setSearchResults] = useState<
     kakao.maps.services.PlacesSearchResultItem[]
   >([]);
-  const [currentDay, setCurrentDay] = useState('day-1');
+  const [currentDay, setCurrentDay] = useState("day-1");
   const {
     cards,
     start_day,
@@ -29,7 +30,12 @@ export default function PlanDetailsTab() {
     deleteCard,
     addCard,
     reorderCardsInDay,
+    clearDrafts,
   } = usePlanStore();
+
+  // 탭을 변경(언마운트) 시, 저장 전 임시 카드(draft)를 정리
+  useEffect(() => () => clearDrafts(), [clearDrafts]);
+
   const mapRef = useRef<kakao.maps.Map | null>(null);
   const placesServiceRef = useRef<kakao.maps.services.Places | null>(null);
   const markers = useMemo(
@@ -59,13 +65,27 @@ export default function PlanDetailsTab() {
   // PLACE 카드에 순차적 순번 부여
   let placeCounter = 1;
   const filteredCards: PlanCardData[] = rawDayCards.map((card) => {
-    if (card.type === 'PLACE') {
+    if (card.type === "PLACE") {
       return { ...card, placeOrderNumber: placeCounter++ };
     }
     return card;
   });
 
-  const dayNumber = parseInt(currentDay.replace('day-', ''), 10) || 1;
+  const dayNumber = parseInt(currentDay.replace("day-", ""), 10) || 1;
+
+  const handleNextDay = () => {
+    const idx = dayOptions.indexOf(currentDay);
+    if (idx >= 0 && idx < dayOptions.length - 1) {
+      setCurrentDay(dayOptions[idx + 1]);
+    }
+  };
+
+  const handlePrevDay = () => {
+    const idx = dayOptions.indexOf(currentDay);
+    if (idx > 0) {
+      setCurrentDay(dayOptions[idx - 1]);
+    }
+  };
 
   const handleMapLoad = (map: kakao.maps.Map) => {
     mapRef.current = map;
@@ -77,7 +97,7 @@ export default function PlanDetailsTab() {
     day: string = CANDIDATE_DAY,
   ) => {
     const category =
-      result.category_name.split(' > ').pop() || result.category_name;
+      result.category_name.split(" > ").pop() || result.category_name;
 
     const dayCards = cards.filter((c) => c.day === day);
     const nextOrder =
@@ -87,7 +107,7 @@ export default function PlanDetailsTab() {
       id: crypto.randomUUID(),
       day,
       order: nextOrder,
-      type: 'PLACE',
+      type: "PLACE",
       name: result.place_name,
       category,
       address: result.road_address_name || result.address_name,
@@ -151,8 +171,8 @@ export default function PlanDetailsTab() {
   };
 
   return (
-    <div className='flex gap-5 h-161'>
-      <div className='flex flex-col gap-5 h-full min-h-0 w-107.5'>
+    <div className="flex gap-5 h-161">
+      <div className="flex flex-col gap-5 h-full min-h-0 w-107.5">
         <FilterGroup
           options={dayOptions}
           value={currentDay}
@@ -161,7 +181,7 @@ export default function PlanDetailsTab() {
         />
         <PlanEditorCard
           dayNumber={dayNumber}
-          dateText={dateText ?? ''}
+          dateText={dateText ?? ""}
           cards={filteredCards}
           onUpdateCard={updateCard}
           onDeleteCard={deleteCard}
@@ -169,25 +189,25 @@ export default function PlanDetailsTab() {
           onReorderCards={(activeId, overId) =>
             reorderCardsInDay(currentDay, activeId, overId)
           }
+          onNextDay={handleNextDay}
+          onPrevDay={handlePrevDay}
         />
       </div>
 
-      <div className='flex flex-1 h-178.5 rounded-lg overflow-hidden -mt-17.5 border border-border'>
+      <div className="flex flex-1 h-178.5 rounded-lg overflow-hidden -mt-17.5 border border-border">
         <div
           className={`flex flex-col h-full overflow-hidden transition-all duration-300 ease-out ${
             hasSearched
-              ? 'box w-70 px-2.5 pt-4 pb-2.5 opacity-100 shadow-card border-r border-border'
-              : 'w-0 px-0 py-0 opacity-0'
+              ? "box w-70 px-2.5 pt-4 pb-2.5 opacity-100 shadow-card border-r border-border"
+              : "w-0 px-0 py-0 opacity-0"
           }`}
         >
-          <div className='font-jalnan-gothic text-sub w-60 mb-4 text-lg'>
+          <div className="font-jalnan-gothic text-sub w-60 mb-4 text-lg">
             검색 결과
           </div>
-          <div className='w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin flex-1 min-h-0'>
+          <div className="w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin flex-1 min-h-0">
             {searchResults.length === 0 ? (
-              <div className='flex items-center justify-center h-full text-muted text-sm'>
-                검색 결과가 없습니다.
-              </div>
+              <Nothing text="검색 결과가 없습니다." />
             ) : (
               searchResults.map((result) => (
                 <SearchResultCard
@@ -200,70 +220,70 @@ export default function PlanDetailsTab() {
             )}
           </div>
         </div>
-        <div className='relative flex-1'>
-          <div className=' w-[calc(100%-20px)] absolute top-2.5 left-2.5 z-10'>
+        <div className="relative flex-1">
+          <div className=" w-[calc(100%-20px)] absolute top-2.5 left-2.5 z-10">
             <form
               onSubmit={handleSearch}
-              className='group flex items-center gap-2.5 px-4 py-2.5 bg-white rounded-full border border-border focus-within:border-primary'
+              className="group flex items-center gap-2.5 px-4 py-2.5 bg-white rounded-full border border-border focus-within:border-primary"
             >
-              <button type='submit' className='shrink-0'>
+              <button type="submit" className="shrink-0">
                 <Search
                   size={24}
-                  className='text-muted group-focus-within:text-primary'
+                  className="text-muted group-focus-within:text-primary"
                 />
               </button>
               <input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder='검색'
-                className='w-full focus:outline-none'
+                placeholder="검색"
+                className="w-full focus:outline-none"
               />
             </form>
-            <div className='flex gap-2 w-66 mt-2.5'>
+            <div className="flex gap-2 w-66 mt-2.5">
               <MainButton
-                variant='roundDefault'
-                style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
+                variant="roundDefault"
+                style={{ fontSize: "14px", flex: 1, width: "fit-content" }}
                 onClick={() => {
-                  setKeyword('맛집');
-                  runSearch('맛집');
+                  setKeyword("맛집");
+                  runSearch("맛집");
                 }}
               >
                 <Hotel
                   size={14}
-                  color='var(--color-sub)'
-                  style={{ marginRight: '4px' }}
+                  color="var(--color-sub)"
+                  style={{ marginRight: "4px" }}
                 ></Hotel>
                 맛집
               </MainButton>
 
               <MainButton
-                variant='roundDefault'
-                style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
+                variant="roundDefault"
+                style={{ fontSize: "14px", flex: 1, width: "fit-content" }}
                 onClick={() => {
-                  setKeyword('카페');
-                  runSearch('카페');
+                  setKeyword("카페");
+                  runSearch("카페");
                 }}
               >
                 <MapPin
                   size={14}
-                  color='var(--color-sub)'
-                  style={{ marginRight: '4px' }}
+                  color="var(--color-sub)"
+                  style={{ marginRight: "4px" }}
                 ></MapPin>
                 카페
               </MainButton>
 
               <MainButton
-                variant='roundDefault'
-                style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
+                variant="roundDefault"
+                style={{ fontSize: "14px", flex: 1, width: "fit-content" }}
                 onClick={() => {
-                  setKeyword('관광');
-                  runSearch('관광');
+                  setKeyword("관광");
+                  runSearch("관광");
                 }}
               >
                 <Newspaper
                   size={14}
-                  color='var(--color-sub)'
-                  style={{ marginRight: '4px' }}
+                  color="var(--color-sub)"
+                  style={{ marginRight: "4px" }}
                 ></Newspaper>
                 관광
               </MainButton>
@@ -271,7 +291,7 @@ export default function PlanDetailsTab() {
           </div>
 
           <KakaoMap
-            className='flex-1 h-178.5'
+            className="flex-1 h-178.5"
             onMapLoad={handleMapLoad}
             cards={cards}
             currentDay={currentDay}
@@ -287,12 +307,12 @@ export default function PlanDetailsTab() {
             }
           />
           <MainButton
-            variant='roundDefault'
+            variant="roundDefault"
             onClick={() => {
               runSearch(keyword);
             }}
             style={{
-              position: 'absolute',
+              position: "absolute",
               bottom: 20,
               right: 20,
               width: 40,
@@ -301,7 +321,7 @@ export default function PlanDetailsTab() {
               zIndex: 50,
             }}
           >
-            <LocateFixed size={24} color='var(--color-sub)' />
+            <LocateFixed size={24} color="var(--color-sub)" />
           </MainButton>
         </div>
       </div>

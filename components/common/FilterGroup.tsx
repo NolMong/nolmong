@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import FilterButton from './FilterButton';
 
 type FilterGroupProps = {
@@ -48,6 +48,21 @@ export default function FilterGroup(props: FilterGroupProps) {
     container.scrollLeft += e.deltaY;
   };
 
+  // 스크롤형(single-select)일 때, 선택된 옵션이 스크롤 영역 밖에 있으면
+  // 최소한으로만 스크롤해서 보이게 한다 (외부에서 value가 바뀌는 경우 포함)
+  const activeOptionRef = useRef<HTMLButtonElement>(null);
+  const activeValue = props.multiple ? null : props.value;
+
+  useEffect(() => {
+    if (props.scroll !== true) return;
+    activeOptionRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'nearest',
+      block: 'nearest',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeValue]);
+
   return (
     <div
       className={`flex items-center gap-2 shrink-0 ${
@@ -60,6 +75,11 @@ export default function FilterGroup(props: FilterGroupProps) {
       {options.map((option) => (
         <FilterButton
           key={option}
+          ref={
+            !props.multiple && option === activeValue
+              ? activeOptionRef
+              : undefined
+          }
           isActive={isActive(option)}
           onClick={() => handleClick(option)}
         >
