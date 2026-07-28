@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dayjs from 'dayjs';
@@ -61,13 +61,24 @@ interface TravelCardProps {
 export default function TravelCard({ data, onLeave }: TravelCardProps) {
   console.log(data);
 
-  const [random, setRandom] = useState(() => ({
-    top: getRandomInt(64, 70), // 18 ~ 24
-    right: getRandomInt(0, 12), // -2 ~ 12
-    rotate: getRandomInt(-20, 20), // -60 ~ 60
-  }));
+  // 서버와 클라이언트가 각자 다른 랜덤값을 렌더링하면 hydration mismatch가 나서,
+  // 서버에서는 null로 두고 마운트 후(클라이언트에서만) 값을 채운다
+  const [random, setRandom] = useState<{
+    top: number;
+    right: number;
+    rotate: number;
+  } | null>(null);
 
-  console.log('DEBUG random:', random);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      setRandom({
+        top: getRandomInt(64, 70), // 18 ~ 24
+        right: getRandomInt(0, 12), // -2 ~ 12
+        rotate: getRandomInt(-20, 20), // -60 ~ 60
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   const renderedWaypoints = useMemo(() => {
     const cards = data?.cards as CardType[] | undefined;
@@ -218,7 +229,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
           <Tag color="primary">수정</Tag>
         </Link>
       </div>
-      {isPastEndDay(data?.end_day || new Date()) && (
+      {random && isPastEndDay(data?.end_day || new Date()) && (
         <Image
           src="/images/stamp.png"
           alt="stamp"

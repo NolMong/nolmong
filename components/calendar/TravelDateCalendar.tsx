@@ -19,19 +19,56 @@ function monthLabel(date: Date) {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
 }
 
+// 이미 등록된 여행(travels prop)이 이 날짜와 겹치면 붙일 클래스들을 모은다.
+// 지금 고르고 있는 새 일정(travel-start/end/between)과 이름이 겹치지 않게 접두사를 다르게 둠
+function getExistingTravelClassNames(
+  dateKey: string,
+  travels: (string | { start_day: string; end_day: string })[],
+) {
+  const classNames = new Set<string>();
+
+  for (const travel of travels) {
+    if (!travel) continue;
+
+    if (typeof travel === 'string') {
+      if (dateKey === travel) {
+        classNames.add('existing-start');
+        classNames.add('existing-end');
+      }
+      continue;
+    }
+
+    if (dateKey === travel.start_day) classNames.add('existing-start');
+    if (dateKey === travel.end_day) classNames.add('existing-end');
+    if (dateKey > travel.start_day && dateKey < travel.end_day) {
+      classNames.add('existing-between');
+    }
+  }
+
+  return classNames;
+}
+
 export default function TravelDateCalendar({
   startDay,
   endDay,
   oneDayTrip = false,
   onChange,
+  travels,
 }: {
   startDay: string;
   endDay: string;
   oneDayTrip?: boolean;
   onChange: (range: { startDay: string; endDay: string }) => void;
+  travels?: (string | { start_day: string; end_day: string })[];
 }) {
   // new Date()를 render 중에 바로 쓰면 서버(UTC)와 클라이언트(KST) 타임존이 달라
   // 자정 근처에 날짜가 어긋나 hydration mismatch가 나서, null로 시작해 클라이언트에서만 채운다
+  console.log('DEBUG TravelDateCalendar render', {
+    startDay,
+    endDay,
+    oneDayTrip,
+    travels,
+  });
   const [today, setToday] = useState<Date | null>(null);
 
   const [monthsAhead, setMonthsAhead] = useState(INITIAL_MONTHS_AHEAD);
@@ -94,14 +131,22 @@ export default function TravelDateCalendar({
 
   const getTileClassName = (date: Date) => {
     const dateKey = formatDateKey(date);
-    const classNames: string[] = [];
-    if (dateKey === startDay) classNames.push('travel-start');
-    if (dateKey === endDay) classNames.push('travel-end');
-    if (classNames.length > 0) return classNames.join(' ');
-    if (startDay && endDay && dateKey > startDay && dateKey < endDay) {
-      return 'travel-between';
+    const classNames = getExistingTravelClassNames(dateKey, travels ?? []);
+
+    if (dateKey === startDay) classNames.add('travel-start');
+    if (dateKey === endDay) classNames.add('travel-end');
+    if (
+      !classNames.has('travel-start') &&
+      !classNames.has('travel-end') &&
+      startDay &&
+      endDay &&
+      dateKey > startDay &&
+      dateKey < endDay
+    ) {
+      classNames.add('travel-between');
     }
-    return null;
+
+    return classNames.size > 0 ? Array.from(classNames).join(' ') : null;
   };
 
   return (
@@ -118,6 +163,7 @@ export default function TravelDateCalendar({
             <Calendar
               activeStartDate={monthDate}
               calendarType='gregory'
+              locale='ko-KR'
               showNavigation={false}
               minDetail='month'
               maxDetail='month'
