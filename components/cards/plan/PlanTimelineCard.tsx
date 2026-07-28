@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import TimelineLeft from './TimelineLeft';
-import PlanCardHeader from './PlanCardHeader';
-import PlanCardBody from './PlanCardBody';
-import type { PlanCardData } from '@/types/plans';
-import { usePlanStore } from '@/store/usePlanStore';
-import { addEditingCard, removeEditingCard } from '@/lib/ably/planPresence';
-import { getEditorsLabel, useCardEditors } from '@/hooks/useCardEditors';
-import { cn } from '@/lib/utils';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useRef, useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import TimelineLeft from "./TimelineLeft";
+import PlanCardHeader from "./PlanCardHeader";
+import PlanCardBody from "./PlanCardBody";
+import type { PlanCardData } from "@/types/plans";
+import { usePlanStore } from "@/store/usePlanStore";
+import { addEditingCard, removeEditingCard } from "@/lib/ably/planPresence";
+import { getEditorsLabel, useCardEditors } from "@/hooks/useCardEditors";
+import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
 
 const Player = dynamic(
-  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  () => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player),
   { ssr: false },
 );
 
@@ -75,7 +75,7 @@ export default function PlanTimelineCard({
   useEffect(() => {
     if (isNew) {
       // 새 카드 위치로 내부 스크롤 이동
-      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      rootRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       clearNewCard();
     }
   }, []);
@@ -104,12 +104,12 @@ export default function PlanTimelineCard({
   }, [isDnd]);
 
   // times 배열 형태(['12:29', '12:50'])와 visitTime 문자열 형태 둘 다 대응
-  const initialStartTime = data.times?.[0] || '';
-  const initialEndTime = data.times?.[1] || '';
+  const initialStartTime = data.times?.[0] || "";
+  const initialEndTime = data.times?.[1] || "";
 
   // cost, memo
-  const initialCost = data.expense !== undefined ? String(data.expense) : '';
-  const initialMemo = data.desc || '';
+  const initialCost = data.expense !== undefined ? String(data.expense) : "";
+  const initialMemo = data.desc || "";
 
   // State 초기화
   const [editStartTime, setEditStartTime] = useState(initialStartTime);
@@ -151,7 +151,7 @@ export default function PlanTimelineCard({
   const handleAddChecklistItem = () => {
     setChecklists((prev) => [
       ...prev,
-      { id: Date.now().toString(), text: '', checked: false },
+      { id: Date.now().toString(), text: "", checked: false },
     ]);
   };
 
@@ -225,12 +225,12 @@ export default function PlanTimelineCard({
         />
       )}
 
-      <div className={cn('flex-1', isDnd ? 'pb-2.5' : 'pb-6')}>
+      <div className={cn("flex-1", isDnd ? "pb-2.5" : "pb-6")}>
         <div
           {...(isDnd ? { ...attributes, ...listeners } : {})}
           className={cn(
-            'px-5 py-4 bg-white rounded-lg shadow-card flex flex-col',
-            isDnd && 'cursor-grab active:cursor-grabbing',
+            "px-5 py-4 bg-white rounded-lg shadow-card flex flex-col",
+            isDnd && "cursor-grab active:cursor-grabbing",
           )}
         >
           <PlanCardHeader
@@ -268,9 +268,9 @@ export default function PlanTimelineCard({
                 loop
                 src="/lottie/loading.json"
                 className="[&_svg]:scale-[3.5] [&_svg]:transform-gpu overflow-visible"
-                style={{ width: '20px', height: '20px' }}
+                style={{ width: "20px", height: "20px" }}
               />
-              <span className="text-xs font-regular truncate text-muted">
+              <span className="text-xs font-regular truncate text-primary-focus">
                 {getEditorsLabel(editors)}
               </span>
             </div>
