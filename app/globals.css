@@ -61,6 +61,10 @@
 
   /* 마운트 시 부드럽게 나타나는 페이드인 */
   --animate-fade-in: fade-in 0.7s ease-out both;
+
+  /* 발자국이 순서대로 나타났다 사라지길 반복하며 걸어가는 것처럼 보이는 애니메이션.
+     delay만 다르게 줘서 여러 개를 이어붙이면 걸음걸이처럼 보인다 */
+  --animate-footstep: footstep 3s ease-in-out infinite backwards;
 }
 
 @keyframes marquee {
@@ -92,6 +96,25 @@
   }
   50% {
     transform: rotate(4deg);
+  }
+}
+
+/* scale만 다뤄서(transform 아님) 발자국에 준 회전용 rotate-* 클래스와 안 부딪힘 */
+@keyframes footstep {
+  0%,
+  8% {
+    opacity: 0;
+    scale: 0.6;
+  }
+  20%,
+  60% {
+    opacity: 1;
+    scale: 1;
+  }
+  75%,
+  100% {
+    opacity: 0;
+    scale: 0.6;
   }
 }
 
