@@ -3,6 +3,7 @@
 import React from 'react';
 import { Clock, CircleDollarSign, SquareMenu } from 'lucide-react';
 import type { PlanCardData } from '@/types/plans';
+import { formatTimeInput } from '@/lib/utils';
 
 interface PlaceCardProps {
   data: PlanCardData;
@@ -34,7 +35,8 @@ export default function PlaceCard({
     data.times && data.times.length === 2
       ? `${data.times[0]} ~ ${data.times[1]}`
       : null;
-  const displayCost = data.expense !== undefined ? data.expense : null;
+  const displayCost =
+    data.expense !== undefined && data.expense !== 0 ? data.expense : null;
   const displayMemo = data.desc;
 
   if (isEditing) {
@@ -44,17 +46,23 @@ export default function PlaceCard({
           <Clock size={12} className="shrink-0 text-main" />
           <input
             type="text"
-            placeholder="11:00"
+            placeholder="00:00"
+            maxLength={5}
             value={editStartTime}
-            onChange={(event) => setEditStartTime(event.target.value)}
+            onChange={(event) =>
+              setEditStartTime(formatTimeInput(event.target.value))
+            }
             className="w-20 rounded-sm border border-border p-1.5 text-left focus:outline-1 focus:outline-muted"
           />
           <span>~</span>
           <input
             type="text"
-            placeholder="13:00"
+            placeholder="00:00"
+            maxLength={5}
             value={editEndTime}
-            onChange={(event) => setEditEndTime(event.target.value)}
+            onChange={(event) =>
+              setEditEndTime(formatTimeInput(event.target.value))
+            }
             className="w-20 rounded-sm border border-border p-1.5 text-left focus:outline-1 focus:outline-muted"
           />
         </div>
@@ -84,22 +92,22 @@ export default function PlaceCard({
   }
 
   return (
-    <div className="flex flex-col gap-1.5 text-sub">
+    <div className="flex flex-col gap-1.5 text-sub mt-2">
       {displayTime && (
         <div className="flex items-center gap-1.5">
-          <Clock size={13} className="shrink-0 text-main" />
+          <Clock size={12} className="shrink-0 text-main mt-[3px]" />
           <span>{displayTime}</span>
         </div>
       )}
-      {displayCost && (
+      {displayCost !== null && (
         <div className="flex items-center gap-1.5">
-          <CircleDollarSign size={13} className="shrink-0 text-main" />
-          <span>{displayCost}</span>
+          <CircleDollarSign size={12} className="shrink-0 text-main" />
+          <span>{displayCost}원</span>
         </div>
       )}
       {displayMemo && (
-        <div className="flex items-start gap-1.5">
-          <SquareMenu size={13} className="shrink-0 text-main" />
+        <div className="flex items-center gap-1.5">
+          <SquareMenu size={12} className="shrink-0 text-main" />
           <span className="whitespace-pre-line">{displayMemo}</span>
         </div>
       )}

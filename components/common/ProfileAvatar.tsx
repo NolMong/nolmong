@@ -20,13 +20,15 @@ const themeStyles: Record<ProfileTheme, string> = {
 interface ProfileAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: number;
   type?: UserType;
-  theme?: ProfileTheme; // 수동 지정 선택
+  theme?: ProfileTheme;
+  borderWidth?: number;
 }
 
 export default function ProfileAvatar({
   size = 40,
   type,
   theme,
+  borderWidth = 3,
   className,
   ...props
 }: ProfileAvatarProps) {
@@ -43,13 +45,14 @@ export default function ProfileAvatar({
   return (
     <div
       className={cn(
-        'relative rounded-full overflow-hidden flex items-center justify-center border-3 select-none transition-colors duration-200',
+        'relative rounded-full overflow-hidden flex items-center justify-center border-solid select-none transition-colors duration-200',
         themeStyles[currentTheme],
         className,
       )}
       style={{
         width: `${size}px`,
         height: `${size}px`,
+        borderWidth: `${borderWidth}px`,
       }}
       {...props}
     >
