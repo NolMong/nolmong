@@ -22,28 +22,29 @@ function getTravelTileClassName(
   travels: (TravelEntry | undefined)[],
 ) {
   const dateKey = formatDateKey(date);
+  // 여러 여행 일정이 같은 날짜에 겹칠 수 있어서(A 여행 끝나는 날 = B 여행 시작일 등),
+  // 첫 매칭에서 바로 return하지 않고 전부 순회하며 클래스를 모은다
+  const classNames = new Set<string>();
 
   for (const travel of travels) {
     if (!travel) continue;
 
     if (typeof travel === 'string') {
       if (dateKey === travel) {
-        return `${TRAVEL_START_CLASS} ${TRAVEL_END_CLASS}`;
+        classNames.add(TRAVEL_START_CLASS);
+        classNames.add(TRAVEL_END_CLASS);
       }
       continue;
     }
 
-    const classNames: string[] = [];
-    if (dateKey === travel.start_day) classNames.push(TRAVEL_START_CLASS);
-    if (dateKey === travel.end_day) classNames.push(TRAVEL_END_CLASS);
-    if (classNames.length > 0) return classNames.join(' ');
-
+    if (dateKey === travel.start_day) classNames.add(TRAVEL_START_CLASS);
+    if (dateKey === travel.end_day) classNames.add(TRAVEL_END_CLASS);
     if (dateKey > travel.start_day && dateKey < travel.end_day) {
-      return TRAVEL_BETWEEN_CLASS;
+      classNames.add(TRAVEL_BETWEEN_CLASS);
     }
   }
 
-  return null;
+  return classNames.size > 0 ? Array.from(classNames).join(' ') : null;
 }
 
 export default function CalendarComponent({

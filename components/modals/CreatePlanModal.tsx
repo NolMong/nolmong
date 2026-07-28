@@ -152,7 +152,11 @@ function PanelSection({
   );
 }
 
-export default function CreatePlanModal() {
+export default function CreatePlanModal({
+  travels,
+}: {
+  travels: (string | { start_day: string; end_day: string })[];
+}) {
   const isOpen = useCreatePlanModalStore((state) => state.isOpen);
   const closeStore = useCreatePlanModalStore((state) => state.close);
   const router = useRouter();
@@ -394,6 +398,7 @@ export default function CreatePlanModal() {
               endDay={plan.endDate}
               oneDayTrip={oneDayTrip}
               onChange={handleChangeDate}
+              travels={travels}
             />
           </div>
         </div>
@@ -429,7 +434,10 @@ export default function CreatePlanModal() {
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
-      onClick={close}
+      onClick={() => {
+        if (isSubmitting) return;
+        close();
+      }}
       onTransitionEnd={handleTransitionEnd}
     >
       <div

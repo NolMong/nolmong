@@ -73,10 +73,9 @@
 
 /* 오늘 날짜 */
 .travel-date-calendar .react-calendar__tile--now {
-  background: none;
-  color: var(--color-primary);
+  background-color: var(--color-pink);
+  color: var(--color-pink-light);
   font-weight: 600;
-  border: 1.5px solid var(--color-primary);
   border-radius: 999px;
 }
 
@@ -86,20 +85,107 @@
   color: #fff !important;
 }
 
-/* CalendarComponent의 tileClassName이 붙여주는 커스텀 클래스 (react-calendar 기본 클래스 아님) */
+/* TravelDateCalendar의 tileClassName이 붙여주는 커스텀 클래스 (react-calendar 기본 클래스 아님) */
 
-/* 여행 일정 하이라이트: 단일 날짜, 또는 범위(startDay~endDay)의 시작·끝 날짜 */
-.travel-date-calendar .travel-edge {
-  background-color: var(--color-primary) !important;
-  color: var(--color-primary-light) !important;
-  /* border-radius: 999px !important; */
+/* 이미 등록된 여행(travels prop) 하이라이트. 지금 고르는 중인 새 일정(travel-*, 아래)과
+   겹칠 수 있어서 이 블록을 먼저 둬 travel-*가 source order상 나중에 이겨서 활성 선택이
+   우선 보이게 한다 */
+.travel-date-calendar .existing-start,
+.travel-date-calendar .existing-end,
+.travel-date-calendar .existing-between {
+  background-color: var(--color-caramel-light) !important;
+  color: var(--color-caramel) !important;
+}
+
+.travel-date-calendar .existing-start {
+  border-top-left-radius: 999px !important;
+  border-bottom-left-radius: 999px !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.travel-date-calendar .existing-end {
+  border-top-right-radius: 999px !important;
+  border-bottom-right-radius: 999px !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.travel-date-calendar .existing-between {
+  border-radius: 0 !important;
+}
+
+.travel-date-calendar .existing-start.existing-end {
+  border-radius: 999px !important;
+}
+
+.travel-date-calendar .existing-start:nth-child(7n + 1),
+.travel-date-calendar .existing-between:nth-child(7n + 1),
+.travel-date-calendar .existing-end:nth-child(7n + 1) {
+  border-top-left-radius: 999px !important;
+  border-bottom-left-radius: 999px !important;
+}
+
+.travel-date-calendar .existing-start:nth-child(7n),
+.travel-date-calendar .existing-between:nth-child(7n),
+.travel-date-calendar .existing-end:nth-child(7n) {
   border-top-right-radius: 999px !important;
   border-bottom-right-radius: 999px !important;
 }
 
-/* 여행 일정 하이라이트: 범위(startDay~endDay) 사이에 낀 날짜들 */
+/* 여행 일정 하이라이트: 시작·끝 날짜는 진하게 강조 */
+.travel-date-calendar .travel-start,
+.travel-date-calendar .travel-end {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-light) !important;
+}
+
+/* 시작~종료 사이 날짜: 연하게 */
 .travel-date-calendar .travel-between {
   background-color: var(--color-primary-light) !important;
   color: var(--color-primary) !important;
+}
+
+/* 시작일: 왼쪽만 둥글게 (오른쪽은 다음 날과 이어지도록 각지게) */
+.travel-date-calendar .travel-start {
+  border-top-left-radius: 999px !important;
+  border-bottom-left-radius: 999px !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* 종료일: 오른쪽만 둥글게 */
+.travel-date-calendar .travel-end {
+  border-top-right-radius: 999px !important;
+  border-bottom-right-radius: 999px !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+/* 시작~종료 사이 날짜: 양쪽 다 각지게 */
+.travel-date-calendar .travel-between {
   border-radius: 0 !important;
+}
+
+/* 당일치기(start_day === end_day)면 travel-start와 travel-end가 같이 붙어서
+   전체가 둥글게 되도록 함 */
+.travel-date-calendar .travel-start.travel-end {
+  border-radius: 999px !important;
+}
+
+/* 여행 범위가 여러 주(행)에 걸치는 경우: 주의 첫 칸(일요일)/마지막 칸(토요일)에서
+   줄이 바뀌면서 하이라이트가 뚝 잘린 것처럼 보이므로, travel-* 종류와 상관없이
+   그 줄 안에서는 캡처럼 둥글게 마무리한다 */
+.travel-date-calendar .travel-start:nth-child(7n + 1),
+.travel-date-calendar .travel-between:nth-child(7n + 1),
+.travel-date-calendar .travel-end:nth-child(7n + 1) {
+  border-top-left-radius: 999px !important;
+  border-bottom-left-radius: 999px !important;
+}
+
+.travel-date-calendar .travel-start:nth-child(7n),
+.travel-date-calendar .travel-between:nth-child(7n),
+.travel-date-calendar .travel-end:nth-child(7n) {
+  border-top-right-radius: 999px !important;
+  border-bottom-right-radius: 999px !important;
 }
