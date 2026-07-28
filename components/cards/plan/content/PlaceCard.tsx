@@ -94,7 +94,7 @@ export default function PlaceCard({
       )}
       {displayCost !== null && (
         <div className="flex items-center gap-1.5">
-          <CircleDollarSign size={13} className="shrink-0 text-main" />
+          <CircleDollarSign size={12} className="shrink-0 text-main" />
           <span>{displayCost}원</span>
         </div>
       )}
