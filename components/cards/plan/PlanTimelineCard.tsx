@@ -10,8 +10,13 @@ import type { PlanCardData } from '@/types/plans';
 import { usePlanStore } from '@/store/usePlanStore';
 import { addEditingCard, removeEditingCard } from '@/lib/ably/planPresence';
 import { getEditorsLabel, useCardEditors } from '@/hooks/useCardEditors';
-import ProfileAvatar from '@/components/common/ProfileAvatar';
 import { cn } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  { ssr: false },
+);
 
 interface PlanTimelineCardProps {
   data: PlanCardData;
@@ -227,7 +232,14 @@ export default function PlanTimelineCard({
           />
 
           {editors.length > 0 && (
-            <div className="flex items-center justify-end gap-1.5 mt-2">
+            <div className="flex items-center justify-end mt-2 gap-1">
+              <Player
+                autoplay
+                loop
+                src="/lottie/loading.json"
+                className="[&_svg]:scale-[3.5] [&_svg]:transform-gpu overflow-visible"
+                style={{ width: '20px', height: '20px' }}
+              />
               <span className="text-xs font-regular truncate text-muted">
                 {getEditorsLabel(editors)}
               </span>
