@@ -144,6 +144,16 @@ export default function PlanTimelineCard({
     setChecklists((prev) => prev.filter((item) => item.id !== id));
   };
 
+  // 편집을 열 때마다 폼을 최신 data로 업데이트
+  const handleEditStart = () => {
+    setEditStartTime(data.times?.[0] || "");
+    setEditEndTime(data.times?.[1] || "");
+    setEditCost(data.expense !== undefined ? String(data.expense) : "");
+    setEditMemo(data.desc || "");
+    setChecklists(data.checklistItems || []);
+    setIsEditing(true);
+  };
+
   const handleSave = () => {
     const updatedTimes =
       editStartTime && editEndTime ? [editStartTime, editEndTime] : data.times;
@@ -232,7 +242,7 @@ export default function PlanTimelineCard({
             data={data}
             isEditing={isEditing}
             isDnd={isDnd}
-            onEditStart={() => setIsEditing(true)}
+            onEditStart={handleEditStart}
             onDelete={handleDelete}
           />
 
