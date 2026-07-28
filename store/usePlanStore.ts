@@ -105,6 +105,9 @@ interface PlanState {
   headcount: number;
   isDirty: boolean; // 자동 저장 감지
   newCardId: string | null; // 방금 추가돼 편집 모드로 열려야 하는 카드 id
+  // 아직 Ably에 올리지 않은(저장 전) 카드 id 목록.
+  // 수신한 서버 상태로 cards를 교체할 때 이 카드들이 지워지지 않도록 하는 데 쓴다.
+  draftCardIds: string[];
 
   // 타이틀 수신 전용 (Ably subscribe로부터 반영 — 여기서 push하면 에코 루프 발생)
   setTitle: (title: string) => void;
@@ -140,6 +143,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   headcount: 0,
   isDirty: false,
   newCardId: null,
+  draftCardIds: [],
 
   setTitle: (title) => set({ title }),
 
@@ -181,7 +185,12 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     // newCardId로 표시해 PlanTimelineCard가 편집 모드로 열도록 함.
     // draft 단계에서는 Ably/DB에 반영하지 않음 (isDirty·push 없음) →
     // 취소 시 다른 참가자 화면에 빈 카드가 깜빡이지 않도록 저장(확인) 시점까지 미룸
-    set({ cards: [...cards, newCard], newCardId: newCard.id });
+    set((state) => ({
+      cards: [...cards, newCard],
+      newCardId: newCard.id,
+      // 저장 전까지는 로컬 전용이므로 draft로 등록
+      draftCardIds: [...state.draftCardIds, newCard.id],
+    }));
   },
 
   // draft를 확정 저장: 로컬 반영 + 이 시점에 Ably에 처음 생성
@@ -189,6 +198,8 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     set((state) => ({
       cards: state.cards.map((c) => (c.id === card.id ? card : c)),
       isDirty: true,
+      // 서버에 생겼으므로 더 이상 draft가 아님
+      draftCardIds: state.draftCardIds.filter((id) => id !== card.id),
     }));
 
     pushCardCreate(card);
@@ -198,6 +209,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   discardCard: (id) => {
     set((state) => ({
       cards: state.cards.filter((c) => c.id !== id),
+      draftCardIds: state.draftCardIds.filter((draftId) => draftId !== id),
     }));
   },
 
