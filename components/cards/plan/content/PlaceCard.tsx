@@ -92,10 +92,10 @@ export default function PlaceCard({
           <span>{displayTime}</span>
         </div>
       )}
-      {displayCost && (
+      {displayCost !== null && (
         <div className="flex items-center gap-1.5">
-          <CircleDollarSign size={12} className="shrink-0 text-main" />
-          <span>{displayCost}</span>
+          <CircleDollarSign size={13} className="shrink-0 text-main" />
+          <span>{displayCost}원</span>
         </div>
       )}
       {displayMemo && (
