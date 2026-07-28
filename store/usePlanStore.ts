@@ -117,6 +117,7 @@ interface PlanState {
   setCards: (cards: PlanCardData[]) => void;
   addCard: (type: PlanCardType, day: string) => void;
   clearNewCard: () => void;
+  clearDrafts: () => void; // 계획 이탈 시 로컬 전용 draft 정리
   commitCard: (card: PlanCardData) => void; // draft의 첫 저장(확인) — 이때 Ably 생성
   discardCard: (id: string) => void; // draft 취소 — 로컬에서만 제거
   updateCard: (updatedCard: PlanCardData) => void;
@@ -174,6 +175,15 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   setHeadcount: (headcount) => set({ headcount }),
 
   clearNewCard: () => set({ newCardId: null }),
+
+  // 계획 페이지를 벗어날 때 로컬 전용 draft를 정리한다.
+  // store가 모듈 스코프라 그대로 두면 다른 계획 화면까지 따라간다.
+  clearDrafts: () =>
+    set((state) => ({
+      cards: state.cards.filter((c) => !state.draftCardIds.includes(c.id)),
+      draftCardIds: [],
+      newCardId: null,
+    })),
 
   addCard: (type, day) => {
     // 해당 day의 맨 뒤에 붙도록 order 계산

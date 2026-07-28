@@ -46,6 +46,7 @@ export function usePlanSync(uuid: string) {
   const setEndDay = usePlanStore((s) => s.setEndDay);
   const setBudget = usePlanStore((s) => s.setBudget);
   const setHeadcount = usePlanStore((s) => s.setHeadcount);
+  const clearDrafts = usePlanStore((s) => s.clearDrafts);
   const setMembers = usePresenceStore((s) => s.setMembers);
   const setMe = usePresenceStore((s) => s.setMe);
   const clearPresence = usePresenceStore((s) => s.clearPresence);
@@ -149,6 +150,9 @@ export function usePlanSync(uuid: string) {
       clearPresence();
       channel.presence.unsubscribe();
       channel.presence.leave().catch(() => {});
+
+      // 저장 전 draft는 이 계획에서만 유효하다. 남겨두면 다음 계획 화면까지 따라간다.
+      clearDrafts();
       // channel도 client와 마찬가지로 이름별 공유 인스턴스라, 여기서 detach하면
       // StrictMode의 mount→cleanup→mount 이중 실행 시 뒤이은 진짜 마운트가 같은
       // 채널을 쓰다가 "Channel detached"를 맞는다. 구독만 정리하고 채널 연결은 유지한다.
@@ -164,5 +168,6 @@ export function usePlanSync(uuid: string) {
     setMembers,
     setMe,
     clearPresence,
+    clearDrafts,
   ]);
 }
