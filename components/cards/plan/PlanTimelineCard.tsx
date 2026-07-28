@@ -115,13 +115,24 @@ export default function PlanTimelineCard({
   // 체크리스트 상태
   const [checklists, setChecklists] = useState(data.checklistItems || []);
 
-  // 조회 모드-체크박스 토글
+  // 체크박스 토글
   const toggleCheck = (id: string) => {
-    setChecklists((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, checked: !item.checked } : item,
-      ),
+    // 편집 중에는 로컬 편집본만 바꾸고 "확인" 시점에 저장한다
+    if (isEditing) {
+      setChecklists((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, checked: !item.checked } : item,
+        ),
+      );
+      return;
+    }
+
+    // 조회 모드의 체크박스는 편집 폼이 아니라 즉시 반영되는 조작으로 취급한다.
+    // 최신 data를 기준으로 갱신해 저장하면 Ably 전파 → data 갱신 → 화면 반영으로 이어진다.
+    const updatedItems = (data.checklistItems || []).map((item) =>
+      item.id === id ? { ...item, checked: !item.checked } : item,
     );
+    onUpdate?.({ ...data, checklistItems: updatedItems });
   };
 
   // 수정 모드-체크리스트 항목 텍스트 변경
