@@ -175,6 +175,15 @@ export default function PlanTimelineCard({
     setIsEditing(false);
   };
 
+  const handleDelete = () => {
+    // 방금 추가한(저장 전) 카드는 삭제 시 로컬에서만 제거
+    if (isDraft) {
+      discardCard(data.id);
+      return;
+    }
+    onDelete?.(data.id);
+  };
+
   return (
     <div
       ref={setRefs}
@@ -224,7 +233,7 @@ export default function PlanTimelineCard({
             isEditing={isEditing}
             isDnd={isDnd}
             onEditStart={() => setIsEditing(true)}
-            onDelete={onDelete}
+            onDelete={handleDelete}
           />
 
           <PlanCardBody
