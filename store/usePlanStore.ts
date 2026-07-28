@@ -152,8 +152,22 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     pushTitle(title);
   },
 
-  // 수신(에코 포함)이 로컬 변경의 isDirty를 씻지 않도록 cards만 교체
-  setCards: (cards) => set({ cards }),
+  // 수신(에코 포함)이 로컬 변경의 isDirty를 씻지 않도록 cards만 교체.
+  // 단, 아직 서버에 올리지 않은 내 draft는 교체 대상에서 제외해 살려둔다.
+  // (draft는 로컬 전용이라 서버 상태로 통째 교체하면 작성 중이던 카드가 사라짐)
+  setCards: (cards) =>
+    set((state) => {
+      const serverIds = new Set(cards.map((c) => c.id));
+      const keptDrafts = state.cards.filter(
+        (c) =>
+          state.draftCardIds.includes(c.id) &&
+          // 저장 직후 에코처럼 서버에도 생긴 카드는 서버 버전이 이겨야 한다
+          !serverIds.has(c.id),
+      );
+
+      // 화면은 order로 정렬해 그리므로 뒤에 붙어도 표시 위치는 유지된다
+      return { cards: [...cards, ...keptDrafts] };
+    }),
   setStartDay: (start_day) => set({ start_day }),
   setEndDay: (end_day) => set({ end_day }),
   setBudget: (budget) => set({ budget }),
