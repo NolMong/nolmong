@@ -6,6 +6,7 @@ export { default as Tag } from './common/Tag';
 export { default as LocationTag } from './common/LocationTag';
 export { default as ProfileAvatar } from './common/ProfileAvatar';
 export { default as Nothing } from './common/Nothing';
+export { default as Reveal } from './common/Reveal';
 
 // cards
 export { default as TravelTestCard } from './cards/TravelTestCard';

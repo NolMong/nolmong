@@ -122,3 +122,14 @@
   color: var(--color-primary) !important; */
   border-radius: 0 !important;
 }
+
+/* 오늘이 여행 시작/끝/중간 날짜와 겹치는 경우, travel-* 색이 오늘(--now) 색을
+   덮어써버려서(둘 다 !important, source order상 travel-*가 뒤라 이김) 오늘 표시가
+   안 보이던 문제. 클래스 3개짜리 선택자로 specificity를 올려 항상 오늘 스타일이 이기게 함 */
+.main-calendar .react-calendar__tile--now.travel-start,
+.main-calendar .react-calendar__tile--now.travel-end,
+.main-calendar .react-calendar__tile--now.travel-between {
+  background-color: var(--color-pink) !important;
+  color: var(--color-pink-light) !important;
+  border-radius: 999px !important;
+}
