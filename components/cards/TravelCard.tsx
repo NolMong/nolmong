@@ -220,7 +220,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
       </div>
       {isPastEndDay(data?.end_day || new Date()) && (
         <Image
-          src="/images/stamp2.png"
+          src="/images/stamp.png"
           alt="stamp"
           width={200}
           height={200}
