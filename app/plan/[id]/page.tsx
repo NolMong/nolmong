@@ -21,6 +21,8 @@ import { usePlanSync } from '@/hooks/usePlanSync';
 import { usePlanStore } from '@/store/usePlanStore';
 import { createClient } from '@/lib/supabase/client';
 import { AnimatePresence, motion } from 'framer-motion';
+import WishlistSkeleton from './_components/WishlistSkeleton';
+import PlanDetailsSkeleton from './_components/PlanDetailSkeleton';
 
 const supabase = createClient();
 
@@ -31,6 +33,7 @@ export default function PlanPage({
 }) {
   const { id: uuid } = use(params);
   const { activePlanTab, setPlanTab } = usePlanTabStore();
+  const { isLoaded, resetPlan } = usePlanStore();
   const { title, updateTitle } = usePlanStore();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -40,7 +43,14 @@ export default function PlanPage({
   const titleRef = useRef<HTMLDivElement>(null);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
+  // plan id 바뀔 때마다 이전 스토어 상태 초기화
+  useEffect(() => {
+    resetPlan();
+  }, [uuid, resetPlan]);
+
+  useAutoSavePlan(uuid);
+  usePlanSync(uuid);
 
   // 편집 모드 진입 시에만 포커스 이동 (DOM 동기화 목적이라 effect가 적절)
   useEffect(() => {
@@ -146,23 +156,34 @@ export default function PlanPage({
       {/* 헤더 타이틀 및 탭 버튼 */}
       <MapModal />
       <div className="flex flex-col gap-5">
-        <div className="flex gap-2">
-          <div
-            ref={titleRef}
-            className={`text-xl font-jalnan-gothic text-sub outline-0 ${titleEditMode ? 'w-200 border border-border bg-white py-2 px-3 rounded-md' : ''}`}
-            contentEditable={titleEditMode}
-            suppressContentEditableWarning
-            onKeyDown={handleKeyDown}
-          >
-            {title || '여행'}
-          </div>
-          <button className="cursor-pointer" onClick={handleTitleEditToggle}>
-            {titleEditMode ? (
-              <Check size={24} className="text-primary" />
-            ) : (
-              <LucideEdit3 size={14} className="text-muted" />
-            )}
-          </button>
+        <div className="flex gap-2 items-center min-h-6">
+          {!isLoaded ? (
+            // 로딩 중
+            <div className="h-6 w-40 animate-pulse rounded-md bg-gray-200 my-1" />
+          ) : (
+            // 로딩 완료
+            <>
+              <div
+                ref={titleRef}
+                className={`text-xl font-jalnan-gothic text-sub outline-0 ${titleEditMode ? 'w-200 border border-border bg-white py-2 px-3 rounded-md' : ''}`}
+                contentEditable={titleEditMode}
+                suppressContentEditableWarning
+                onKeyDown={handleKeyDown}
+              >
+                {title || '여행'}
+              </div>
+              <button
+                className="cursor-pointer"
+                onClick={handleTitleEditToggle}
+              >
+                {titleEditMode ? (
+                  <Check size={24} className="text-primary" />
+                ) : (
+                  <LucideEdit3 size={14} className="text-muted" />
+                )}
+              </button>
+            </>
+          )}
         </div>
 
         <div className="flex gap-2 mb-7">
@@ -183,8 +204,37 @@ export default function PlanPage({
         </div>
       </div>
 
-      {/* 탭별 뷰 렌더링 */}
-      {activePlanTab === 'PLAN_DETAILS' ? <PlanDetailsTab /> : <WishlistTab />}
+      <AnimatePresence mode="wait">
+        {!isLoaded ? (
+          <motion.div
+            key={`skeleton-${uuid}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            {activePlanTab === 'PLAN_DETAILS' ? (
+              <PlanDetailsSkeleton />
+            ) : (
+              <WishlistSkeleton />
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key={`content-${uuid}-${activePlanTab}`}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activePlanTab === 'PLAN_DETAILS' ? (
+              <PlanDetailsTab />
+            ) : (
+              <WishlistTab />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {toastMessage && (

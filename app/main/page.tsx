@@ -270,7 +270,7 @@ function MainPageContent() {
             <div className="absolute top-24.5 left-8 text-white">
               친구들을 초대해 실시간으로 계획을 만들고 공유해봐요.
             </div>
-            <div className="absolute top-5.5 right-8 bg-[#36B9FD] text-white rounded-full w-50 h-10 text-sm font-bold flex items-center justify-center">
+            <div className="absolute top-5.5 right-8 bg-[#36B9FD] text-white rounded-full w-50 h-10 text-sm font-bold flex items-center justify-center transition-transform duration-200 hover:scale-105 active:scale-95">
               새 여행 일정 만들러 가기
             </div>
           </button>

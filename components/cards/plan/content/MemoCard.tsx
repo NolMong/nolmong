@@ -3,6 +3,7 @@
 import React from 'react';
 import { Clock, SquareMenu } from 'lucide-react';
 import type { PlanCardData } from '@/types/plans';
+import { formatTimeInput } from '@/lib/utils';
 
 interface MemoCardProps {
   data: PlanCardData;
@@ -40,16 +41,22 @@ export default function MemoCard({
           <input
             type="text"
             placeholder="00:00"
+            maxLength={5}
             value={editStartTime}
-            onChange={(event) => setEditStartTime(event.target.value)}
+            onChange={(event) =>
+              setEditStartTime(formatTimeInput(event.target.value))
+            }
             className="w-20 rounded-sm border border-border p-1.5 text-left focus:outline-1 focus:outline-muted"
           />
           <span>~</span>
           <input
             type="text"
             placeholder="00:00"
+            maxLength={5}
             value={editEndTime}
-            onChange={(event) => setEditEndTime(event.target.value)}
+            onChange={(event) =>
+              setEditEndTime(formatTimeInput(event.target.value))
+            }
             className="w-20 rounded-sm border border-border p-1.5 text-left focus:outline-1 focus:outline-muted"
           />
         </div>

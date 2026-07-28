@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { PlanCardData, PlanCardType } from "@/types/plans";
-import { arrayMove } from "@dnd-kit/sortable";
+import { create } from 'zustand';
+import { PlanCardData, PlanCardType } from '@/types/plans';
+import { arrayMove } from '@dnd-kit/sortable';
 import {
   pushCardCreate,
   pushCardFields,
@@ -8,93 +8,7 @@ import {
   pushCardOrders,
   pushCardRemove,
   pushTitle,
-} from "@/lib/ably/planObject";
-
-// 임의로 생성한 더미데이터. 데이터 연결할때 삭제하면 됩니다.
-const initialCards: PlanCardData[] = [
-  // 후보 장소 리스트 (day: "")
-  {
-    id: "cand-1",
-    day: "",
-    order: 1,
-    type: "PLACE",
-    name: "해운대블루라인파크",
-    category: "테마/체험",
-    address: "부산 해운대구 달맞이길 116",
-    x: 129.178,
-    y: 35.158,
-  },
-  {
-    id: "cand-2",
-    day: "",
-    order: 2,
-    type: "PLACE",
-    name: "미피스토어 해운대점",
-    category: "관광",
-    address: "나만의 장소",
-    x: 129.16,
-    y: 35.161,
-  },
-  {
-    id: "cand-3",
-    day: "",
-    order: 3,
-    type: "PLACE",
-    name: "국이네 낙지볶음",
-    category: "식당",
-    address: "부산 수영구 연수로 410",
-    x: 129.112,
-    y: 35.17,
-  },
-
-  // --- day 1 데이터 (day: 'day-1') ---
-  {
-    id: "card-1",
-    day: "day-1",
-    order: 1,
-    type: "CHECKLIST",
-    checklistItems: [
-      { id: "c1", text: "기차 티켓 확인", checked: true },
-      { id: "c2", text: "렌터카 인수 확인 및 운전면허증 지참", checked: false },
-    ],
-  },
-  {
-    id: "card-2",
-    day: "day-1",
-    order: 2,
-    type: "PLACE",
-    name: "부산역",
-    category: "관광",
-    address: "부산 동구 중앙대로 206",
-    x: 129.041,
-    y: 35.115,
-    times: ["12:29", "12:50"],
-    expense: 150900,
-    desc: "가기 전에 탑승권 뽑고 역무원에게 문의",
-  },
-  {
-    id: "card-3",
-    day: "day-1",
-    order: 3,
-    type: "MEMO",
-    times: ["13:00", "13:30"],
-    desc: "부산역 근처 카페에서 일정 점검 및 커피 한 잔",
-  },
-  {
-    id: "card-4",
-    day: "day-1",
-    order: 4,
-    type: "PLACE",
-    name: "톤쇼우 남포점",
-    category: "식당",
-    address: "부산 남포동",
-    x: 129.032,
-    y: 35.098,
-    times: ["13:30", "15:00"],
-    expense: 35000,
-    desc: "캐치테이블 현장 대기 등록 필수!",
-  },
-];
+} from '@/lib/ably/planObject';
 
 interface PlanState {
   title: string;
@@ -108,6 +22,11 @@ interface PlanState {
   // 아직 Ably에 올리지 않은(저장 전) 카드 id 목록.
   // 수신한 서버 상태로 cards를 교체할 때 이 카드들이 지워지지 않도록 하는 데 쓴다.
   draftCardIds: string[];
+
+  // 데이터 로딩 상태
+  isLoaded: boolean;
+  setIsLoaded: (isLoaded: boolean) => void;
+  resetPlan: () => void;
 
   // 타이틀 수신 전용 (Ably subscribe로부터 반영 — 여기서 push하면 에코 루프 발생)
   setTitle: (title: string) => void;
@@ -136,15 +55,34 @@ interface PlanState {
 }
 
 export const usePlanStore = create<PlanState>((set, get) => ({
-  title: "",
+  title: '',
   cards: [],
-  start_day: "",
-  end_day: "",
+  start_day: '',
+  end_day: '',
   budget: 0,
   headcount: 0,
   isDirty: false,
   newCardId: null,
   draftCardIds: [],
+
+  // 초기 로딩값
+  isLoaded: false,
+  setIsLoaded: (isLoaded) => set({ isLoaded }),
+
+  // 이전 플랜 잔상을 지우기 위해 초기화
+  resetPlan: () =>
+    set({
+      title: '',
+      cards: [],
+      start_day: '',
+      end_day: '',
+      budget: 0,
+      headcount: 0,
+      isDirty: false,
+      newCardId: null,
+      draftCardIds: [],
+      isLoaded: false, // 스켈레톤이 다시 보이도록 처리
+    }),
 
   setTitle: (title) => set({ title }),
 
@@ -167,7 +105,10 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       );
 
       // 화면은 order로 정렬해 그리므로 뒤에 붙어도 표시 위치는 유지된다
-      return { cards: [...cards, ...keptDrafts] };
+      return {
+        cards: [...cards, ...keptDrafts],
+        isLoaded: true, // 데이터가 동기화되면 로딩 완료
+      };
     }),
   setStartDay: (start_day) => set({ start_day }),
   setEndDay: (end_day) => set({ end_day }),
@@ -194,16 +135,16 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     const base = { id: crypto.randomUUID(), day, order };
 
     let newCard: PlanCardData;
-    if (type === "CHECKLIST") {
+    if (type === 'CHECKLIST') {
       newCard = {
         ...base,
-        type: "CHECKLIST",
-        checklistItems: [{ id: crypto.randomUUID(), text: "", checked: false }],
+        type: 'CHECKLIST',
+        checklistItems: [{ id: crypto.randomUUID(), text: '', checked: false }],
       };
-    } else if (type === "MEMO") {
-      newCard = { ...base, type: "MEMO", desc: "", times: null };
+    } else if (type === 'MEMO') {
+      newCard = { ...base, type: 'MEMO', desc: '', times: null };
     } else {
-      newCard = { ...base, type: "PLACE" };
+      newCard = { ...base, type: 'PLACE' };
     }
 
     // newCardId로 표시해 PlanTimelineCard가 편집 모드로 열도록 함.
