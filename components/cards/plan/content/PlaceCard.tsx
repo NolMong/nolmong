@@ -84,7 +84,7 @@ export default function PlaceCard({
   }
 
   return (
-    <div className="flex flex-col gap-1.5 text-sub">
+    <div className="flex flex-col gap-1.5 text-sub mt-2">
       {displayTime && (
         <div className="flex items-center gap-1.5">
           <Clock size={13} className="shrink-0 text-main" />
@@ -98,7 +98,7 @@ export default function PlaceCard({
         </div>
       )}
       {displayMemo && (
-        <div className="flex items-start gap-1.5">
+        <div className="flex items-center gap-1.5">
           <SquareMenu size={13} className="shrink-0 text-main" />
           <span className="whitespace-pre-line">{displayMemo}</span>
         </div>
