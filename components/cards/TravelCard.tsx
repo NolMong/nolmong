@@ -1,16 +1,18 @@
 'use client';
 
-import { Tag } from '@/components';
-import { X } from 'lucide-react';
-import { CardType, PlanType } from '@/api/getPlans';
-import { getRelativeTime } from '@/utils/getRelativeTime';
-import { locations } from '@/data/locations';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import dayjs from 'dayjs';
+import { X } from 'lucide-react';
+import { Tag, ProfileAvatar } from '@/components';
+import { CardType, PlanType } from '@/api/getPlans';
 import { deletePlan } from '@/api/deletePlan';
-import { useMemo } from 'react';
-import { ProfileAvatar } from '@/components';
 import { MemberProfileList } from '../common/MemberProfileList';
+import { getRelativeTime } from '@/utils/getRelativeTime';
+import { getRandomInt } from '@/utils/getRandomInt';
+import { locations } from '@/data/locations';
+import { isPastEndDay } from '@/utils/isPastEndDay';
 
 const Locations = ({
   startLocation,
@@ -28,7 +30,7 @@ const Locations = ({
   };
 
   return (
-    <div className="flex gap-3 items-center font-jalnan-gothic text-main text-[18px]">
+    <div className="flex gap-3 items-start font-jalnan-gothic text-main text-[18px] z-1">
       <div>
         <div>{startLocation}</div>
         <div className="text-[10px] text-muted -mt-1 font-sans">
@@ -37,7 +39,7 @@ const Locations = ({
       </div>
       <div>‣</div>
       {endLocations.map((location, index) => (
-        <div key={index} className="flex gap-3 items-center">
+        <div key={index} className="flex gap-3 items-start">
           <div>
             <div>{location}</div>
             <div className="text-[10px] text-muted -mt-1 font-sans">
@@ -58,6 +60,14 @@ interface TravelCardProps {
 
 export default function TravelCard({ data, onLeave }: TravelCardProps) {
   console.log(data);
+
+  const [random, setRandom] = useState(() => ({
+    top: getRandomInt(64, 70), // 18 ~ 24
+    right: getRandomInt(0, 12), // -2 ~ 12
+    rotate: getRandomInt(-20, 20), // -60 ~ 60
+  }));
+
+  console.log('DEBUG random:', random);
 
   const renderedWaypoints = useMemo(() => {
     const cards = data?.cards as CardType[] | undefined;
@@ -138,7 +148,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
   const hasValidWaypoints = Boolean(renderedWaypoints);
 
   return (
-    <div className="box w-90 rounded-[10px] border-2 border-border overflow-hidden shadow-[0px_4px_10px_0px_#b5b5b540] group hover:border-primary hover:scale-105 transition-all duration-300">
+    <div className="relative box w-90 rounded-[10px] border-2 border-border overflow-hidden shadow-[0px_4px_10px_0px_#b5b5b540] group hover:border-primary hover:scale-105 transition-all duration-300">
       {/* 카드 헤더 */}
       <div className="w-full px-3.5 py-2 bg-primary-light flex justify-between">
         <div className="text-[12px] text-muted">
@@ -153,9 +163,9 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
         ></X>
       </div>
       {/* 카드 몸통 */}
-      <div className="w-full px-4 pt-3 pb-2 bg-[#FEFFFD]">
+      <div className="w-full px-4 pt-3 pb-2 bg-[#FEFFFD] z-1">
         {/* 목적지와 누구 */}
-        <div className="w-full flex justify-between items-start">
+        <div className="w-full flex justify-between items-start z-1">
           <Locations
             startLocation={data?.start_location || ''}
             endLocations={data?.end_locations || []}
@@ -170,15 +180,17 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
         </div>
         {/* 가는 날짜 */}
         <div className="flex gap-1.5 text-sm text-main mt-2">
-          <div>{dayjs(data?.start_day).format('YYYY년 MM월 DD일')}</div>
-          <div>‣</div>
-          <div>{dayjs(data?.end_day).format('MM월 DD일')}</div>
+          <div className="z-1">
+            {dayjs(data?.start_day).format('YYYY년 MM월 DD일')}
+          </div>
+          <div className="z-1">‣</div>
+          <div className="z-1">{dayjs(data?.end_day).format('MM월 DD일')}</div>
         </div>
         {/* 여행 제목 */}
-        <div className="mt-4 text-muted">{data?.title || ''}</div>
+        <div className="relative mt-4 text-muted z-1">{data?.title || ''}</div>
       </div>
       {/* 들르는 장소 */}
-      <div className="w-full px-3.5 py-2 bg-primary-light overflow-hidden">
+      <div className="w-full px-3.5 py-2 bg-primary-light overflow-hidden z-1">
         <div className="flex w-max group-hover:animate-marquee">
           <div className="text-[12px] text-muted whitespace-nowrap pr-8">
             {hasValidWaypoints ? renderedWaypoints : '아직 일정이 없습니다.'}
@@ -206,6 +218,20 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
           <Tag color="primary">수정</Tag>
         </Link>
       </div>
+      {isPastEndDay(data?.end_day || new Date()) && (
+        <Image
+          src="/images/stamp2.png"
+          alt="stamp"
+          width={200}
+          height={200}
+          className="absolute w-30 h-30 object-cover object-center opacity-70 z-0"
+          style={{
+            top: `${random.top}px`,
+            right: `${random.right}px`,
+            transform: `rotate(${-random.rotate}deg)`,
+          }}
+        />
+      )}
     </div>
   );
 }
