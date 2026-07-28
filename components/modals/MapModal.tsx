@@ -27,7 +27,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Search, Hotel, MapPin, Newspaper, LocateFixed } from 'lucide-react';
+import { Search, Hotel, MapPin, Newspaper, LocateFixed, X } from 'lucide-react';
 
 // 후보(장소 리스트) 카드는 day: 'day-0' 예약값으로 표현 (WishlistTab과 동일한 컨벤션)
 const CANDIDATE_DAY = 'day-0';
@@ -175,8 +175,18 @@ export default function MapModal() {
               : 'w-0 px-0 py-0 opacity-0'
           }`}
         >
-          <div className='font-jalnan-gothic text-sub w-60 mb-4 shrink-0'>
-            검색 결과
+          <div className='flex items-center justify-between  mb-4'>
+            <div className='font-jalnan-gothic text-sub w-60 text-lg'>
+              검색 결과
+            </div>
+            <X
+              size={24}
+              className='text-muted cursor-pointer'
+              onClick={() => {
+                setHasSearched(false);
+                setSearchResults([]);
+              }}
+            />
           </div>
           <div className='w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin h-full'>
             {searchResults.length === 0 ? (
