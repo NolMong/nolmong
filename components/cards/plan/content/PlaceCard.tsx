@@ -34,7 +34,8 @@ export default function PlaceCard({
     data.times && data.times.length === 2
       ? `${data.times[0]} ~ ${data.times[1]}`
       : null;
-  const displayCost = data.expense !== undefined ? data.expense : null;
+  const displayCost =
+    data.expense !== undefined && data.expense !== 0 ? data.expense : null;
   const displayMemo = data.desc;
 
   if (isEditing) {
