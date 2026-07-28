@@ -172,128 +172,128 @@ function LandingContent() {
     <div>
       {/* <Header /> */}
       {/* 랜딩 이미지 */}
-      <div className='relative'>
+      <div className="relative">
         <Image
-          src='/images/landing_bg.webp'
-          alt='Landing Image'
+          src="/images/landing_bg.png"
+          alt="Landing Image"
           width={1512}
           height={856}
-          className='h-auto w-full'
-          loading='eager'
+          className="h-auto w-full"
+          loading="eager"
         />
 
         <Image
-          src='/images/cloud1.png'
-          alt='cloud1'
+          src="/images/cloud1.png"
+          alt="cloud1"
           width={500}
           height={50}
-          className='absolute top-[20%] left-[10%] w-[24%] h-auto'
+          className="absolute top-[20%] left-[10%] w-[24%] h-auto"
           style={{
             animation:
               'fade-in 1.1s ease-out 0s both, float 4s ease-in-out 0s infinite backwards',
           }}
-          loading='eager'
+          loading="eager"
         />
         <Image
-          src='/images/cloud2.png'
-          alt='cloud2'
+          src="/images/cloud2.png"
+          alt="cloud2"
           width={300}
           height={50}
-          className='absolute top-[48%] left-[3%] w-[14%] h-auto'
+          className="absolute top-[48%] left-[3%] w-[14%] h-auto"
           style={{
             animation:
               'fade-in 1.1s ease-out 0.05s both, float 4.6s ease-in-out 0.6s infinite backwards',
           }}
-          loading='eager'
+          loading="eager"
         />
         <Image
-          src='/images/cloud3.png'
-          alt='cloud3'
+          src="/images/cloud3.png"
+          alt="cloud3"
           width={300}
           height={50}
-          className='absolute top-[36%] left-[38%] w-[16%] h-auto'
+          className="absolute top-[36%] left-[38%] w-[16%] h-auto"
           style={{
             animation:
               'fade-in 1.1s ease-out 0.08s both, float 4.2s ease-in-out 1.2s infinite backwards',
           }}
-          loading='eager'
+          loading="eager"
         />
         <Image
-          src='/images/cloud4.png'
-          alt='cloud4'
+          src="/images/cloud4.png"
+          alt="cloud4"
           width={1000}
           height={50}
-          className='absolute top-[32%] right-[27%] w-[12%] h-auto'
+          className="absolute top-[32%] right-[27%] w-[12%] h-auto"
           style={{
             animation:
               'fade-in 1.1s ease-out 0.1s both, float 3.8s ease-in-out 0.3s infinite backwards',
           }}
-          loading='eager'
+          loading="eager"
         />
         <Image
-          src='/images/cloud5.png'
-          alt='cloud5'
+          src="/images/cloud5.png"
+          alt="cloud5"
           width={300}
           height={50}
-          className='absolute top-[56%] left-[30%] w-[8%] h-auto'
+          className="absolute top-[56%] left-[30%] w-[8%] h-auto"
           style={{
             animation:
               'fade-in 1.1s ease-out 0.12s both, float 5s ease-in-out 0.9s infinite backwards',
           }}
-          loading='eager'
+          loading="eager"
         />
         <Image
-          src='/images/cloud5.png'
-          alt='cloud5'
+          src="/images/cloud5.png"
+          alt="cloud5"
           width={300}
           height={50}
-          className='absolute top-[46%] right-[20%] w-[6%] h-auto'
+          className="absolute top-[46%] right-[20%] w-[6%] h-auto"
           style={{
             animation:
               'fade-in 1.1s ease-out 0.15s both, float 5s ease-in-out 0.9s infinite backwards',
           }}
-          loading='eager'
+          loading="eager"
         />
         <Image
-          src='/images/capi1.webp'
-          alt='Capi Image'
+          src="/images/capi1.png"
+          alt="Capi Image"
           width={222}
           height={295}
-          loading='eager'
-          className='absolute bottom-[-10%] left-[12%] w-[14.68%] h-auto origin-bottom animate-hum'
+          loading="eager"
+          className="absolute bottom-[-10%] left-[12%] w-[14.68%] h-auto origin-bottom animate-hum"
         />
         <Image
-          src='/images/bara1.webp'
-          alt='Bara Image'
+          src="/images/bara1.png"
+          alt="Bara Image"
           width={222}
           height={295}
-          loading='eager'
-          className='absolute bottom-[-10%] left-[30%] w-[14.68%] h-auto origin-bottom animate-nod'
+          loading="eager"
+          className="absolute bottom-[-10%] left-[30%] w-[14.68%] h-auto origin-bottom animate-nod"
         />
         <Image
-          src='/images/title1.png'
-          alt='Title1 Image'
+          src="/images/title1.png"
+          alt="Title1 Image"
           width={908}
           height={90}
-          loading='eager'
-          className='absolute top-[13%] right-[5%] w-[42%] h-auto -translate-y-1/2 animate-fade-in [animation-delay:0.15s] [animation-duration:1.1s]'
+          loading="eager"
+          className="absolute top-[13%] right-[5%] w-[42%] h-auto -translate-y-1/2 animate-fade-in [animation-delay:0.15s] [animation-duration:1.1s]"
         />
         <Image
-          src='/images/title2.png'
-          alt='Title2 Image'
+          src="/images/title2.png"
+          alt="Title2 Image"
           width={908}
           height={90}
-          loading='eager'
-          className='absolute top-[24%] right-[5%] w-[20%] h-auto -translate-y-1/2 animate-fade-in [animation-delay:0.2s] [animation-duration:1.1s]'
+          loading="eager"
+          className="absolute top-[24%] right-[5%] w-[20%] h-auto -translate-y-1/2 animate-fade-in [animation-delay:0.2s] [animation-duration:1.1s]"
         />
       </div>
 
       {/* 첫번째 카드 */}
-      <div className='box bg-primary-light w-full py-15 font-jalnan'>
-        <div className='mb-4 text-2xl text-center text-primary-focus'>
+      <div className="box bg-primary-light w-full py-15 font-jalnan">
+        <div className="mb-4 text-2xl text-center text-primary-focus">
           공동 여행 계획 서비스
         </div>
-        <div className='text-center text-4xl text-primary leading-[1.4]'>
+        <div className="text-center text-4xl text-primary leading-[1.4]">
           친구들과 함께 여행 계획을
           <br />
           세워보세요!
@@ -301,20 +301,20 @@ function LandingContent() {
         {/* 나중에 화면 캡쳐해서 쓸거임 */}
       </div>
       {/* 두번째 카드 */}
-      <div className='box bg-white w-full py-15 font-jalnan'>
-        <div className='text-center text-4xl text-sub'>이런걸 도와드려요</div>
+      <div className="box bg-white w-full py-15 font-jalnan">
+        <div className="text-center text-4xl text-sub">이런걸 도와드려요</div>
 
-        <div className='w-fit flex gap-7.5 mx-auto mt-15'>
+        <div className="w-fit flex gap-7.5 mx-auto mt-15">
           {features.map(({ icon: Icon, bg, iconColor, title, description }) => (
             <div
               key={title}
               className={`box w-80 h-72 rounded-[20px] px-10 py-7.5 ${bg} flex flex-col items-center gap-5`}
             >
-              <div className='w-14 h-14 bg-white rounded-full flex items-center justify-center'>
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
                 <Icon className={`w-8 h-8 ${iconColor}`} />
               </div>
-              <div className='text-[20px] text-center text-sub'>{title}</div>
-              <div className='font-sans font-normal text-center text-sub'>
+              <div className="text-[20px] text-center text-sub">{title}</div>
+              <div className="font-sans font-normal text-center text-sub">
                 {description}
               </div>
             </div>
@@ -323,54 +323,54 @@ function LandingContent() {
       </div>
 
       {/* 세번째 카드 */}
-      <div className='box bg-caramel-light w-full py-15 font-jalnan'>
-        <div className='mb-4 text-2xl text-center text-brown'>
+      <div className="box bg-caramel-light w-full py-15 font-jalnan">
+        <div className="mb-4 text-2xl text-center text-brown">
           공동 여행 계획 서비스
         </div>
-        <div className='mb-4 text-center text-4xl text-caramel'>
+        <div className="mb-4 text-center text-4xl text-caramel">
           카피 & 바라를 소개합니다
         </div>
-        <div className='font-sans font-normal text-center text-brown'>
+        <div className="font-sans font-normal text-center text-brown">
           서로 다른 여행 스타일을 가진 두 친구, 당신은 누구와 더 닮았나요?
         </div>
-        <div className='flex gap-4 justify-center mt-15'>
+        <div className="flex gap-4 justify-center mt-15">
           <Image
-            src='/images/capi2.webp'
-            alt='Capi Image'
+            src="/images/capi2.webp"
+            alt="Capi Image"
             width={222}
             height={295}
-            loading='eager'
+            loading="eager"
           />
           <Image
-            src='/images/bara2.webp'
-            alt='Bara Image'
+            src="/images/bara2.webp"
+            alt="Bara Image"
             width={222}
             height={295}
-            loading='eager'
+            loading="eager"
           />
         </div>
         <div>
-          <div className='flex gap-15 mt-15 mx-auto w-fit'>
+          <div className="flex gap-15 mt-15 mx-auto w-fit">
             {characters.map((c) => (
               <div
                 key={c.name}
                 className={`box rounded-[20px] border ${c.borderColor} w-fit bg-white p-7.5`}
               >
-                <div className='flex gap-2 items-center'>
-                  <div className='text-brown-light text-xl my-2'>{c.name}</div>
+                <div className="flex gap-2 items-center">
+                  <div className="text-brown-light text-xl my-2">{c.name}</div>
                   <Tag color={c.tagColor}>{c.tagLabel}</Tag>
                 </div>
 
-                <div className='font-normal text-brown-light leading-[1.4] font-sans text-sm mb-5'>
+                <div className="font-normal text-brown-light leading-[1.4] font-sans text-sm mb-5">
                   {c.description}
                 </div>
-                <div className='flex flex-col gap-1 font-sans'>
+                <div className="flex flex-col gap-1 font-sans">
                   {c.traits.map((trait) => (
-                    <div key={trait} className='flex gap-2 items-center'>
+                    <div key={trait} className="flex gap-2 items-center">
                       <div
                         className={`w-1.5 h-1.5 rounded-full ${c.dotColor}`}
                       ></div>
-                      <div className='text-muted text-sm'>{trait}</div>
+                      <div className="text-muted text-sm">{trait}</div>
                     </div>
                   ))}
                 </div>
@@ -379,7 +379,7 @@ function LandingContent() {
           </div>
           <button
             onClick={handleTestBtnClick}
-            className='cursor-pointer text-white text-xl hover:bg-[#bc9d79] px-14 py-4 rounded-full mt-10 block w-fit mx-auto bg-caramel transition duration-200'
+            className="cursor-pointer text-white text-xl hover:bg-[#bc9d79] px-14 py-4 rounded-full mt-10 block w-fit mx-auto bg-caramel transition duration-200"
           >
             나는 카피? 바라? 테스트 해보기
           </button>
