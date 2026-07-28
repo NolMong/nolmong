@@ -71,7 +71,7 @@ export default function MemoCard({
     <div className="flex flex-col gap-1.5 text-sub mt-2">
       {displayTime && (
         <div className="flex items-center gap-1.5">
-          <Clock size={13} className="shrink-0 text-muted" />
+          <Clock size={12} className="shrink-0 text-main mt-[3px]" />
           <span>{displayTime}</span>
         </div>
       )}

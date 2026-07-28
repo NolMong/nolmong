@@ -88,19 +88,19 @@ export default function PlaceCard({
     <div className="flex flex-col gap-1.5 text-sub mt-2">
       {displayTime && (
         <div className="flex items-center gap-1.5">
-          <Clock size={13} className="shrink-0 text-main" />
+          <Clock size={12} className="shrink-0 text-main mt-[3px]" />
           <span>{displayTime}</span>
         </div>
       )}
       {displayCost && (
         <div className="flex items-center gap-1.5">
-          <CircleDollarSign size={13} className="shrink-0 text-main" />
+          <CircleDollarSign size={12} className="shrink-0 text-main" />
           <span>{displayCost}</span>
         </div>
       )}
       {displayMemo && (
         <div className="flex items-center gap-1.5">
-          <SquareMenu size={13} className="shrink-0 text-main" />
+          <SquareMenu size={12} className="shrink-0 text-main" />
           <span className="whitespace-pre-line">{displayMemo}</span>
         </div>
       )}
