@@ -105,6 +105,9 @@ interface PlanState {
   headcount: number;
   isDirty: boolean; // 자동 저장 감지
   newCardId: string | null; // 방금 추가돼 편집 모드로 열려야 하는 카드 id
+  // 아직 Ably에 올리지 않은(저장 전) 카드 id 목록.
+  // 수신한 서버 상태로 cards를 교체할 때 이 카드들이 지워지지 않도록 하는 데 쓴다.
+  draftCardIds: string[];
 
   // 타이틀 수신 전용 (Ably subscribe로부터 반영 — 여기서 push하면 에코 루프 발생)
   setTitle: (title: string) => void;
@@ -114,6 +117,7 @@ interface PlanState {
   setCards: (cards: PlanCardData[]) => void;
   addCard: (type: PlanCardType, day: string) => void;
   clearNewCard: () => void;
+  clearDrafts: () => void; // 계획 이탈 시 로컬 전용 draft 정리
   commitCard: (card: PlanCardData) => void; // draft의 첫 저장(확인) — 이때 Ably 생성
   discardCard: (id: string) => void; // draft 취소 — 로컬에서만 제거
   updateCard: (updatedCard: PlanCardData) => void;
@@ -140,6 +144,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   headcount: 0,
   isDirty: false,
   newCardId: null,
+  draftCardIds: [],
 
   setTitle: (title) => set({ title }),
 
@@ -148,14 +153,37 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     pushTitle(title);
   },
 
-  // 수신(에코 포함)이 로컬 변경의 isDirty를 씻지 않도록 cards만 교체
-  setCards: (cards) => set({ cards }),
+  // 수신(에코 포함)이 로컬 변경의 isDirty를 씻지 않도록 cards만 교체.
+  // 단, 아직 서버에 올리지 않은 내 draft는 교체 대상에서 제외해 살려둔다.
+  // (draft는 로컬 전용이라 서버 상태로 통째 교체하면 작성 중이던 카드가 사라짐)
+  setCards: (cards) =>
+    set((state) => {
+      const serverIds = new Set(cards.map((c) => c.id));
+      const keptDrafts = state.cards.filter(
+        (c) =>
+          state.draftCardIds.includes(c.id) &&
+          // 저장 직후 에코처럼 서버에도 생긴 카드는 서버 버전이 이겨야 한다
+          !serverIds.has(c.id),
+      );
+
+      // 화면은 order로 정렬해 그리므로 뒤에 붙어도 표시 위치는 유지된다
+      return { cards: [...cards, ...keptDrafts] };
+    }),
   setStartDay: (start_day) => set({ start_day }),
   setEndDay: (end_day) => set({ end_day }),
   setBudget: (budget) => set({ budget }),
   setHeadcount: (headcount) => set({ headcount }),
 
   clearNewCard: () => set({ newCardId: null }),
+
+  // 계획 페이지를 벗어날 때 로컬 전용 draft를 정리한다.
+  // store가 모듈 스코프라 그대로 두면 다른 계획 화면까지 따라간다.
+  clearDrafts: () =>
+    set((state) => ({
+      cards: state.cards.filter((c) => !state.draftCardIds.includes(c.id)),
+      draftCardIds: [],
+      newCardId: null,
+    })),
 
   addCard: (type, day) => {
     // 해당 day의 맨 뒤에 붙도록 order 계산
@@ -181,7 +209,12 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     // newCardId로 표시해 PlanTimelineCard가 편집 모드로 열도록 함.
     // draft 단계에서는 Ably/DB에 반영하지 않음 (isDirty·push 없음) →
     // 취소 시 다른 참가자 화면에 빈 카드가 깜빡이지 않도록 저장(확인) 시점까지 미룸
-    set({ cards: [...cards, newCard], newCardId: newCard.id });
+    set((state) => ({
+      cards: [...cards, newCard],
+      newCardId: newCard.id,
+      // 저장 전까지는 로컬 전용이므로 draft로 등록
+      draftCardIds: [...state.draftCardIds, newCard.id],
+    }));
   },
 
   // draft를 확정 저장: 로컬 반영 + 이 시점에 Ably에 처음 생성
@@ -189,6 +222,8 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     set((state) => ({
       cards: state.cards.map((c) => (c.id === card.id ? card : c)),
       isDirty: true,
+      // 서버에 생겼으므로 더 이상 draft가 아님
+      draftCardIds: state.draftCardIds.filter((id) => id !== card.id),
     }));
 
     pushCardCreate(card);
@@ -198,6 +233,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   discardCard: (id) => {
     set((state) => ({
       cards: state.cards.filter((c) => c.id !== id),
+      draftCardIds: state.draftCardIds.filter((draftId) => draftId !== id),
     }));
   },
 

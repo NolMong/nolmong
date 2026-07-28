@@ -120,13 +120,24 @@ export default function PlanTimelineCard({
   // 체크리스트 상태
   const [checklists, setChecklists] = useState(data.checklistItems || []);
 
-  // 조회 모드-체크박스 토글
+  // 체크박스 토글
   const toggleCheck = (id: string) => {
-    setChecklists((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, checked: !item.checked } : item,
-      ),
+    // 편집 중에는 로컬 편집본만 바꾸고 "확인" 시점에 저장한다
+    if (isEditing) {
+      setChecklists((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, checked: !item.checked } : item,
+        ),
+      );
+      return;
+    }
+
+    // 조회 모드의 체크박스는 편집 폼이 아니라 즉시 반영되는 조작으로 취급한다.
+    // 최신 data를 기준으로 갱신해 저장하면 Ably 전파 → data 갱신 → 화면 반영으로 이어진다.
+    const updatedItems = (data.checklistItems || []).map((item) =>
+      item.id === id ? { ...item, checked: !item.checked } : item,
     );
+    onUpdate?.({ ...data, checklistItems: updatedItems });
   };
 
   // 수정 모드-체크리스트 항목 텍스트 변경
@@ -147,6 +158,16 @@ export default function PlanTimelineCard({
   // 수정 모드-체크리스트 항목 삭제
   const handleRemoveChecklistItem = (id: string) => {
     setChecklists((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // 편집을 열 때마다 폼을 최신 data로 업데이트
+  const handleEditStart = () => {
+    setEditStartTime(data.times?.[0] || "");
+    setEditEndTime(data.times?.[1] || "");
+    setEditCost(data.expense !== undefined ? String(data.expense) : "");
+    setEditMemo(data.desc || "");
+    setChecklists(data.checklistItems || []);
+    setIsEditing(true);
   };
 
   const handleSave = () => {
@@ -180,6 +201,15 @@ export default function PlanTimelineCard({
     setIsEditing(false);
   };
 
+  const handleDelete = () => {
+    // 방금 추가한(저장 전) 카드는 삭제 시 로컬에서만 제거
+    if (isDraft) {
+      discardCard(data.id);
+      return;
+    }
+    onDelete?.(data.id);
+  };
+
   return (
     <div
       ref={setRefs}
@@ -207,8 +237,8 @@ export default function PlanTimelineCard({
             data={data}
             isEditing={isEditing}
             isDnd={isDnd}
-            onEditStart={() => setIsEditing(true)}
-            onDelete={onDelete}
+            onEditStart={handleEditStart}
+            onDelete={handleDelete}
           />
 
           <PlanCardBody
