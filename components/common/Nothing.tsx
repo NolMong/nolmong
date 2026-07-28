@@ -14,7 +14,7 @@ export default function Nothing({
   return (
     <div
       className={`flex justify-center items-center text-muted ${textSize}`}
-      style={{ width: width || '100%', height: height || 'h-full' }}
+      style={{ width: width || '100%', height: height || '100%' }}
     >
       {text || '장소가 없습니다.'}
     </div>

@@ -54,7 +54,7 @@ export default function DayCard({
       >
         <div className='h-full flex flex-col gap-2 overflow-y-scroll scrollbar-thin'>
           {places.length === 0 ? (
-            <Nothing text='장소가 없습니다.' />
+            <Nothing text='장소가 없습니다.' height='100%' />
           ) : (
             places.map((place) => <PlaceCard key={place.id} place={place} />)
           )}

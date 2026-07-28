@@ -49,6 +49,18 @@
 
   /* 가만히 있어도 옆으로 흐르는 마퀴(marquee) 애니메이션 */
   --animate-marquee: marquee 10s linear infinite;
+
+  /* 구름이 위아래로 둥실거리는 애니메이션 */
+  --animate-float: float 4s ease-in-out infinite;
+
+  /* 캐릭터가 발밑을 축으로 까딱까딱 끄덕이는 애니메이션 */
+  --animate-nod: nod 2.5s ease-in-out infinite;
+
+  /* 캐릭터가 흥얼거리며 좌우로 스윙하는 애니메이션 */
+  --animate-hum: hum 1.6s ease-in-out infinite;
+
+  /* 마운트 시 부드럽게 나타나는 페이드인 */
+  --animate-fade-in: fade-in 0.7s ease-out both;
 }
 
 @keyframes marquee {
@@ -57,6 +69,53 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(-50%);
+  }
+  50% {
+    transform: translateY(calc(-50% - 12px));
+  }
+}
+
+@keyframes nod {
+  0%,
+  100% {
+    transform: translateY(-50%) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-50%) rotate(4deg);
+  }
+}
+
+@keyframes hum {
+  0%,
+  100% {
+    transform: translateY(-50%) rotate(-3deg);
+  }
+  25% {
+    transform: translateY(calc(-50% - 4px)) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50%) rotate(3deg);
+  }
+  75% {
+    transform: translateY(calc(-50% - 4px)) rotate(0deg);
+  }
+}
+
+/* 마운트 시 부드럽게 나타나는 페이드인 (opacity만 다뤄서 float/hum/nod 같은
+   transform 애니메이션과 같이 써도 서로 안 부딪힘) */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
