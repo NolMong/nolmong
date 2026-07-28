@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { deletePlan } from '@/api/deletePlan';
 import { useMemo } from 'react';
 import { ProfileAvatar } from '@/components';
+import { MemberProfileList } from '../common/MemberProfileList';
 
 const Locations = ({
   startLocation,
@@ -161,26 +162,11 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
           ></Locations>
 
           {/* 프로필 리스트 */}
-          <div className="flex items-center pl-2">
-            {data?.members && data.members.length > 0 ? (
-              data.members.map((member, index) => {
-                const type = member.features?.[0];
-                const theme = member.features?.[1];
-
-                return (
-                  <ProfileAvatar
-                    key={member.id || index}
-                    size={28}
-                    type={type}
-                    theme={theme}
-                    className={index > 0 ? '-ml-3' : ''}
-                  />
-                );
-              })
-            ) : (
-              <ProfileAvatar size={28} />
-            )}
-          </div>
+          <MemberProfileList
+            members={data?.members}
+            size={28}
+            overlapMargin="-ml-3"
+          />
         </div>
         {/* 가는 날짜 */}
         <div className="flex gap-1.5 text-sm text-main mt-2">
