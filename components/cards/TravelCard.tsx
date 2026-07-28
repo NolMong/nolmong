@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dayjs from 'dayjs';
 import { X } from 'lucide-react';
-import { Tag, ProfileAvatar } from '@/components';
+import { Tag } from '@/components';
 import { CardType, PlanType } from '@/api/getPlans';
 import { deletePlan } from '@/api/deletePlan';
 import { MemberProfileList } from '../common/MemberProfileList';
