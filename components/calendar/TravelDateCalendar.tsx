@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { Calendar } from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import './travel_calendar.css';
+import { useEffect, useRef, useState } from "react";
+import { Calendar } from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import "./travel_calendar.css";
 
 const MONTHS_LOAD_STEP = 6;
 const INITIAL_MONTHS_AHEAD = 12;
 
 function formatDateKey(date: Date) {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -30,18 +30,18 @@ function getExistingTravelClassNames(
   for (const travel of travels) {
     if (!travel) continue;
 
-    if (typeof travel === 'string') {
+    if (typeof travel === "string") {
       if (dateKey === travel) {
-        classNames.add('existing-start');
-        classNames.add('existing-end');
+        classNames.add("existing-start");
+        classNames.add("existing-end");
       }
       continue;
     }
 
-    if (dateKey === travel.start_day) classNames.add('existing-start');
-    if (dateKey === travel.end_day) classNames.add('existing-end');
+    if (dateKey === travel.start_day) classNames.add("existing-start");
+    if (dateKey === travel.end_day) classNames.add("existing-end");
     if (dateKey > travel.start_day && dateKey < travel.end_day) {
-      classNames.add('existing-between');
+      classNames.add("existing-between");
     }
   }
 
@@ -63,12 +63,12 @@ export default function TravelDateCalendar({
 }) {
   // new Date()를 render 중에 바로 쓰면 서버(UTC)와 클라이언트(KST) 타임존이 달라
   // 자정 근처에 날짜가 어긋나 hydration mismatch가 나서, null로 시작해 클라이언트에서만 채운다
-  console.log('DEBUG TravelDateCalendar render', {
-    startDay,
-    endDay,
-    oneDayTrip,
-    travels,
-  });
+  // console.log('DEBUG TravelDateCalendar render', {
+  //   startDay,
+  //   endDay,
+  //   oneDayTrip,
+  //   travels,
+  // });
   const [today, setToday] = useState<Date | null>(null);
 
   const [monthsAhead, setMonthsAhead] = useState(INITIAL_MONTHS_AHEAD);
@@ -82,7 +82,7 @@ export default function TravelDateCalendar({
 
   // 처음 열리면 이번달이 맨 위(중심)에 오도록 스크롤
   useEffect(() => {
-    currentMonthRef.current?.scrollIntoView({ block: 'start' });
+    currentMonthRef.current?.scrollIntoView({ block: "start" });
   }, [today]);
 
   // 아래로 스크롤하면 다음 달들을 계속 이어서 로드
@@ -96,7 +96,7 @@ export default function TravelDateCalendar({
           setMonthsAhead((prev) => prev + MONTHS_LOAD_STEP);
         }
       },
-      { rootMargin: '400px' },
+      { rootMargin: "400px" },
     );
     observer.observe(target);
     return () => observer.disconnect();
@@ -122,7 +122,7 @@ export default function TravelDateCalendar({
     }
 
     if (!startDay || (startDay && endDay) || dateKey < startDay) {
-      onChange({ startDay: dateKey, endDay: '' });
+      onChange({ startDay: dateKey, endDay: "" });
       return;
     }
 
@@ -133,50 +133,50 @@ export default function TravelDateCalendar({
     const dateKey = formatDateKey(date);
     const classNames = getExistingTravelClassNames(dateKey, travels ?? []);
 
-    if (dateKey === startDay) classNames.add('travel-start');
-    if (dateKey === endDay) classNames.add('travel-end');
+    if (dateKey === startDay) classNames.add("travel-start");
+    if (dateKey === endDay) classNames.add("travel-end");
     if (
-      !classNames.has('travel-start') &&
-      !classNames.has('travel-end') &&
+      !classNames.has("travel-start") &&
+      !classNames.has("travel-end") &&
       startDay &&
       endDay &&
       dateKey > startDay &&
       dateKey < endDay
     ) {
-      classNames.add('travel-between');
+      classNames.add("travel-between");
     }
 
-    return classNames.size > 0 ? Array.from(classNames).join(' ') : null;
+    return classNames.size > 0 ? Array.from(classNames).join(" ") : null;
   };
 
   return (
-    <div className='travel-date-calendar h-full overflow-y-auto scrollbar-thin flex flex-col gap-8'>
+    <div className="travel-date-calendar h-full overflow-y-auto scrollbar-thin flex flex-col gap-8">
       {months.map((monthDate, i) => {
         const isCurrentMonth =
           monthDate.getFullYear() === thisMonth.getFullYear() &&
           monthDate.getMonth() === thisMonth.getMonth();
         return (
           <div key={i} ref={isCurrentMonth ? currentMonthRef : undefined}>
-            <div className='text-sub text-lg text-center font-medium py-2 mb-2'>
+            <div className="text-sub text-lg text-center font-medium py-2 mb-2">
               {monthLabel(monthDate)}
             </div>
             <Calendar
               activeStartDate={monthDate}
-              calendarType='gregory'
-              locale='ko-KR'
+              calendarType="gregory"
+              locale="ko-KR"
               showNavigation={false}
-              minDetail='month'
-              maxDetail='month'
+              minDetail="month"
+              maxDetail="month"
               formatDay={(_locale, date) => String(date.getDate())}
               onClickDay={handleClickDay}
               tileClassName={({ date, view }) =>
-                view === 'month' ? getTileClassName(date) : null
+                view === "month" ? getTileClassName(date) : null
               }
             />
           </div>
         );
       })}
-      <div ref={bottomRef} className='h-1' />
+      <div ref={bottomRef} className="h-1" />
     </div>
   );
 }

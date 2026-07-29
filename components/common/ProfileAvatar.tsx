@@ -14,7 +14,7 @@ const themeStyles: Record<ProfileTheme, string> = {
   green: 'bg-primary-light border-primary',
   pink: 'bg-pink-light border-pink',
   caramel: 'bg-caramel-light border-caramel',
-  brown: 'bg-border border-muted',
+  brown: 'bg-moca-light border-moca',
 };
 
 interface ProfileAvatarProps extends React.HTMLAttributes<HTMLDivElement> {

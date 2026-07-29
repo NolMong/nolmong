@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from "@/lib/supabase/client";
 
 export async function updateSupabaseTitle({
   data,
@@ -6,13 +6,13 @@ export async function updateSupabaseTitle({
   data: { planId: string; title: string };
 }) {
   const supabase = createClient();
-  console.log('updateSupabaseTitle called with data:', data);
+  // console.log('updateSupabaseTitle called with data:', data);
   const { data: result, error } = await supabase
-    .from('plans')
+    .from("plans")
     .update({ title: data.title })
-    .eq('uuid', data.planId);
+    .eq("uuid", data.planId);
   if (error) {
-    console.error('계획 수정 실패:', error.message);
+    console.error("계획 수정 실패:", error.message);
     return { data: null, error };
   }
   return { data: result, error: null };

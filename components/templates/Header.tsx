@@ -3,7 +3,11 @@
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { MainButton, LoginModal } from '@/components';
-import { ProfileAvatar, ProfileEditModal } from '@/components';
+import {
+  ProfileAvatar,
+  ProfileEditModal,
+  PlanMemberAvatars,
+} from '@/components';
 import { useLoginModalStore } from '@/store/useModalStore';
 import {
   useUserStore,
@@ -157,6 +161,8 @@ export default function Header() {
               {user ? (
                 // 로그인 상태
                 <>
+                  {/* 계획 페이지에서만 — 지금 같이 접속 중인 참여자들 */}
+                  {isPlanPage && <PlanMemberAvatars className="mr-1" />}
                   <div
                     className="cursor-pointer hover:opacity-90 transition-opacity"
                     onClick={() => setIsEditModalOpen(true)}

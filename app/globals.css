@@ -15,6 +15,8 @@
   --color-caramel-light: #fff7e6;
   --color-brown: #4b3f36;
   --color-brown-light: #6f655e;
+  --color-moca: #906744;
+  --color-moca-light: #BA916D;
 
   /* ===== Text & Border & Shadow ===== */
   /* text- 접두사를 중복 유발하는 이름 대신 직관적인 컬러명으로 변경 */
@@ -71,6 +73,7 @@
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-50%);
   }
@@ -80,20 +83,24 @@
    Tailwind v4에서 translate는 transform과 별개 CSS 속성이라 여기서 transform만
    다뤄도 서로 안 부딪히고 그대로 합쳐진다 */
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-12px);
   }
 }
 
 @keyframes nod {
+
   0%,
   100% {
     transform: rotate(-4deg);
   }
+
   50% {
     transform: rotate(4deg);
   }
@@ -101,16 +108,19 @@
 
 /* scale만 다뤄서(transform 아님) 발자국에 준 회전용 rotate-* 클래스와 안 부딪힘 */
 @keyframes footstep {
+
   0%,
   8% {
     opacity: 0;
     scale: 0.6;
   }
+
   20%,
   60% {
     opacity: 1;
     scale: 1;
   }
+
   75%,
   100% {
     opacity: 0;
@@ -119,16 +129,20 @@
 }
 
 @keyframes hum {
+
   0%,
   100% {
     transform: rotate(-3deg);
   }
+
   25% {
     transform: translateY(-4px) rotate(0deg);
   }
+
   50% {
     transform: rotate(3deg);
   }
+
   75% {
     transform: translateY(-4px) rotate(0deg);
   }
@@ -140,6 +154,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
