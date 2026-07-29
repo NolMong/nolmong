@@ -5,6 +5,7 @@ export { default as MainButton } from './common/MainButton';
 export { default as Tag } from './common/Tag';
 export { default as LocationTag } from './common/LocationTag';
 export { default as ProfileAvatar } from './common/ProfileAvatar';
+export { default as PlanMemberAvatars } from './common/PlanMemberAvatars';
 export { default as Nothing } from './common/Nothing';
 
 // cards
