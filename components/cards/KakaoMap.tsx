@@ -97,8 +97,12 @@ interface KakaoMapProps {
   markers?: KakaoMapMarker[];
   /** 지도 인스턴스가 생성된 직후 호출 (장소 검색 등에 사용) */
   onMapLoad?: (map: kakao.maps.Map) => void;
-  /** 마커 클릭 시 오버레이 안에 렌더링할 커스텀 콘텐츠 (없으면 이름/주소 기본 표시) */
-  renderMarkerContent?: (marker: KakaoMapMarker) => ReactNode;
+  /** 마커 클릭 시 오버레이 안에 렌더링할 커스텀 콘텐츠 (없으면 이름/주소 기본 표시).
+   *  closeOverlay로 오버레이를 직접 닫을 수 있다 (예: 일정 추가 후 카드 닫기) */
+  renderMarkerContent?: (
+    marker: KakaoMapMarker,
+    closeOverlay: () => void,
+  ) => ReactNode;
 }
 
 // 부산역 기본 위치
@@ -319,13 +323,13 @@ export default function KakaoMap({
 
         // render()가 비동기로 처리되면 setMap()이 아직 이전(빈) DOM 기준으로
         // 오버레이 크기/클릭 영역을 계산해버려서, 렌더을 동기로 강제한다
+        const closeOverlay = () => overlayRef.current?.setMap(null);
+
         flushSync(() => {
           overlayRootRef.current!.render(
-            <MarkerOverlayContent
-              onClose={() => overlayRef.current?.setMap(null)}
-            >
+            <MarkerOverlayContent onClose={closeOverlay}>
               {renderMarkerContent ? (
-                renderMarkerContent(marker)
+                renderMarkerContent(marker, closeOverlay)
               ) : (
                 <DefaultMarkerContent marker={marker} />
               )}

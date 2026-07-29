@@ -306,11 +306,14 @@ export default function PlanDetailsTab() {
             cards={cards}
             currentDay={currentDay}
             markers={markers}
-            renderMarkerContent={(marker) =>
+            renderMarkerContent={(marker, closeOverlay) =>
               marker.data ? (
                 <SearchResultCard
                   data={marker.data}
-                  onAddPlace={handleAddPlace}
+                  onAddPlace={(result, day) => {
+                    handleAddPlace(result, day);
+                    closeOverlay();
+                  }}
                   onSelect={handleSelectPlace}
                 />
               ) : null
