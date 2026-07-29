@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import ProfileAvatar from "./ProfileAvatar";
 import { usePresenceStore } from "@/store/usePresenceStore";
 import { cn } from "@/lib/utils";
@@ -40,13 +40,23 @@ export default function PlanMemberAvatars({
   return (
     <div className={cn("flex items-center shrink-0", className)}>
       {others.map((member, index) => (
-        <ProfileAvatar
+        <div
           key={member.userId}
-          size={size}
-          type={member.character}
-          theme={member.theme}
-          className={index > 0 ? overlapMargin : ""}
-        />
+          className={cn("relative group", index > 0 ? overlapMargin : "")}
+        >
+          <ProfileAvatar
+            size={size}
+            type={member.character}
+            theme={member.theme}
+          />
+          <div
+            className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap
+            rounded-lg bg-black/80 px-4 py-2.5 mt-1 text-sm font-medium text-white shadow-lg backdrop-blur-sm
+            opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            {member.name}
+          </div>
+        </div>
       ))}
     </div>
   );
