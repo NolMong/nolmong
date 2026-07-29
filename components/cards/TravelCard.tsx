@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import dayjs from 'dayjs';
-import { X } from 'lucide-react';
-import { Tag } from '@/components';
-import { CardType, PlanType } from '@/api/getPlans';
-import { deletePlan } from '@/api/deletePlan';
-import { MemberProfileList } from '../common/MemberProfileList';
-import { getRelativeTime } from '@/utils/getRelativeTime';
-import { getRandomInt } from '@/utils/getRandomInt';
-import { locations } from '@/data/locations';
-import { isPastEndDay } from '@/utils/isPastEndDay';
+import { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import dayjs from "dayjs";
+import { X } from "lucide-react";
+import { Tag } from "@/components";
+import { CardType, PlanType } from "@/api/getPlans";
+import { deletePlan } from "@/api/deletePlan";
+import { MemberProfileList } from "../common/MemberProfileList";
+import { getRelativeTime } from "@/utils/getRelativeTime";
+import { getRandomInt } from "@/utils/getRandomInt";
+import { locations } from "@/data/locations";
+import { isPastEndDay } from "@/utils/isPastEndDay";
 
 const Locations = ({
   startLocation,
@@ -26,7 +26,7 @@ const Locations = ({
       loc.options.find((c) => c.city === location),
     );
     const city = foundLocation?.options.find((c) => c.city === location);
-    return city ? city.eng : '';
+    return city ? city.eng : "";
   };
 
   return (
@@ -59,7 +59,7 @@ interface TravelCardProps {
 }
 
 export default function TravelCard({ data, onLeave }: TravelCardProps) {
-  console.log(data);
+  // console.log(data);
 
   // 서버와 클라이언트가 각자 다른 랜덤값을 렌더링하면 hydration mismatch가 나서,
   // 서버에서는 null로 두고 마운트 후(클라이언트에서만) 값을 채운다
@@ -87,7 +87,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
     // day 별로 그룹화
     const groupedByDay = cards.reduce<Record<string, CardType[]>>(
       (acc, card: CardType) => {
-        const dayKey = card.day || 'day-1';
+        const dayKey = card.day || "day-1";
         if (!acc[dayKey]) acc[dayKey] = [];
         acc[dayKey].push(card);
         return acc;
@@ -97,10 +97,10 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
 
     // day 키 정렬
     const sortedDays = Object.keys(groupedByDay)
-      .filter((dayKey) => dayKey !== 'day-0' && dayKey !== 'day0')
+      .filter((dayKey) => dayKey !== "day-0" && dayKey !== "day0")
       .sort((a, b) => {
-        const numA = parseInt(a.replace(/[^0-9]/g, ''), 10) || 0;
-        const numB = parseInt(b.replace(/[^0-9]/g, ''), 10) || 0;
+        const numA = parseInt(a.replace(/[^0-9]/g, ""), 10) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, ""), 10) || 0;
         return numA - numB;
       });
 
@@ -116,8 +116,8 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
 
           // Day-1 형식으로 변환
           const dayLabel = dayKey
-            .replace('day-', 'Day ')
-            .replace('day', 'Day ');
+            .replace("day-", "Day ")
+            .replace("day", "Day ");
 
           return (
             <div key={dayKey} className="inline-flex items-center mr-6">
@@ -138,7 +138,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
     if (!data) return;
 
     const confirmLeave = window.confirm(
-      `'${data.title || '계획'}' 방에서 나가시겠습니까?\n방에서 나가면 나의 계획 목록에서 제외됩니다.`,
+      `'${data.title || "계획"}' 방에서 나가시겠습니까?\n방에서 나가면 나의 계획 목록에서 제외됩니다.`,
     );
 
     if (!confirmLeave) return;
@@ -146,11 +146,11 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
     const { error } = await deletePlan(data.id);
 
     if (error) {
-      alert('방에서 나가는 도중 오류가 발생했습니다.');
+      alert("방에서 나가는 도중 오류가 발생했습니다.");
       return;
     }
 
-    alert('계획에서 나갔습니다.');
+    alert("계획에서 나갔습니다.");
     if (onLeave) {
       onLeave(data.id); // 부모에게 나간 plan.id 전달
     }
@@ -163,7 +163,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
       {/* 카드 헤더 */}
       <div className="w-full px-3.5 py-2 bg-primary-light flex justify-between">
         <div className="text-[12px] text-muted">
-          No. {data ? dayjs(data.created_at).format('YYYYMMDDHHmmssms') : ''}
+          No. {data ? dayjs(data.created_at).format("YYYYMMDDHHmmssms") : ""}
         </div>
 
         <X
@@ -178,7 +178,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
         {/* 목적지와 누구 */}
         <div className="w-full flex justify-between items-start z-1">
           <Locations
-            startLocation={data?.start_location || ''}
+            startLocation={data?.start_location || ""}
             endLocations={data?.end_locations || []}
           ></Locations>
 
@@ -192,19 +192,19 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
         {/* 가는 날짜 */}
         <div className="flex gap-1.5 text-sm text-main mt-2">
           <div className="z-1">
-            {dayjs(data?.start_day).format('YYYY년 MM월 DD일')}
+            {dayjs(data?.start_day).format("YYYY년 MM월 DD일")}
           </div>
           <div className="z-1">‣</div>
-          <div className="z-1">{dayjs(data?.end_day).format('MM월 DD일')}</div>
+          <div className="z-1">{dayjs(data?.end_day).format("MM월 DD일")}</div>
         </div>
         {/* 여행 제목 */}
-        <div className="relative mt-4 text-muted z-1">{data?.title || ''}</div>
+        <div className="relative mt-4 text-muted z-1">{data?.title || ""}</div>
       </div>
       {/* 들르는 장소 */}
       <div className="w-full px-3.5 py-2 bg-primary-light overflow-hidden z-1">
         <div className="flex w-max group-hover:animate-marquee">
           <div className="text-[12px] text-muted whitespace-nowrap pr-8">
-            {hasValidWaypoints ? renderedWaypoints : '아직 일정이 없습니다.'}
+            {hasValidWaypoints ? renderedWaypoints : "아직 일정이 없습니다."}
           </div>
           {hasValidWaypoints && (
             <div
@@ -220,7 +220,7 @@ export default function TravelCard({ data, onLeave }: TravelCardProps) {
       {/* 언제 바꿨는지 & 수정버튼 */}
       <div className="w-full px-3.5 py-1.5 bg-[#FEFFFD] flex items-center justify-between">
         <div className="text-[12px] text-muted whitespace-nowrap">
-          최근 편집 : {data ? getRelativeTime(data.updated_at) : ''}
+          최근 편집 : {data ? getRelativeTime(data.updated_at) : ""}
         </div>
         <Link
           href={`/plan/${data?.uuid}?tab=WISHLIST`}

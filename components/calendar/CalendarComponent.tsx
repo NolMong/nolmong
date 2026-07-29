@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { Calendar } from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import './custom_calendar.css';
-import type { TravelEntry } from '@/types/calendar';
+import { Calendar } from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import "./custom_calendar.css";
+import type { TravelEntry } from "@/types/calendar";
 
 function formatDateKey(date: Date) {
-  console.log('formatDateKey', date);
+  // console.log('formatDateKey', date);
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
-const TRAVEL_START_CLASS = 'travel-start';
-const TRAVEL_END_CLASS = 'travel-end';
-const TRAVEL_BETWEEN_CLASS = 'travel-between';
+const TRAVEL_START_CLASS = "travel-start";
+const TRAVEL_END_CLASS = "travel-end";
+const TRAVEL_BETWEEN_CLASS = "travel-between";
 
 function getTravelTileClassName(
   date: Date,
@@ -29,7 +29,7 @@ function getTravelTileClassName(
   for (const travel of travels) {
     if (!travel) continue;
 
-    if (typeof travel === 'string') {
+    if (typeof travel === "string") {
       if (dateKey === travel) {
         classNames.add(TRAVEL_START_CLASS);
         classNames.add(TRAVEL_END_CLASS);
@@ -44,7 +44,7 @@ function getTravelTileClassName(
     }
   }
 
-  return classNames.size > 0 ? Array.from(classNames).join(' ') : null;
+  return classNames.size > 0 ? Array.from(classNames).join(" ") : null;
 }
 
 export default function CalendarComponent({
@@ -63,14 +63,14 @@ export default function CalendarComponent({
 
   return (
     <Calendar
-      calendarType='gregory'
-      locale='ko-KR'
-      className={['font-jalnan', 'main-calendar']}
+      calendarType="gregory"
+      locale="ko-KR"
+      className={["font-jalnan", "main-calendar"]}
       formatDay={(_locale, date) => String(date.getDate())}
       tileClassName={({ date, view }) =>
-        view === 'month' ? getTravelTileClassName(date, travels) : null
+        view === "month" ? getTravelTileClassName(date, travels) : null
       }
-      tileDisabled={({ view }) => view === 'month'}
+      tileDisabled={({ view }) => view === "month"}
     />
   );
 }
