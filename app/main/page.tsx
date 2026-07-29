@@ -278,28 +278,28 @@ function MainPageContent() {
               alt='Cloud Image'
               width={200}
               height={100}
-              className='absolute top-[6%] left-[46%] w-[15%] h-auto -translate-y-1/2 animate-float [animation-delay:0s]'
+              className='absolute top-[26%] left-[46%] w-[15%] h-auto -translate-y-1/2 animate-float [animation-delay:0s]'
             />
             <Image
               src='/images/cloud4.png'
               alt='Cloud Image'
               width={200}
               height={100}
-              className='absolute top-[31%] right-[21%] w-[11%] h-auto -translate-y-1/2 animate-float [animation-delay:0.6s] [animation-duration:4.6s]'
+              className='absolute top-[46%] right-[21%] w-[11%] h-auto -translate-y-1/2 animate-float [animation-delay:0.6s] [animation-duration:4.6s]'
             />
             <Image
               src='/images/cloud5.png'
               alt='Cloud Image'
               width={200}
               height={100}
-              className='absolute top-[50%] left-[5%] w-[8%] h-auto -translate-y-1/2 animate-float [animation-delay:1.2s] [animation-duration:4.2s]'
+              className='absolute top-[58%] left-[5%] w-[8%] h-auto -translate-y-1/2 animate-float [animation-delay:1.2s] [animation-duration:4.2s]'
             />
             <Image
               src='/images/cloud2.png'
               alt='Cloud Image'
               width={200}
               height={100}
-              className='absolute top-[50%] left-[30%] w-[8%] h-auto -translate-y-1/2 animate-float [animation-delay:0.3s] [animation-duration:3.8s]'
+              className='absolute top-[56%] left-[30%] w-[8%] h-auto -translate-y-1/2 animate-float [animation-delay:0.3s] [animation-duration:3.8s]'
             />
           </button>
         </div>
