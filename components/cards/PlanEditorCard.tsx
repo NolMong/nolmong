@@ -1,7 +1,7 @@
 'use client';
 
 import { SquareMenu, CheckSquare, Replace } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -46,6 +46,15 @@ export default function PlanEditorCard({
   // 짧은 시간 안에 휠 이벤트가 여러 번 들어와도 Day가 한 번에 여러 칸
   // 넘어가지 않도록 마지막 전환 시각을 기억해 잠깐 무시한다
   const lastDayChangeRef = useRef(0);
+  // 리스트 끝에 닿은 상태에서 스크롤을 살짝만 굴려도 바로 넘어가지 않도록,
+  // 같은 방향으로 누적된 deltaY가 이 값을 넘어야 옆 Day로 이동한다
+  const WHEEL_THRESHOLD = 180;
+  const wheelAccumRef = useRef(0);
+  // Day가 바뀌면(휠 넘김/화살표/필터 클릭 등 원인 무관) 카드 리스트를 맨 위로 되돌린다
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    scrollContainerRef.current?.scrollTo({ top: 0 });
+  }, [dayNumber]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -64,10 +73,31 @@ export default function PlanEditorCard({
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 1;
     const atTop = el.scrollTop <= 0;
 
-    if (e.deltaY > 0 && atBottom && onNextDay) {
+    const scrollingPastBottom = e.deltaY > 0 && atBottom;
+    const scrollingPastTop = e.deltaY < 0 && atTop;
+
+    // 끝에 닿지 않은 상태로 되돌아오면 누적치를 리셋
+    if (!scrollingPastBottom && !scrollingPastTop) {
+      wheelAccumRef.current = 0;
+      return;
+    }
+
+    // 방향이 바뀌면(예: 끝까지 내렸다가 다시 올림) 누적치를 리셋
+    if (
+      (scrollingPastBottom && wheelAccumRef.current < 0) ||
+      (scrollingPastTop && wheelAccumRef.current > 0)
+    ) {
+      wheelAccumRef.current = 0;
+    }
+
+    wheelAccumRef.current += e.deltaY;
+
+    if (wheelAccumRef.current > WHEEL_THRESHOLD && onNextDay) {
+      wheelAccumRef.current = 0;
       lastDayChangeRef.current = Date.now();
       onNextDay();
-    } else if (e.deltaY < 0 && atTop && onPrevDay) {
+    } else if (wheelAccumRef.current < -WHEEL_THRESHOLD && onPrevDay) {
+      wheelAccumRef.current = 0;
       lastDayChangeRef.current = Date.now();
       onPrevDay();
     }
@@ -121,6 +151,7 @@ export default function PlanEditorCard({
         </div>
       </div>
       <div
+        ref={scrollContainerRef}
         className='flex flex-col flex-1 min-h-0 overflow-y-scroll scrollbar-thin pr-1'
         onWheel={handleWheel}
       >

@@ -1,14 +1,7 @@
 'use client';
 
-import React from 'react';
-import {
-  KakaoMap,
-  SearchResultCard,
-  PlaceCard,
-  MainButton,
-  Nothing,
-} from '@/components';
-import { useMemo, useRef, useState } from 'react';
+import { PlaceSearchMap, PlaceCard } from '@/components';
+import { useState } from 'react';
 import { usePlanStore } from '@/store/usePlanStore';
 import { loadSavedMapCenter, saveMapCenter } from '@/utils/kakaomap_utils';
 import { useMapModalStore } from '@/store/useModalStore';
@@ -27,7 +20,6 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Search, Hotel, MapPin, Newspaper, LocateFixed, X } from 'lucide-react';
 
 // 후보(장소 리스트) 카드는 day: 'day-0' 예약값으로 표현 (WishlistTab과 동일한 컨벤션)
 const CANDIDATE_DAY = 'day-0';
@@ -40,7 +32,7 @@ export default function MapModal() {
     closeStore,
   );
 
-  const { cards, updateCard, reorderCardsInDay } = usePlanStore();
+  const { cards, reorderCardsInDay } = usePlanStore();
 
   // 장소 리스트는 로컬 state가 아니라 cards에서 매번 파생시켜서, Ably로 들어오는
   // 변경(다른 참가자가 추가/삭제한 카드 등)도 그대로 반영되게 한다
@@ -59,118 +51,21 @@ export default function MapModal() {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
-  const mapRef = useRef<kakao.maps.Map | null>(null);
-  const placesServiceRef = useRef<kakao.maps.services.Places | null>(null);
-  // 최초 렌더에서 한 번만 읽으면 되므로 lazy initializer로 저장된 위치를 불러온다
-  // (없으면 undefined -> KakaoMap이 자기 기본값(부산역)을 씀)
-  const [savedCenter] = useState(loadSavedMapCenter);
-  const [keyword, setKeyword] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
-  const [searchResults, setSearchResults] = useState<
-    kakao.maps.services.PlacesSearchResultItem[]
-  >([]);
-
-  const markers = useMemo(
-    () =>
-      searchResults.map((result) => ({
-        id: result.id,
-        lat: Number(result.y),
-        lng: Number(result.x),
-        title: result.place_name,
-        address: result.road_address_name || result.address_name,
-        data: result,
-      })),
-    [searchResults],
-  );
-
   if (!rendered) return null;
 
-  const handleMapLoad = (map: kakao.maps.Map) => {
-    mapRef.current = map;
-    placesServiceRef.current = new window.kakao.maps.services.Places();
+  // MapModal 자신은 plan 페이지에 마운트된 채로 열고 닫힐 때마다 rendered만
+  // 토글되고 컴포넌트가 재마운트되지 않아서, useState로 한 번만 읽으면 이후
+  // 드래그로 저장한 값이 다음에 열 때 반영되지 않는다. 매번 새로 읽는다
+  const savedCenter = loadSavedMapCenter();
 
-    // 사용자가 지도를 옮기면(드래그 끝) 그 위치를 저장해서 다음에 열 때도 이어서 보이게 한다
-    window.kakao.maps.event.addListener(map, 'dragend', () => {
+  // 화면이 움직일 때마다(드래그, 검색으로 인한 panTo/setBounds, 줌 등) 위치를 저장해서
+  // 다음에 열 때도 이어서 보이게 한다. 'dragend'는 사용자가 직접 드래그할 때만 발생해서
+  // 검색 결과로 지도가 이동하는 경우를 놓치므로, 모든 이동이 끝났을 때 공통으로 발생하는
+  // 'idle'을 쓴다
+  const handleMapLoad = (map: kakao.maps.Map) => {
+    window.kakao.maps.event.addListener(map, 'idle', () => {
       const center = map.getCenter();
       saveMapCenter({ lat: center.getLat(), lng: center.getLng() });
-    });
-  };
-
-  const handleSelectPlace = (
-    result: kakao.maps.services.PlacesSearchResultItem,
-  ) => {
-    if (!mapRef.current) return;
-    mapRef.current.panTo(
-      new window.kakao.maps.LatLng(Number(result.y), Number(result.x)),
-    );
-  };
-
-  const moveMapToResults = (
-    results: kakao.maps.services.PlacesSearchResultItem[],
-  ) => {
-    if (!mapRef.current || results.length === 0) return;
-
-    if (results.length === 1) {
-      const result = results[0];
-      mapRef.current.panTo(
-        new window.kakao.maps.LatLng(Number(result.y), Number(result.x)),
-      );
-      return;
-    }
-
-    const bounds = new window.kakao.maps.LatLngBounds();
-    results.forEach((result) =>
-      bounds.extend(
-        new window.kakao.maps.LatLng(Number(result.y), Number(result.x)),
-      ),
-    );
-    mapRef.current.setBounds(bounds);
-  };
-
-  const runSearch = (searchKeyword: string) => {
-    if (!searchKeyword.trim() || !placesServiceRef.current) return;
-
-    setHasSearched(true);
-    placesServiceRef.current.keywordSearch(
-      searchKeyword,
-      (data, status) => {
-        if (status === window.kakao.maps.services.Status.OK) {
-          setSearchResults(data);
-          moveMapToResults(data);
-        } else {
-          setSearchResults([]);
-        }
-      },
-      mapRef.current ? { location: mapRef.current.getCenter() } : undefined,
-    );
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    runSearch(keyword);
-  };
-
-  const handleAddPlace = (
-    result: kakao.maps.services.PlacesSearchResultItem,
-    day: string = CANDIDATE_DAY,
-  ) => {
-    const category =
-      result.category_name.split(' > ').pop() || result.category_name;
-
-    const dayCards = cards.filter((c) => c.day === day);
-    const nextOrder =
-      dayCards.reduce((max, c) => Math.max(max, c.order ?? 0), 0) + 1;
-
-    updateCard({
-      id: crypto.randomUUID(),
-      day,
-      order: nextOrder,
-      type: 'PLACE',
-      name: result.place_name,
-      category,
-      address: result.road_address_name || result.address_name,
-      x: Number(result.x),
-      y: Number(result.y),
     });
   };
 
@@ -200,148 +95,13 @@ export default function MapModal() {
         className='bg-white rounded-lg flex shadow-[0px_4px_10px_0px_#525252] w-fit h-200 overflow-hidden'
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className={`flex flex-col h-full overflow-hidden transition-all duration-300 ease-out ${
-            hasSearched
-              ? 'w-70 px-2.5 pt-4 pb-2.5 opacity-100'
-              : 'w-0 px-0 py-0 opacity-0'
-          }`}
-        >
-          <div className='flex items-center justify-between  mb-4'>
-            <div className='font-jalnan-gothic text-sub w-60 text-lg'>
-              검색 결과
-            </div>
-            <X
-              size={24}
-              className='text-muted cursor-pointer'
-              onClick={() => {
-                setHasSearched(false);
-                setSearchResults([]);
-              }}
-            />
-          </div>
-          <div className='w-70 flex flex-col gap-2.5 overflow-y-auto scrollbar-thin h-full'>
-            {searchResults.length === 0 ? (
-              <Nothing text='검색 결과가 없습니다.' />
-            ) : (
-              searchResults.map((result) => (
-                <SearchResultCard
-                  key={result.id}
-                  data={result}
-                  onAddPlace={handleAddPlace}
-                  onSelect={handleSelectPlace}
-                />
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className='relative w-200 h-full '>
-          <div className=' w-[calc(100%-20px)] absolute top-2.5 left-2.5 z-10'>
-            <form
-              onSubmit={handleSearch}
-              className='group flex items-center gap-2.5 px-4 py-2.5 bg-white rounded-full border border-border focus-within:border-primary'
-            >
-              <button type='submit' className='shrink-0'>
-                <Search
-                  size={24}
-                  className='text-muted group-focus-within:text-primary'
-                />
-              </button>
-              <input
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder='검색'
-                className='w-full focus:outline-none'
-              />
-            </form>
-            <div className='flex gap-2 w-66 mt-2.5'>
-              <MainButton
-                variant='roundDefault'
-                style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
-                onClick={() => {
-                  setKeyword('맛집');
-                  runSearch('맛집');
-                }}
-              >
-                <Hotel
-                  size={14}
-                  color='var(--color-sub)'
-                  style={{ marginRight: '4px' }}
-                ></Hotel>
-                맛집
-              </MainButton>
-
-              <MainButton
-                variant='roundDefault'
-                style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
-                onClick={() => {
-                  setKeyword('카페');
-                  runSearch('카페');
-                }}
-              >
-                <MapPin
-                  size={14}
-                  color='var(--color-sub)'
-                  style={{ marginRight: '4px' }}
-                ></MapPin>
-                카페
-              </MainButton>
-
-              <MainButton
-                variant='roundDefault'
-                style={{ fontSize: '14px', flex: 1, width: 'fit-content' }}
-                onClick={() => {
-                  setKeyword('관광');
-                  runSearch('관광');
-                }}
-              >
-                <Newspaper
-                  size={14}
-                  color='var(--color-sub)'
-                  style={{ marginRight: '4px' }}
-                ></Newspaper>
-                관광
-              </MainButton>
-            </div>
-          </div>
-
-          <KakaoMap
-            className='flex-1 h-full '
-            center={savedCenter}
-            markers={markers}
-            onMapLoad={handleMapLoad}
-            renderMarkerContent={(marker, closeOverlay) =>
-              marker.data ? (
-                <SearchResultCard
-                  data={marker.data}
-                  onAddPlace={(result, day) => {
-                    handleAddPlace(result, day);
-                    closeOverlay();
-                  }}
-                  onSelect={handleSelectPlace}
-                />
-              ) : null
-            }
-          />
-          <MainButton
-            variant='roundDefault'
-            onClick={() => {
-              runSearch(keyword);
-            }}
-            style={{
-              position: 'absolute',
-              bottom: 20,
-              right: 20,
-              width: 40,
-              height: 40,
-              padding: 0,
-              zIndex: 50,
-            }}
-          >
-            <LocateFixed size={24} color='var(--color-sub)' />
-          </MainButton>
-        </div>
+        <PlaceSearchMap
+          className='flex h-full'
+          mapAreaClassName='relative w-200 h-full'
+          mapClassName='flex-1 h-full'
+          center={savedCenter}
+          onMapLoad={handleMapLoad}
+        />
         <div className='w-70 px-2.5 pt-4 pb-2.5 flex flex-col'>
           <div className='font-jalnan-gothic text-sub w-65 mb-4'>
             장소 리스트
