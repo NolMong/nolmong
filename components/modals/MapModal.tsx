@@ -96,6 +96,37 @@ export default function MapModal() {
     });
   };
 
+  const handleSelectPlace = (
+    result: kakao.maps.services.PlacesSearchResultItem,
+  ) => {
+    if (!mapRef.current) return;
+    mapRef.current.panTo(
+      new window.kakao.maps.LatLng(Number(result.y), Number(result.x)),
+    );
+  };
+
+  const moveMapToResults = (
+    results: kakao.maps.services.PlacesSearchResultItem[],
+  ) => {
+    if (!mapRef.current || results.length === 0) return;
+
+    if (results.length === 1) {
+      const result = results[0];
+      mapRef.current.panTo(
+        new window.kakao.maps.LatLng(Number(result.y), Number(result.x)),
+      );
+      return;
+    }
+
+    const bounds = new window.kakao.maps.LatLngBounds();
+    results.forEach((result) =>
+      bounds.extend(
+        new window.kakao.maps.LatLng(Number(result.y), Number(result.x)),
+      ),
+    );
+    mapRef.current.setBounds(bounds);
+  };
+
   const runSearch = (searchKeyword: string) => {
     if (!searchKeyword.trim() || !placesServiceRef.current) return;
 
@@ -105,6 +136,7 @@ export default function MapModal() {
       (data, status) => {
         if (status === window.kakao.maps.services.Status.OK) {
           setSearchResults(data);
+          moveMapToResults(data);
         } else {
           setSearchResults([]);
         }
@@ -197,6 +229,7 @@ export default function MapModal() {
                   key={result.id}
                   data={result}
                   onAddPlace={handleAddPlace}
+                  onSelect={handleSelectPlace}
                 />
               ))
             )}
@@ -278,11 +311,15 @@ export default function MapModal() {
             center={savedCenter}
             markers={markers}
             onMapLoad={handleMapLoad}
-            renderMarkerContent={(marker) =>
+            renderMarkerContent={(marker, closeOverlay) =>
               marker.data ? (
                 <SearchResultCard
                   data={marker.data}
-                  onAddPlace={handleAddPlace}
+                  onAddPlace={(result, day) => {
+                    handleAddPlace(result, day);
+                    closeOverlay();
+                  }}
+                  onSelect={handleSelectPlace}
                 />
               ) : null
             }
