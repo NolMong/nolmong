@@ -64,6 +64,50 @@
 ## 🧩 시스템 구조
 <img width="3256" height="2084" alt="image" src="https://github.com/user-attachments/assets/1c5c9b34-7581-43c7-8b07-4b93aaad8e47" />
 
+---
+
+## 💻 포팅 매뉴얼
+로컬 개발 환경에서 프로젝트를 구동하기 위한 설치 및 실행 가이드입니다.
+
+**1. 사전 요구사항**  
+프로젝트에 사용된 `Next.js 16` 스펙 구동을 위해 아래 버전 이상을 권장합니다.
+
+- **Node.js**: `v18.17.0` 이상 (v20.x / v22.x 권장)
+- **npm**: `v9.0.0` 이상 (v10.x 권장)
+
+**2. 저장소 클론**  
+터미널을 열고 프로젝트를 다운로드한 후 해당 디렉토리로 이동합니다.
+```bash
+git clone https://github.com/NolMong/nolmong.git
+cd NolMong
+```
+
+**3. 의존성 패키지 설치**  
+프로젝트 구동에 필요한 라이브러리를 설치합니다.
+```bash
+npm install
+```
+
+**4. 환경 변수 설정**  
+프로젝트 루트 디렉토리에 `.env.local` 파일을 생성하고 아래 형식에 맞추어 본인의 API 발급 키를 입력합니다.
+```bash
+# Kakao Map
+NEXT_PUBLIC_KAKAO_MAP_KEY=YOUR_KAKAO_MAP_KEY_HERE
+
+# Ably
+NEXT_PUBLIC_ABLY_API_KEY=YOUR_ABLY_API_KEY_HERE
+
+# SUPABASE
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL_HERE
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY_HERE
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY_HERE
+```
+
+**5. 개발 서버 실행**  
+로컬 개발 서버를 구동합니다.
+```bash
+npm run dev
+```
 
 ---
 
