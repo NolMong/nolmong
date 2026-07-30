@@ -10,12 +10,12 @@
 - **서비스명**: **NolMong(놀몽)**
 - **타겟**: 동반자와 함께 국내 여행 일정을 실시간으로 공동 기획하고자 하는 유저
 
-### 배경 및 문제 상황
+### 🔍 배경 및 문제 상황
 - 메신저와 지도 앱을 번갈아가며 계획해야하는 비효율적인 동선
 - 한 명만 모든 일정 계획을 떠맡게 되는 총대 구조
 - 복잡한 텍스트 중심 일정표로 인한 직관성 부족
 
-### 핵심 가치
+### 🌈 핵심 가치
  - **프론트엔드 극대화**: Supabase 및 Ably를 활용한 프론트엔드 단 중심의 Next 컴포넌트 설계 및 상태 관리 최적화
  - **실시간 인터랙티브 UI/UX**: 일행 간 실시간 편집 및 Kakao Maps 루트 동선 시각화 제공
 
@@ -109,7 +109,7 @@
 
 ---
 
-## 🌐 배포 웹사이트
+## 🔗 배포 웹사이트
 누르시면 배포 웹사이트로 이동하실 수 있습니다.  
 
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_Demo-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://nolmong.vercel.app/landing)
