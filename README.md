@@ -68,6 +68,14 @@
 ---
 
 ## 🚀 핵심 기능
+| 01. 여행 계획 생성·관리 | 02. 위시리스트 & 일정 편집 |
+| :---: | :---: |
+| <img width="1518" height="969" alt="image" src="https://github.com/user-attachments/assets/bf290451-09ac-42fd-9ed1-0f50b925656c" /> | <img width="1323" height="940" alt="image" src="https://github.com/user-attachments/assets/88dae22d-1933-4bdf-8716-99aa45ea0338" /> |
+| 장소, 날짜, 예산, 인원을 입력해 계획을 만들면 캘린더에서 여행 기간이 바로 표시되고 제목은 언제든 다시 고칠 수 있고, 여행을 그만두고 싶다면 방을 나갈 수도 있습니다. | 가고 싶은 곳을 day별로 드래그해서 정리하고, 지도에서 맛집·카페·관광지를 검색해 타임라인에 바로 담을 수 있습니다.
+추가적인 메모와 체크리스트도 남길 수 있어요. |
+| **03. 실시간 협업** | **04. 간편 로그인 & 초대** |
+| <img width="1284" height="902" alt="image" src="https://github.com/user-attachments/assets/95fe0823-4d06-4e74-a6df-8775920eea7d" /> | <img width="1648" height="969" alt="image" src="https://github.com/user-attachments/assets/e35ff504-cb5a-479c-b0bc-e8377c2db57f" /> |
+| 친구들과 같은 계획을 동시에 열어 카드, 제목, 날짜를 함께  편집할 수 있습니다. 누가 접속해 있는지, 어떤 카드를 만지고 있는지 실시간으로 보여서 헷갈리지 않습니다. | 카카오 계정으로 바로 로그인하고, 5문항 여행 성향 테스트로 나만의 카피바라 캐릭터와 테마 컬러를 받아보세요. 초대 링크로 들어온 친구도 자연스럽게 같은 계획에 합류해요. |
 
 ---
 
