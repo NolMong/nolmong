@@ -44,7 +44,7 @@
     </tr>
     <tr>
       <td align="center">Kakao Map api 연동, react-calendar custom css</td>
-      <td align="center">Kakao Map api 연동, react-calendar custom css</td>
+      <td align="center">Ably 실시간 동기화, 동시 편집 표시(Presence), 계획 상세 페이지 구현</td>
       <td align="center">Kakao Oauth 연동, 실시간 dnd 구현, 초대하기 구현, 스켈레톤 UI</td>
     </tr>
   </tbody>
